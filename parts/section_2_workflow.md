@@ -62,7 +62,7 @@ Paste-safe (plain characters, all lines under 90 columns).
 
 ```
               +---------------------------------------------+
-              | 1  CUSTOMER  (master record, CloudZoo ERP)  |
+              | 1  CUSTOMER  (master record, held in LIMS)  |
               +---------------------------------------------+
                                   |
                                   v

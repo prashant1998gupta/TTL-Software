@@ -23,8 +23,8 @@ downloaded from the foot of that page.
 | Document | For | Size |
 |---|---|---|
 | `index.html` — the visual guide, published at the link above | The Unit In-Charge. Start here. | ~20 min read |
-| `Silk Testing Laboratory System - Overview for the Lab.docx` | The laboratory, as a circulable Word file | 43,000 words |
-| `Silk Testing Laboratory System - Full Specification.docx` | The developer | 187,000 words, 1,278 requirements |
+| `Silk Testing Laboratory System - Overview for the Lab.docx` | The laboratory, as a circulable Word file | 44,000 words |
+| `Silk Testing Laboratory System - Full Specification.docx` | The developer | 191,000 words, 1,280 requirements |
 
 The overview is a strict subset of the full specification, so the two cannot disagree.
 The visual guide is one self-contained file: no external fonts, scripts or images, so it works offline,
@@ -92,7 +92,7 @@ An initial ten-point discussion note (reproduced verbatim in Appendix A) was exp
 specification. Domain facts were researched against 259 sources rather than assumed, and the
 research briefs in `parts/research_*.md` mark their own confidence — verified, inferred, or
 unverified. Where a fact could not be established, the document raises an **OPEN-Q** with a
-recommended default instead of asserting it. There are 110 such questions; five are answered.
+recommended default instead of asserting it. There are 110 such questions; seven are answered.
 
 The draft was then reviewed adversarially. 129 findings were raised, each serious one independently
 re-checked — 42 were rejected as misreadings and 73 confirmed and applied, followed by a second pass

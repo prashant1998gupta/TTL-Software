@@ -2,7 +2,7 @@
   "org": "Central Silk Board, Ministry of Textiles, Government of India",
   "unit": "Regional Silk Technological Research Station / Silk Conditioning & Testing House, Dharmavaram, Andhra Pradesh — under CSTRI, Bengaluru",
   "title": "Silk Testing Laboratory Management System",
-  "subtitle": "Software Requirements Specification — for build on / alongside CloudZoo ERP",
+  "subtitle": "Software Requirements Specification — for a standalone laboratory system",
   "docCode": "TTL-SRS-v1.0",
   "runningHead": "Silk Testing Laboratory Management System — Software Requirements Specification",
   "creator": "Prepared for Central Silk Board (CSTRI / RSTRS Dharmavaram)",
@@ -28,8 +28,8 @@
       "NABL accredited to ISO/IEC 17025:2017 in its own right — certificate NABLT0726AD18713, issued 17/07/2026, valid to 16/07/2030, in the name of the Central Silk Board. Compliance requirements are mandatory, not optional."
     ],
     [
-      "Host system",
-      "CloudZoo ERP (customer master, invoicing, inventory, assets). The laboratory system is a separate application integrated with it."
+      "System boundary",
+      "A standalone application. It holds its own customer master, tax invoice numbering, receipts, tax masters, customer ledger, consumable stock and working asset record. The general ledger and the procurement chain beyond the laboratory's indent stay with the unit's accounts wing. The interface to an external accounting system is specified but switched off, because the unit runs no such system."
     ],
     [
       "Review needed on",

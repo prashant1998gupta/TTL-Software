@@ -1,6 +1,6 @@
 ## 1. Purpose of this document
 
-This document is the build specification for a Laboratory Information Management System (LIMS) for the Regional Silk Technological Research Station (RSTRS) / Silk Conditioning and Testing House at Dharmavaram, Andhra Pradesh, a unit of the Central Silk Technological Research Institute (CSTRI) under the Central Silk Board (CSB). "Laboratory Information Management System" means the software that records who sent a sample, what tests were asked for, what the testers measured, who checked it, what certificate was issued, and what happened to the sample afterwards. The system will be built on and alongside CloudZoo ERP ("Enterprise Resource Planning" — the existing business software the implementing developer works with, which already provides customer records, invoicing, inventory and asset handling). This document defines the laboratory layer that sits on top of it.
+This document is the build specification for a Laboratory Information Management System (LIMS) for the Regional Silk Technological Research Station (RSTRS) / Silk Conditioning and Testing House at Dharmavaram, Andhra Pradesh, a unit of the Central Silk Technological Research Institute (CSTRI) under the Central Silk Board (CSB). "Laboratory Information Management System" means the software that records who sent a sample, what tests were asked for, what the testers measured, who checked it, what certificate was issued, and what happened to the sample afterwards. The system is a standalone application. It owns its own customer master, its own tax-invoice numbering, its own consumable stock records and its own equipment register, and it needs no other business software to run a day's work. The unit operates no external accounting system, so there is nothing for a laboratory layer to sit on top of. If one is ever adopted, the machinery for exchanging customers, invoices and stock movements with it is specified in M22 and delivered switched off. This document defines the whole application.
 
 The document is written to be read by two different people at the same time. **The scientist and Unit Incharge** should read Sections 1 to 6 (purpose, background, goals, roles, glossary, scope) and then the specific module sections that describe his own work — sample registration, result entry, approval, certificates, and the registers and returns the unit must produce. He should treat every item marked **OPEN-Q** as a question addressed directly to him: nothing in this document invents a fact about the lab that has not been confirmed. **The implementing developer** should read every section, and should treat the numbered requirements as the work list, the tables as the data definitions, and the acceptance checks as the tests to write. Where the document says [MUST], the system is not finished without it. Where it says [SHOULD], it is needed but can follow shortly. Where it says [LATER], it is deliberately deferred to a later phase and must not consume phase-1 effort.
 
@@ -119,9 +119,9 @@ The following are deliberately **not** part of this project. They are listed so 
 | # | Not doing | Why not |
 |---|---|---|
 | N1 | Payroll, salary, leave, attendance, service records, pension | Handled by departmental systems. No overlap with laboratory work. |
-| N2 | General financial accounting — ledgers, budgets, grants, expenditure heads, trial balance | CloudZoo ERP and the unit's accounts wing own this. The LIMS raises test invoices and records receipts; it does not keep the books. |
+| N2 | General financial accounting — ledgers, budgets, grants, expenditure heads, trial balance | The unit's accounts wing owns this, on whatever books it already keeps. The LIMS raises test invoices and records receipts; it does not keep the books. |
 | N3 | Procurement workflow — indent, sanction, tender, GeM purchase, purchase order approval | Existing government process. The LIMS records what stock arrived and what it was used for. |
-| N4 | Fixed-asset accounting, depreciation, condemnation committees, annual physical verification of assets | The LIMS holds the **metrological** equipment register (calibration, checks, status). The **financial** asset register stays where it is. Both exist; they are not the same register. |
+| N4 | Fixed-asset accounting, depreciation, condemnation committees, annual physical verification of assets | The LIMS holds the **metrological** equipment register — calibration, checks, status — and a working record of each instrument's purchase, cost and expected life, which calibration and traceability need. Fixed-asset accounting itself — capitalisation, depreciation, condemnation — belongs to the parent institute and the unit's accounts wing. Both records exist; they are not the same register. |
 | N5 | Research data analysis, statistical modelling, publication figures | Scientists use their own tools. The LIMS holds records; it is not an analysis package. |
 | N6 | Direct control of instruments — starting a test, setting a machine, driving a motor | Out of scope entirely and permanently. |
 | N7 | Automatic reading capture from instruments in phase 1 | Deferred. Manual entry, hardened with validation and printout attachment, is the phase-1 answer. File import is a later phase. See M6. |
@@ -233,7 +233,6 @@ Every term used anywhere in this document is defined here in one plain sentence.
 | **Challan** | The document evidencing that money has been credited into a government account through a bank (*chalān*). |
 | **Chop** | A field on the raw-silk grading certificate; understood locally to be the producer's or filature's trade mark stamped on books and bales. |
 | **Cleanness** | A raw-silk quality measure, expressed as a percentage, based on counting defects such as slugs and gouts on inspection panels and subtracting penalty points. |
-| **CloudZoo ERP** | The existing Enterprise Resource Planning software the developer works with, which already provides customer records, invoicing, inventory and asset handling, and on which this laboratory system is built. |
 | **Cohesion** | A raw-silk test measuring how many strokes of friction the thread withstands before its filaments open out; reported as a whole number of strokes. |
 | **Conditioned mass (conditioned weight, correct invoice mass)** | The trade weight of raw silk, calculated as its oven-dry weight plus exactly 11 per cent of that oven-dry weight. |
 | **Conditioning (commercial)** | The service of determining the conditioned mass of raw silk so that buyer and seller can settle on a neutral weight. |
@@ -252,6 +251,7 @@ Every term used anywhere in this document is defined here in one plain sentence.
 | **Enquiry** | A customer's question about what a test costs or whether the lab can do it, before any commitment is made. |
 | **eSign** | An Aadhaar-based electronic signature service that lets an individual sign a document online without holding any hardware. |
 | **Evenness** | A raw-silk quality measure based on counting variation stripes on wound inspection panels compared against official standard photographs. |
+| **External accounting system** | Any accounting or Enterprise Resource Planning (ERP) software outside this one that could hold customer records, invoices, stock or asset values. The unit operates none, so the LIMS holds that data itself; M22 specifies a generic interface to such a system and it is delivered switched off, in case the unit or CSB adopts one later. |
 | **Financial year (FY)** | In India, 1 April to 31 March; written in this document as 2026-27. |
 | **First-time-right** | The proportion of tests that are approved without ever being sent back to the tester for correction. |
 | **Frozen document** | The exact file that was issued to the customer, stored byte for byte with a fingerprint, so that a later change to a template can never alter what an auditor sees. |
@@ -355,20 +355,21 @@ Every term used anywhere in this document is defined here in one plain sentence.
 | **M19** | Notifications | Alerts and messages for staff and customers, with a delivery log. |
 | **M20** | Reports, Registers and Dashboards | The statutory registers, the monthly and annual return to headquarters, management dashboards and full data export. |
 | **M21** | Administration, Security and Audit | Users and roles, the audit trail, customer-identity masking, backups, retention policy and the system incident log. |
-| **M22** | Integration with CloudZoo ERP | Which system owns which data, how they exchange it, and the rule that each field has exactly one system of record. |
+| **M22** | Interface to an External Accounting System | Dormant: if the unit ever adopts such a system, which side owns which data, how the two exchange it, and the rule that each field has exactly one system of record. Specified now, delivered switched off. |
 
 ### 6.2 Out of scope for phase 1
 
 - **Automatic capture of readings from instruments.** Manual entry with strong validation and an attached instrument printout is the phase-1 answer. File import from a watched folder and serial capture from balances are later phases.
 - **Two-way integration with the national CSB online testing portal.** Test requests arriving from it are recorded with a source flag; no live interface is built.
+- **A live interface to an external accounting system.** The LIMS owns its customers, its tax invoices and its stock outright. M22 specifies the interface generically and it is delivered switched off, because there is no such system here to connect to.
 - **DigiLocker issuance of certificates.** Requires CSB headquarters sponsorship. The design keeps a stable document identifier and a machine-readable copy of each report so that it becomes configuration work later.
 - **Deployment at other CSB units.** Unit codes and per-unit configuration are built in so it is possible, but only Dharmavaram goes live.
 - **Multi-language user interface.** English internal screens. Telugu is required for customer-facing documents and messages only.
 - **Full workflow for trainings, demonstrations, awareness programmes and field visits.** Counts recorded for the headquarters return; no workflow.
 - **Payroll, leave, attendance and service records.**
-- **General financial accounting beyond test invoicing and receipts** — ledgers, budgets, expenditure heads and the trial balance stay with CloudZoo ERP and the accounts wing.
+- **General financial accounting beyond test invoicing and receipts** — ledgers, budgets, expenditure heads and the trial balance stay with the unit's accounts wing.
 - **Procurement workflow** — indent, sanction, tender, purchase order approval.
-- **Fixed-asset financial accounting, depreciation and condemnation.** The metrological equipment register is in scope; the financial asset register is not.
+- **Fixed-asset financial accounting, depreciation and condemnation.** The metrological equipment register is in scope, together with the working record of what each instrument cost, because calibration and traceability need it. The financial asset register, with its capitalisation and depreciation, belongs to the parent institute and the accounts wing.
 - **Research data analysis and statistical modelling for publications.**
 - **Any form of instrument control.**
 - **Mobile applications.** A browser interface that works acceptably on a tablet is sufficient; a native application is not built.

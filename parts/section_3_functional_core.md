@@ -246,7 +246,7 @@ The "Required at provisional save?" column exists so that the Mandatory column k
 | Relationship with laboratory staff declared | Yes / No + note | Yes | Default applies (No) | Default No | Impartiality flag; if Yes, alerts on allocation |
 | Is provisional (walk-in) | Yes / No | Auto | Auto (set Yes) | Set Yes when created with the short form | Clears when the full record is completed |
 | Is active | Yes / No | Yes | Default applies (Yes) | Default Yes | |
-| Linked host ERP customer identifier | Text | No | No | Must be unique if present | Link to the host ERP customer master |
+| Linked external accounting system customer identifier | Text | No | No | Must be unique if present | Empty today, because this system masters the customer; filled only if the optional M22 interface is ever switched on |
 | Remarks | Long text | No | No | — | Not printed |
 
 ### M1 rules and edge cases
@@ -260,9 +260,9 @@ The "Required at provisional save?" column exists so that the Mandatory column k
 7. **Method revision during an open job.** A job that has already started continues on the method revision it snapshotted. It is never silently migrated to the new revision. If the laboratory decides the job must be redone on the new revision, that is an explicit decision recorded as a repeat, not an edit.
 8. **Parameter plausibility limits are warnings, not blocks.** A genuinely unusual sample exists. The system warns loudly, requires the tester to confirm, and records the confirmation. It does not refuse the reading.
 9. **Deleting a reason code.** Never permitted. Deactivate only. Otherwise historic rejections lose their explanation.
-10. **Duplicate customers already merged.** A merged-away customer identifier must continue to resolve (redirect) forever, because barcode labels, old acknowledgement slips and the host ERP may still carry it.
+10. **Duplicate customers already merged.** A merged-away customer identifier must continue to resolve (redirect) forever, because barcode labels, old acknowledgement slips and the unit's own paper registers may still carry it.
 11. **Numbering across a financial year boundary.** A sample received on 31 March and reported on 2 April takes its sample number from the closing year's series and its report number from the opening year's series. Both are correct; the system must not attempt to make them match.
-12. **Two masters at risk of silent divergence with the host ERP.** Customer and Consumable Item. For each field, exactly one system must be the source of truth, and the other must be read-only for that field. The recommended split is: the host ERP owns customer identity, tax identifiers and financial terms; the laboratory system owns concession category, confidentiality flags, consents and laboratory-specific notes.
+12. **Two masters to watch if an external accounting system ever arrives.** Customer and Consumable Item. There is no such system at this unit, so this system masters both outright: every field on the customer record above, and every field on the consumable item, is entered, edited and read here. If the parent body ever mandates an accounting system for the unit, the rule from that day is that for each field exactly one system is the source of truth and the other is read-only for that field, and the recommended split then is that the accounting system takes customer identity, tax identifiers and financial terms while this system keeps concession category, confidentiality flags, consents and laboratory-specific notes. The rule is recorded now, while it is dormant, because a split of this kind is far easier to agree before the data exists than after several years of it. See M22 and OPEN-Q-T8.
 
 ---
 

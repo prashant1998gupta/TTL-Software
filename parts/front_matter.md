@@ -41,7 +41,7 @@ Eleven further modules were added that the original note did not mention: sample
 
 ## What we need from you before coding starts
 
-The specification contains **110 questions marked OPEN-Q**, of which seven have since been answered, leaving **103 open**. The answered ones are marked where the question is raised, and the register shows the answer rather than a default. The rest carry a recommended default so that nothing is blocked while answers are pending. They are lettered by the part that raises them — OPEN-Q-A1 in Part A, OPEN-Q-T1 in the technical part, and so on. The full register is in Appendix B. These are the ones worth answering first, because the answers prevent the most rework.
+The specification contains **111 questions marked OPEN-Q**, of which seven have since been answered, leaving **104 open**. The answered ones are marked where the question is raised, and the register shows the answer rather than a default. The rest carry a recommended default so that nothing is blocked while answers are pending. They are lettered by the part that raises them — OPEN-Q-A1 in Part A, OPEN-Q-T1 in the technical part, and so on. The full register is in Appendix B. These are the ones worth answering first, because the answers prevent the most rework.
 
 | Question | Why it matters |
 |---|---|
@@ -52,6 +52,7 @@ The specification contains **110 questions marked OPEN-Q**, of which seven have 
 | Every existing paper form, register and report format | The system should print what the unit already prints. Please collect one filled example of each. |
 | The real daily volumes and the busiest hour | Decides the design of the batch entry screens. |
 | Who signs, who verifies, and who deputises when the signatory is away | Decides the permission matrix. |
+| Is a valid digital signature on the certificate enough, or does the quality system require long-term validation — a signature that can still be proved valid years after the signing certificate has expired? The Unit In-Charge has said verbally that a valid signature is what is needed; that is recorded as an assumption until the Quality Manager confirms it in writing. | Long-term validation cannot be done at the moment of issue: it needs the certifying authority's revocation service and a timestamping authority, both reached over the internet, and nothing on the report-issue path may call outside the laboratory network. So if the written answer is that long-term validation is required, it does not mean different software — it means the report is issued first and a separate timestamped copy is produced and kept afterwards, which is Phase 6 work. |
 | Whether the sample is returned, retained or disposed, and for how long | Decides the storage and disposal module. |
 
 ## What it takes to build

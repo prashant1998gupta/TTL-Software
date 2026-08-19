@@ -1,0 +1,20 @@
+{
+  "name": "ttl-lims-documents",
+  "version": "1.0.0",
+  "description": "Document component for the Dharmavaram silk testing LIMS",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "fontkit": "^2.0.4",
+    "harfbuzzjs": "^1.6.0",
+    "pdfkit": "^0.19.1"
+  },
+  "devDependencies": {
+    "pdfjs-dist": "^6.2.108"
+  }
+}

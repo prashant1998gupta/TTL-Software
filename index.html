@@ -196,6 +196,14 @@ footer{padding:44px 56px; background:#2a211c; color:rgba(255,255,255,.68); font-
 footer h4{color:#fff; font-size:17px; margin-bottom:10px}
 footer a{color:#e9b9a6}
 footer .cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:26px; max-width:1000px}
+footer .dl{display:flex; flex-direction:column; gap:9px; margin:0}
+footer .dl a{
+  display:block; padding:11px 14px; border-radius:10px; text-decoration:none;
+  background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16);
+  color:#fff; font-weight:600; font-size:14.5px; transition:.15s;
+}
+footer .dl a:hover{background:rgba(255,255,255,.14); border-color:#e9b9a6}
+footer .dl a small{display:block; font-weight:400; font-size:12.5px; color:rgba(255,255,255,.6); margin-top:3px}
 
 /* ---------- responsive ---------- */
 @media (max-width:1000px){
@@ -1111,9 +1119,13 @@ footer .cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1f
           strict subset of it, so the two cannot disagree.</p>
         </div>
         <div>
-          <h4>The companion documents</h4>
-          <p>Silk Testing Laboratory System &mdash; Full Specification (TTL&#8209;SRS&#8209;v1.0)<br>
-          Silk Testing Laboratory System &mdash; Overview for the Lab (TTL&#8209;BRIEF&#8209;v1.0)</p>
+          <h4>Download the documents</h4>
+          <p class="dl">
+            <a href="Silk%20Testing%20Laboratory%20System%20-%20Overview%20for%20the%20Lab.docx" download>&#8681;&nbsp; Overview for the Laboratory
+              <small>Word &middot; the same material as this page, to circulate on paper</small></a>
+            <a href="Silk%20Testing%20Laboratory%20System%20-%20Full%20Specification.docx" download>&#8681;&nbsp; Full Specification
+              <small>Word &middot; for the developer</small></a>
+          </p>
         </div>
         <div>
           <h4>Next step</h4>

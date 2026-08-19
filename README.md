@@ -11,16 +11,27 @@ obligations rather than good practice.
 
 This repository contains the **specification only**. No application code yet.
 
+## Read it online
+
+**https://prashant1998gupta.github.io/TTL-Software/**
+
+No download, no install — it opens in any browser, on a phone or a desktop. The Word documents can be
+downloaded from the foot of that page.
+
 ## The three documents
 
 | Document | For | Size |
 |---|---|---|
-| `Silk Lab System - Visual Guide.html` | The Unit In-Charge. Start here. | ~20 min read |
+| `index.html` — the visual guide, published at the link above | The Unit In-Charge. Start here. | ~20 min read |
 | `Silk Testing Laboratory System - Overview for the Lab.docx` | The laboratory, as a circulable Word file | 43,000 words |
 | `Silk Testing Laboratory System - Full Specification.docx` | The developer | 187,000 words, 1,278 requirements |
 
 The overview is a strict subset of the full specification, so the two cannot disagree.
-Open the visual guide in any browser — it is one self-contained file and needs no internet.
+The visual guide is one self-contained file: no external fonts, scripts or images, so it works offline,
+survives being emailed, and prints to PDF straight from the browser.
+
+`.nojekyll` is present because GitHub Pages otherwise runs Jekyll, which skips files beginning with an
+underscore. It makes Pages serve the repository verbatim.
 
 ## Building
 
@@ -30,7 +41,7 @@ bash build.sh
 ```
 
 Everything is generated from `parts/`. **Never edit the outputs** — `SPEC.md`, `BRIEF.md`,
-`parts/appendix.md`, the `.docx` files and the `.html` guide are all overwritten on every build.
+`parts/appendix.md`, the `.docx` files and `index.html` are all overwritten on every build.
 
 | Edit this | To change |
 |---|---|
@@ -69,7 +80,7 @@ make_appendix.py        derives the appendices from the assembled body
 make_brief.py           extracts the laboratory overview as a subset
 make_digest.py          builds review digests
 build_doc.js            markdown → Word
-build_guide.js          content → the visual guide
+build_guide.js          content → index.html, the published visual guide
 lint_spec.py            consistency checks
 fixes/, fixes2/         what the review found and what was changed
 review_*.json/.txt      the review audit trail
@@ -81,7 +92,7 @@ An initial ten-point discussion note (reproduced verbatim in Appendix A) was exp
 specification. Domain facts were researched against 259 sources rather than assumed, and the
 research briefs in `parts/research_*.md` mark their own confidence — verified, inferred, or
 unverified. Where a fact could not be established, the document raises an **OPEN-Q** with a
-recommended default instead of asserting it. There are 106 such questions; three are answered.
+recommended default instead of asserting it. There are 110 such questions; four are answered.
 
 The draft was then reviewed adversarially. 129 findings were raised, each serious one independently
 re-checked — 42 were rejected as misreadings and 73 confirmed and applied, followed by a second pass

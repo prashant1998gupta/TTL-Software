@@ -9,6 +9,8 @@ so they are checked here rather than spent on a reviewer's attention:
   * an open question referenced but never defined
   * a markdown table whose rows disagree on column count
   * a numbering-format example that does not match its own format string
+  * a question already marked ANSWERED that is still described as open, and a
+    stated count of open questions that disagrees with the document itself
 
 Usage: python lint_spec.py <spec.md>
 Exit status is 0 always; this reports, it does not gate.
@@ -156,6 +158,60 @@ def check_number_formats(lines):
     return problems
 
 
+# Phrases that assert a question is still open. Used only on lines that
+# reference a question already marked ANSWERED elsewhere.
+STILL_OPEN_RE = re.compile(
+    r"remains? open|still open|not yet (?:been )?answered|awaiting an answer"
+    r"|must be (?:answered|confirmed|settled)|to be (?:answered|confirmed|settled)"
+    r"|one question remains|should settle it in writing"
+    r"|working assumption is|rather than assumed",
+    re.IGNORECASE)
+
+# "**110 questions marked OPEN-Q**", and the optional breakdown that follows it.
+STATED_TOTAL_RE = re.compile(r"\*{0,2}(\d{1,4})\s+questions marked OPEN-Q")
+STATED_OPEN_RE = re.compile(r"leaving\s+\*{0,2}(\d{1,4})\s+open")
+
+
+def check_answered(lines, qdefined):
+    """
+    Two ways a settled question silently reverts to an open one.
+
+    (a) A question is marked ANSWERED at its definition, but some other passage
+        still tells the reader it is unresolved. This is what happens when an
+        answer lands in the body and the executive summary is not revisited.
+    (b) A passage states how many questions are open. That number is written by
+        hand and goes stale the moment a question is answered, so it is checked
+        against the document rather than trusted.
+    """
+    answered = set()
+    for num, line in enumerate(lines, 1):
+        stripped = line.strip()
+        m = QID_RE.search(stripped)
+        if m and re.search(r"\bANSWERED\b", stripped[:m.end() + 40]):
+            answered.add(m.group(1))
+
+    stale = []
+    for num, line in enumerate(lines, 1):
+        stripped = line.strip()
+        for m in QID_RE.finditer(stripped):
+            qid = m.group(1)
+            if qid in answered and num != qdefined.get(qid) and qid not in stripped[:m.start()]:
+                if STILL_OPEN_RE.search(stripped) and "ANSWERED" not in stripped:
+                    stale.append((num, qid, stripped[:110]))
+                    break
+
+    counts = []
+    n_answered = len(answered)
+    for num, line in enumerate(lines, 1):
+        m = STATED_TOTAL_RE.search(line)
+        if m and int(m.group(1)) != len(qdefined):
+            counts.append((num, "total", int(m.group(1)), len(qdefined)))
+        m2 = STATED_OPEN_RE.search(line)
+        if m2 and int(m2.group(1)) != len(qdefined) - n_answered:
+            counts.append((num, "open", int(m2.group(1)), len(qdefined) - n_answered))
+    return answered, stale, counts
+
+
 def main():
     path = sys.argv[1]
     lines = load(path)
@@ -164,10 +220,12 @@ def main():
     qdefined, qundefined, qdupes = check_questions(lines)
     tables = check_tables(lines)
     formats = check_number_formats(lines)
+    answered, stale_q, bad_counts = check_answered(lines, qdefined)
 
     print("SPEC LINT — %s" % path)
-    print("  lines %d | requirement ids defined %d | open questions defined %d"
-          % (len(lines), len(defined), len(qdefined)))
+    print("  lines %d | requirement ids defined %d | open questions defined %d (%d answered, %d open)"
+          % (len(lines), len(defined), len(qdefined), len(answered),
+             len(qdefined) - len(answered)))
     print()
 
     print("1. Requirement ids defined more than once: %d" % len(dupes))
@@ -200,6 +258,16 @@ def main():
     print("5. Numbering examples inconsistent with their format: %d" % len(formats))
     for num, fmt, example, why in formats[:15]:
         print("   L%-6d %s vs %s (%s)" % (num, fmt, example, why))
+    print()
+
+    print("6a. Answered questions still described as open: %d" % len(stale_q))
+    for num, qid, text in stale_q[:15]:
+        print("   L%-6d %-14s %s" % (num, qid, text))
+    print()
+
+    print("6b. Stated question counts that disagree with the document: %d" % len(bad_counts))
+    for num, kind, said, actual in bad_counts[:15]:
+        print("   L%-6d says %d %s, document has %d" % (num, said, kind, actual))
 
 
 if __name__ == "__main__":

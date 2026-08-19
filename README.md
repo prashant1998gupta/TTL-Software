@@ -56,14 +56,14 @@ first without an appendix present. `build.sh` handles this.
 ## Checking your work
 
 ```bash
-python lint_spec.py SPEC.md
+python3 lint_spec.py SPEC.md
 ```
 
 Reports duplicate requirement identifiers, references to identifiers that were never defined,
 open questions referenced but never defined, malformed table rows, and numbering examples that
 contradict their own format string. All five checks should report zero.
 
-`python _inspect.py <file.docx>` round-trips a generated Word file and reports heading levels,
+`python3 _inspect.py <file.docx>` round-trips a generated Word file and reports heading levels,
 table width agreement and whether the table-of-contents field is present.
 
 ## Repository layout
@@ -92,7 +92,7 @@ An initial ten-point discussion note (reproduced verbatim in Appendix A) was exp
 specification. Domain facts were researched against 259 sources rather than assumed, and the
 research briefs in `parts/research_*.md` mark their own confidence — verified, inferred, or
 unverified. Where a fact could not be established, the document raises an **OPEN-Q** with a
-recommended default instead of asserting it. There are 110 such questions; four are answered.
+recommended default instead of asserting it. There are 110 such questions; five are answered.
 
 The draft was then reviewed adversarially. 129 findings were raised, each serious one independently
 re-checked — 42 were rejected as misreadings and 73 confirmed and applied, followed by a second pass

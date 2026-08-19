@@ -10,23 +10,23 @@ export PYTHONIOENCODING=utf-8
 
 echo "== 1/7  assemble body (no appendix) =="
 rm -f parts/appendix.md
-python assemble.py parts SPEC_body.md
+python3 assemble.py parts SPEC_body.md
 
 echo
 echo "== 2/7  derive appendices from the body =="
-python make_appendix.py SPEC_body.md parts brother_doc_dump.txt parts/appendix.md
+python3 make_appendix.py SPEC_body.md parts brother_doc_dump.txt parts/appendix.md
 
 echo
 echo "== 3/7  assemble the full document =="
-python assemble.py parts SPEC.md
+python3 assemble.py parts SPEC.md
 
 echo
 echo "== 4/7  build the laboratory overview (a subset of the full document) =="
-python make_brief.py parts BRIEF.md
+python3 make_brief.py parts BRIEF.md
 
 echo
 echo "== 5/7  refresh review digests =="
-python make_digest.py SPEC.md digests
+python3 make_digest.py SPEC.md digests
 
 echo
 echo "== 6/7  render Word documents =="

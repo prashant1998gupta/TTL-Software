@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Silk Testing Laboratory System</title>
+<style>
+:root{
+  --ink:#1d1815; --ink-soft:#4a4038; --muted:#7a6f66;
+  --paper:#fbf8f3; --paper-2:#f4efe6; --card:#ffffff;
+  --silk:#8c1d2f; --silk-dk:#6b1523; --silk-lt:#f5e6e8;
+  --gold:#a8801a; --gold-lt:#fdf4e0;
+  --sage:#3f6146; --sage-lt:#eaf2ec;
+  --line:#e6ddd0; --line-2:#d3c7b6;
+  --shadow:0 1px 2px rgba(60,40,20,.05),0 8px 24px rgba(60,40,20,.06);
+  --radius:14px;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font:16.5px/1.65 var(--sans); -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--serif); font-weight:600; line-height:1.22; margin:0}
+p{margin:0 0 1em}
+strong{font-weight:650}
+a{color:var(--silk)}
+
+/* ---------- layout ---------- */
+.wrap{display:grid; grid-template-columns:250px minmax(0,1fr); gap:0; max-width:1400px; margin:0 auto}
+.rail{
+  position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto;
+  padding:32px 20px 40px; border-right:1px solid var(--line); background:var(--paper-2);
+}
+.rail .brand{font-family:var(--serif); font-size:15px; color:var(--silk); font-weight:600; line-height:1.3}
+.rail .brand small{display:block; font-family:var(--sans); font-size:11.5px; color:var(--muted); font-weight:400; margin-top:6px; letter-spacing:.02em}
+.rail nav{margin-top:26px; display:flex; flex-direction:column; gap:1px}
+.rail a{
+  display:flex; gap:9px; align-items:baseline; padding:7px 10px; border-radius:8px;
+  font-size:13.5px; color:var(--ink-soft); text-decoration:none; transition:.12s;
+}
+.rail a .num{font-size:11px; color:var(--muted); min-width:14px; font-variant-numeric:tabular-nums}
+.rail a:hover{background:#fff; color:var(--silk)}
+.rail a.on{background:var(--silk); color:#fff}
+.rail a.on .num{color:rgba(255,255,255,.6)}
+main{min-width:0; padding:0 0 100px}
+section{padding:64px 56px; border-bottom:1px solid var(--line); scroll-margin-top:0}
+section:nth-of-type(even){background:var(--paper-2)}
+.inner{max-width:940px}
+.wide{max-width:1120px}
+
+/* ---------- section heads ---------- */
+.eyebrow{
+  display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--silk); margin-bottom:12px;
+}
+h2{font-size:34px; letter-spacing:-.015em; margin-bottom:14px}
+.lede{font-size:19px; line-height:1.6; color:var(--ink-soft); max-width:70ch; margin-bottom:34px}
+h3{font-size:21px; margin:36px 0 12px}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(160deg,#7d1828 0%,#5d1220 55%,#3f0d17 100%); color:#fff; border:0; padding:76px 56px 64px}
+.hero .eyebrow{color:#e9b9a6}
+.hero h1{font-size:52px; letter-spacing:-.025em; margin-bottom:18px; max-width:20ch}
+.hero .sub{font-size:20px; line-height:1.55; color:rgba(255,255,255,.86); max-width:62ch; margin-bottom:34px}
+.hero .meta{display:flex; flex-wrap:wrap; gap:10px 26px; padding-top:26px; border-top:1px solid rgba(255,255,255,.18); font-size:13.5px; color:rgba(255,255,255,.72)}
+.hero .meta b{color:#fff; font-weight:600}
+.readfirst{
+  margin-top:30px; background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.16);
+  border-radius:var(--radius); padding:20px 22px; max-width:72ch;
+}
+.readfirst h4{font-size:15px; color:#fff; margin-bottom:8px; font-family:var(--sans); font-weight:650}
+.readfirst p{color:rgba(255,255,255,.82); font-size:14.5px; margin:0}
+
+/* ---------- stat strip ---------- */
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr)); gap:14px; margin:8px 0 6px}
+.stat{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow)}
+.stat .v{font-family:var(--serif); font-size:34px; color:var(--silk); line-height:1; letter-spacing:-.02em}
+.stat .l{font-size:12.5px; font-weight:650; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin:9px 0 7px}
+.stat .n{font-size:13px; color:var(--muted); line-height:1.5}
+
+/* ---------- generic cards ---------- */
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow)}
+.grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:16px}
+.grid3{display:grid; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); gap:14px}
+
+/* ---------- callouts ---------- */
+.note{border-left:3px solid var(--gold); background:var(--gold-lt); padding:16px 20px; border-radius:0 10px 10px 0; margin:22px 0; font-size:15px}
+.note.silk{border-color:var(--silk); background:var(--silk-lt)}
+.note.sage{border-color:var(--sage); background:var(--sage-lt)}
+.note b{display:block; margin-bottom:5px; font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--silk)}
+.note.sage b{color:var(--sage)} .note b.g{color:var(--gold)}
+
+/* ---------- journey ---------- */
+.journey{position:relative; margin-top:10px}
+.journey::before{content:""; position:absolute; left:19px; top:14px; bottom:14px; width:2px; background:linear-gradient(var(--silk),var(--gold))}
+.step{position:relative; padding:0 0 26px 58px}
+.step .dot{
+  position:absolute; left:0; top:0; width:40px; height:40px; border-radius:50%;
+  background:var(--silk); color:#fff; display:grid; place-items:center;
+  font-family:var(--serif); font-size:17px; box-shadow:0 0 0 5px var(--paper)
+}
+section:nth-of-type(even) .step .dot{box-shadow:0 0 0 5px var(--paper-2)}
+.step h4{font-size:19px; margin-bottom:6px}
+.step .who{
+  display:inline-block; font-size:11.5px; font-weight:650; letter-spacing:.04em; text-transform:uppercase;
+  color:var(--silk); background:var(--silk-lt); padding:3px 9px; border-radius:20px; margin-bottom:10px;
+}
+.step .mins{font-size:11.5px; color:var(--muted); margin-left:8px}
+.step p{margin-bottom:10px; color:var(--ink-soft)}
+.chip{display:block; font-size:14px; padding:11px 14px; border-radius:9px; margin-top:8px; line-height:1.55}
+.chip.sys{background:#eef3f7; border-left:3px solid #4a6b86}
+.chip.guard{background:var(--sage-lt); border-left:3px solid var(--sage)}
+.chip .k{font-weight:650; font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; display:block; margin-bottom:3px}
+.chip.sys .k{color:#3d5a73} .chip.guard .k{color:var(--sage)}
+
+/* ---------- change cards ---------- */
+.chg{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow)}
+.chg .hd{padding:18px 22px 14px; border-bottom:1px solid var(--line)}
+.chg .hd h4{font-size:19px}
+.chg .bd{padding:6px 22px 20px}
+.chg .row{padding:13px 0; border-bottom:1px dashed var(--line)}
+.chg .row:last-child{border:0}
+.chg .row .k{font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:4px}
+.chg .row.was .k{color:var(--muted)}
+.chg .row.now .k{color:var(--silk)}
+.chg .row.why .k{color:var(--gold)}
+.chg .row.eg{background:var(--paper-2); margin:10px -22px -20px; padding:14px 22px 18px; border:0}
+.chg .row.eg .k{color:var(--sage)}
+
+/* ---------- roles ---------- */
+.role{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; box-shadow:var(--shadow)}
+.role.key{border-color:var(--silk); border-width:1.5px}
+.role h4{font-size:16.5px; margin-bottom:8px; display:flex; align-items:center; gap:8px}
+.role .star{font-size:10px; background:var(--silk); color:#fff; padding:2px 7px; border-radius:20px; letter-spacing:.05em; font-family:var(--sans); font-weight:700}
+.role p{font-size:14.5px; margin-bottom:9px; color:var(--ink-soft)}
+.role .kv{font-size:13.5px; padding-top:9px; border-top:1px solid var(--line); color:var(--muted)}
+.role .kv b{color:var(--ink-soft)}
+.role .kv .no{color:var(--silk)}
+
+/* ---------- scope ---------- */
+table{width:100%; border-collapse:collapse; font-size:14.5px; background:var(--card); border-radius:10px; overflow:hidden; box-shadow:var(--shadow)}
+th{background:var(--silk); color:#fff; text-align:left; padding:11px 14px; font-size:12.5px; letter-spacing:.05em; text-transform:uppercase; font-weight:650}
+td{padding:11px 14px; border-top:1px solid var(--line); vertical-align:top}
+tr.hl td{background:var(--gold-lt); font-weight:600}
+.scopebar{display:flex; height:44px; border-radius:10px; overflow:hidden; margin:22px 0 10px; box-shadow:var(--shadow); font-size:12.5px; font-weight:650}
+.scopebar div{display:grid; place-items:center; color:#fff; text-align:center; padding:0 8px}
+.scopebar .in{background:var(--sage); flex:7}
+.scopebar .out{background:var(--silk); flex:93}
+
+/* ---------- decisions ---------- */
+.toolbar{display:flex; gap:10px; align-items:center; margin-bottom:20px; flex-wrap:wrap}
+.btn{
+  font:inherit; font-size:13.5px; font-weight:600; padding:8px 16px; border-radius:20px; cursor:pointer;
+  border:1px solid var(--line-2); background:var(--card); color:var(--ink-soft); transition:.15s;
+}
+.btn:hover{border-color:var(--silk); color:var(--silk)}
+.btn.on{background:var(--silk); border-color:var(--silk); color:#fff}
+.qgroup{margin-bottom:26px}
+.qgroup > h3{display:flex; align-items:center; gap:10px; margin:0 0 12px}
+.qgroup > h3 .cnt{font-family:var(--sans); font-size:12px; font-weight:650; color:var(--muted); background:var(--paper-2); border:1px solid var(--line); padding:2px 9px; border-radius:20px}
+.q{background:var(--card); border:1px solid var(--line); border-radius:11px; padding:16px 18px; margin-bottom:9px; box-shadow:var(--shadow)}
+.q.urgent{border-left:4px solid var(--silk)}
+.q .top{display:flex; gap:9px; align-items:baseline; flex-wrap:wrap; margin-bottom:7px}
+.q .id{font-size:11px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:var(--muted); background:var(--paper-2); padding:2px 7px; border-radius:5px}
+.q .flag{font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#fff; background:var(--silk); padding:2px 8px; border-radius:20px}
+.q .ask{font-size:16.5px; font-weight:600; line-height:1.45; margin-bottom:9px}
+.q .meta{font-size:13.5px; color:var(--muted); line-height:1.55}
+.q .meta div{margin-top:5px}
+.q .meta b{color:var(--ink-soft); font-weight:650}
+
+/* ---------- phases ---------- */
+.ph{display:grid; grid-template-columns:52px 1fr 108px; gap:16px; align-items:start; padding:16px 0; border-bottom:1px solid var(--line)}
+.ph:last-child{border:0}
+.ph .n{width:44px; height:44px; border-radius:11px; background:var(--paper-2); border:1px solid var(--line-2); display:grid; place-items:center; font-family:var(--serif); font-size:19px; color:var(--ink-soft)}
+.ph.live .n{background:var(--silk); border-color:var(--silk); color:#fff}
+.ph h4{font-size:17px; margin-bottom:5px}
+.ph.live h4::after{content:"GOES LIVE HERE"; font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:.07em; background:var(--gold); color:#fff; padding:2px 8px; border-radius:20px; margin-left:9px; vertical-align:2px}
+.ph p{font-size:14.5px; color:var(--ink-soft); margin:0}
+.ph .w{text-align:right; font-size:13.5px; color:var(--muted); white-space:nowrap; padding-top:3px}
+.ph .w b{display:block; font-family:var(--serif); font-size:21px; color:var(--silk); line-height:1.1}
+
+/* ---------- before/after ---------- */
+.ba{display:grid; grid-template-columns:1fr 34px 1fr; gap:0; align-items:stretch; margin-bottom:9px}
+.ba .t,.ba .a{padding:14px 16px; font-size:14.5px; line-height:1.55}
+.ba .t{background:#fff; border:1px solid var(--line); border-right:0; border-radius:10px 0 0 10px; color:var(--muted)}
+.ba .arrow{display:grid; place-items:center; background:var(--paper-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line); color:var(--silk); font-size:15px}
+.ba .a{background:var(--sage-lt); border:1px solid var(--line); border-left:0; border-radius:0 10px 10px 0; color:var(--ink)}
+.balabel{display:grid; grid-template-columns:1fr 34px 1fr; margin-bottom:8px; font-size:11.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--muted)}
+.balabel span:last-child{color:var(--sage)}
+
+/* ---------- footer ---------- */
+footer{padding:44px 56px; background:#2a211c; color:rgba(255,255,255,.68); font-size:14px}
+footer h4{color:#fff; font-size:17px; margin-bottom:10px}
+footer a{color:#e9b9a6}
+footer .cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:26px; max-width:1000px}
+
+/* ---------- responsive ---------- */
+@media (max-width:1000px){
+  .wrap{grid-template-columns:1fr}
+  .rail{position:static; height:auto; border-right:0; border-bottom:1px solid var(--line)}
+  .rail nav{flex-direction:row; flex-wrap:wrap; gap:6px}
+  .rail a{font-size:12.5px; padding:5px 11px; background:#fff; border:1px solid var(--line)}
+  section,.hero,footer{padding-left:24px; padding-right:24px}
+  .hero h1{font-size:36px}
+  h2{font-size:27px}
+  .ba,.balabel{grid-template-columns:1fr}
+  .ba .t{border-radius:10px 10px 0 0; border-right:1px solid var(--line); border-bottom:0}
+  .ba .a{border-radius:0 0 10px 10px; border-left:1px solid var(--line); border-top:0}
+  .ba .arrow{border-left:1px solid var(--line); border-right:1px solid var(--line); padding:2px}
+  .balabel{display:none}
+}
+
+/* ---------- print ---------- */
+@media print{
+  .rail,.toolbar,.noprint{display:none}
+  .wrap{display:block; max-width:none}
+  body{background:#fff; font-size:10.5pt}
+  section{padding:16pt 0; page-break-inside:auto; border-bottom:1px solid #ccc; background:#fff!important}
+  .hero{background:#fff!important; color:#000; padding:0 0 16pt}
+  .hero h1{color:var(--silk); font-size:26pt} .hero .sub,.hero .meta{color:#333}
+  .hero .meta{border-color:#ccc} .hero .meta b{color:#000}
+  .readfirst{background:#f4f4f4; border:1px solid #ccc} .readfirst h4,.readfirst p{color:#000}
+  .card,.chg,.role,.q,.stat{box-shadow:none; break-inside:avoid}
+  .step,.ph,.ba,.q{break-inside:avoid}
+  h2,h3,h4{break-after:avoid}
+  footer{background:#fff; color:#333; border-top:2px solid var(--silk)}
+  footer h4{color:#000} footer a{color:var(--silk)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="rail noprint">
+    <div class="brand">The Silk Testing Laboratory System<small>A visual guide for the Unit In-Charge</small></div>
+    <nav><a href="#top"><span class="num">&#9679;</span>Start here</a><a href="#facts"><span class="num">1</span>By the numbers</a><a href="#journey"><span class="num">2</span>Follow one lot</a><a href="#changes"><span class="num">3</span>What changed</a><a href="#roles"><span class="num">4</span>Who uses it</a><a href="#scope"><span class="num">5</span>Accredited scope</a><a href="#benefits"><span class="num">6</span>Before &amp; after</a><a href="#plan"><span class="num">7</span>The plan</a><a href="#decisions"><span class="num">8</span>Over to you</a></nav>
+  </aside>
+  <main>
+    
+<header class="hero" id="top">
+  <div class="inner">
+    <div class="eyebrow">Central Silk Board · CSTRI · RSTRS Dharmavaram</div>
+    <h1>The Silk Testing Laboratory System</h1>
+    <p class="sub">A system that knows where every sample is, who tested it, on which balance, in what room conditions, against which version of which method — and can prove all of it four years later.</p>
+    <div class="readfirst">
+      <h4>How to read this</h4>
+      <p>Read it top to bottom in about twenty minutes, or jump straight to <strong>Follow one lot</strong> to see the whole thing working on a real consignment. The last section, <strong>Over to you</strong>, is the only part that needs anything from you. Nothing here is technical, and nothing here is decided without you.</p>
+    </div>
+    <div class="meta">
+      <span><b>Prepared for</b> &nbsp;Shri Sanjeev Gupta, Scientist-D, Unit In-Charge</span><span><b>Laboratory</b> &nbsp;RSTRS / Silk Conditioning &amp; Testing House, Dharmavaram</span><span><b>Accreditation</b> &nbsp;NABL · ISO/IEC 17025:2017 · NABLT0726AD18713</span><span><b>Companion</b> &nbsp;TTL-SRS-v1.0, the full specification</span>
+    </div>
+  </div>
+</header>
+    
+<section id="facts">
+  <div class="inner wide">
+    <div class="eyebrow">By the numbers</div>
+    <h2>The figures that shaped every design decision</h2>
+    <p class="lede">Nothing here is invented. Each number comes from the laboratory's own published figures or from the
+     standards its work is governed by, and each one changed something about how the system is built.</p>
+    <div class="stats">
+      <div class="stat">
+        <div class="v">11,294</div>
+        <div class="l">Samples tested in 2021-22</div>
+        <div class="n">A screen that takes ninety seconds per sample cannot get through eleven thousand samples in a year, so fast batch entry of many lots of the same test is the first design rule, not a refinement.</div>
+      </div>
+      <div class="stat">
+        <div class="v">98%</div>
+        <div class="l">Share that is the Limited Test</div>
+        <div class="n">About 11,071 of those samples were the single ₹50 Limited Test, done in daily batches of ten to thirty lots, so that one path is the path the whole system is shaped around.</div>
+      </div>
+      <div class="stat">
+        <div class="v">₹67</div>
+        <div class="l">Average revenue per sample</div>
+        <div class="n">Revenue of ₹7,56,789 spread across 11,294 samples means clerical minutes cost more than the test earns, which is why the re-typing and re-totalling has to go before anything else.</div>
+      </div>
+      <div class="stat">
+        <div class="v">7</div>
+        <div class="l">Entries in the accredited scope</div>
+        <div class="n">Only one of the seven is raw silk (Raw Silk Yarn / Count / IS 15090 Part 5) and five are fabric tests, so most of what the unit sells falls outside the scope and the system must keep the accreditation symbol off those reports.</div>
+      </div>
+      <div class="stat">
+        <div class="v">80</div>
+        <div class="l">Sizing skeins weighed per lot</div>
+        <div class="n">For silk of 3.8 tex and above, eight sizing skeins of 112.5 m are reeled from each of ten bobbins and each is weighed on its own — forty for finer counts — so one lot's size deviation is eighty readings, not one.</div>
+      </div>
+      <div class="stat">
+        <div class="v">20</div>
+        <div class="l">Seriplane panels, three tests</div>
+        <div class="n">The same twenty panels wound from ten bobbins serve evenness, cleanness and neatness, so one physical piece has to be able to carry several results instead of being written down three times.</div>
+      </div>
+      <div class="stat">
+        <div class="v">11%</div>
+        <div class="l">Official regain for silk</div>
+        <div class="n">Conditioned mass is oven-dry mass plus eleven per cent, and because money changes hands on that final kilogram figure the constant is held as dated reference data rather than fixed inside the program.</div>
+      </div>
+      <div class="stat">
+        <div class="v">27 ± 2 °C</div>
+        <div class="l">Indian standard testing atmosphere</div>
+        <div class="n">With 65 ± 2 per cent relative humidity, this is the condition that winding, size, seriplane, serigraph and cohesion all require, so the room reading is captured beside the result and not left to memory.</div>
+      </div>
+      <div class="stat">
+        <div class="v">24 hours</div>
+        <div class="l">Pre-conditioning before a physical test</div>
+        <div class="n">The specimen must reach moisture equilibrium before it can be touched, which is why waiting time is counted separately from working time whenever the system reports turnaround.</div>
+      </div></div>
+  </div>
+</section>
+    
+<section id="journey">
+  <div class="inner">
+    <div class="eyebrow">Follow one lot</div>
+    <h2>From the counter to a signed certificate</h2>
+    <p class="lede">Most days the Dharmavaram counter takes in Limited Test lots by the dozen — winding, wrap-reeling, kilcha, denier, one deviation figure, fifty rupees. This is the longer journey, because it exercises everything: one full BIS grading lot, from the moment a broker sets two bales down on the counter to the moment a buyer in the market scans the code on the certificate and satisfies himself it is real. Every step below is the corrected workflow of the specification, walked through by one real consignment.</p>
+    <div class="note silk"><b>The consignment in this example</b>One BIS grading lot — 2 bales, 47 books, about 120 kg of multi-end reeled raw silk marked SLS-118, declared 20/22 denier, brought in for M/s Sri Lakshmi Silks, Regatipalli, by their broker Sri M. Naidu on Wednesday 19 August 2026.</div>
+     <div class="journey">
+       
+       <div class="step">
+         <div class="dot">1</div>
+         <h4>The request is taken</h4>
+         <div><span class="who">Front Desk clerk</span></div>
+         <p>Sri M. Naidu sets down two bales and says they are for Sri Lakshmi Silks. The clerk finds the mill by its mobile number rather than typing a name that already exists in the register in three spellings, and records Naidu separately as the sender. She writes the request: one lot, marked SLS-118, declared 20/22 denier, multi-end reeled, full BIS grading, balance of the lot to be returned, normal priority.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It keeps the paying customer and the man who carried the bales in two different places, and labels every declared figure &quot;declared by customer, not verified by the laboratory&quot;. It will not let the request be confirmed until the customer's consent is on record — a signed slip, a one-time password to the registered mobile, or an attached letter.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>The certificate can only ever be issued in the name of the mill that owns the silk, never in the broker's name, because the two were never allowed to share one field.</div>
+       </div>
+       <div class="step">
+         <div class="dot">2</div>
+         <h4>The request is reviewed</h4>
+         <div><span class="who">Unit Incharge</span></div>
+         <p>Before a single skein is touched, the Unit Incharge opens the request and confirms, test by test, that the laboratory can actually do what has been asked: the method is live, an instrument of each type is in calibration, somebody is authorised for it, and there is capacity this week. He records the outcome as Accept.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It runs that check itself and shows a red line against any test whose only instrument is out of calibration, or for which nobody holds a current authorisation. Accepting anyway is still possible, but only with a typed justification that stays on the record for good.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>No silk may be taken in, and no work started, against a request that has not been reviewed and accepted — the receipt screen refuses and names the missing review.</div>
+       </div>
+       <div class="step">
+         <div class="dot">3</div>
+         <h4>The bales are received</h4>
+         <div><span class="who">Sample Receipt Clerk</span></div>
+         <p>The two bales come across the counter at 10:40. The clerk records the date and time, the mode of receipt, the sender, 47 books and the gross weight. She works down the condition checklist — packing intact, seal intact, dry, marks legible, quantity matching the declaration. On bale 2 the wrapping is torn open along one edge and the seal is broken.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It records the weight together with the identity of the balance used and whether that balance's calibration was valid at that moment. It gives the lot its laboratory number, DVM/2026-27/RS/01204, on an acknowledgement slip — no label is printed yet, because the lot has not been accepted yet.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>The torn packing cannot be saved as a note alone: any adverse answer on the checklist demands a photograph with the sample number visible in the frame, which is the laboratory's own protection if this lot is ever disputed.</div>
+       </div>
+       <div class="step">
+         <div class="dot">4</div>
+         <h4>A doubt is settled</h4>
+         <div><span class="who">Sample Receipt Clerk, then Front Desk with the Unit Incharge</span></div>
+         <p>The clerk puts the lot into Doubt Raised, which stops everything. The Front Desk telephones Sri K. Ramesh at the mill, explains that bale 2's wrapping is torn and its seal broken, and records his instruction: proceed. The Unit Incharge accepts the lot with a recorded reservation, naming the tests a damaged wrapping could affect — and that same text will print as a caveat on the certificate.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It blocks all testing until the consultation is on record: the date, who spoke to whom, what was put to the customer and what the customer instructed. On acceptance it prints the lot's label, carrying the sample number, the due dates and the test short codes — and nowhere on it, the customer's name.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>A lot cannot leave Doubt Raised on somebody's memory of a phone call. Without the recorded instruction, no work can begin at all.</div>
+       </div>
+       <div class="step">
+         <div class="dot">5</div>
+         <h4>One order, nine tests</h4>
+         <div><span class="who">System</span></div>
+         <p>The order is one line on the rate card — Raw silk testing and grading, BIS, ₹400. The moment the lot is accepted, the system opens nine separate pieces of work against it: visual and tactual examination, winding, size deviation and maximum deviation, conditioned size, evenness, cleanness, neatness, tenacity and elongation, and cohesion. Each carries its own state, its own tester, its own instrument and its own due date.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It computes each due date from the moment of acceptance, counted in working hours from the laboratory's own calendar, and adds the method's mandatory 24 hours of pre-conditioning before it quotes any date to the customer.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>A promised date can never be quoted that quietly ignores the 24 hours the silk must sit in the conditioning room. The wait is part of the arithmetic, not something a person has to remember to allow for.</div>
+       </div>
+       <div class="step">
+         <div class="dot">6</div>
+         <h4>Specimens drawn and conditioned</h4>
+         <div><span class="who">Tester / Technical Assistant</span><span class="mins">24 hours</span></div>
+         <p>Ten skeins are drawn from the lot under the method's own draw rule and go into the conditioning room at 15:10 on the 19th, at 27 °C and 65 per cent relative humidity. They come out at 15:10 on the 20th. This is a genuine wait, not an administrative one.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It writes a conditioning register entry — start, end, which room, and the temperature and humidity through the period, with the source of every reading stated, whether sensor, logger export or the wall hygrometer. Each specimen keeps a permanent link back to the skein, the book and the bale it came from.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>The Start button on every conditioning-dependent test is refused until the 24 hours have actually elapsed, and it shows the earliest time work may begin.</div>
+       </div>
+       <div class="step">
+         <div class="dot">7</div>
+         <h4>A balance is refused</h4>
+         <div><span class="who">Section Head</span></div>
+         <p>The size work goes to Smt. P. Sujatha, who is authorised for IS 15090 (Part 5). The Section Head selects the quadrant balance DVM/EQ/021 for the weighing planned on the 21st. The system refuses it: that balance's calibration runs out on the 20th. He picks the other one, and the refusal stays on the record.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It checks competence and calibration against the planned test date, not against today — which is precisely the case a wall chart misses. It also checks that the named person is authorised for that method revision on that date, not merely that she holds the Tester role.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>Only the Unit Incharge may override either refusal, only with a reason from the controlled list, and the override opens a nonconformity by itself — so a gate that was overridden can never pass unnoticed.</div>
+       </div>
+       <div class="step">
+         <div class="dot">8</div>
+         <h4>Winding onto ten bobbins</h4>
+         <div><span class="who">Assigned Tester</span><span class="mins">about 70 minutes of machine time</span></div>
+         <p>The ten conditioned skeins are wound at fixed speed. Four threads break, and the tester records each break with its cause — two loose ends, one nib, one split. The winding leaves ten bobbins, and those ten bobbins are now the physical basis for nearly everything that follows: forty sizing skeins of 450 metres, twenty seriplane panels, ten test pieces for cohesion.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It records that the same ten bobbins feed the size, evenness, tenacity and cohesion work, and that the same twenty panels serve evenness, cleanness and neatness — so a later question about what was consumed, and by which test, has an answer.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>A break cannot be entered as a bare number. Each one needs its cause, because the standard requires break causes and their frequency to be stated on the certificate.</div>
+       </div>
+       <div class="step">
+         <div class="dot">9</div>
+         <h4>Forty sizing skeins weighed</h4>
+         <div><span class="who">Assigned Tester</span><span class="mins">twenty readings in under 90 seconds is the target, so roughly three minutes of typing for forty, apart from the weighing itself</span></div>
+         <p>Four sizing skeins of 450 metres are reeled from each of the ten bobbins, and each of the forty is weighed on its own. At around 21 denier a 450-metre skein weighs a little over a gram. On skein 27 the tester's finger slips and 10.7 goes in where 1.07 was meant.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It keeps forty individual readings, never an average in their place, each tied to the one sizing skein it came from and each carrying the balance used, the time, the person, and the temperature and humidity of the room. The running average and coefficient of variation update as he types, so 10.7 makes the average jump on the screen at once and raises a plausibility warning he must answer.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>The forty readings must resolve to four sizing skeins from each of ten bobbins. Forty readings that came from nine bobbins are refused at submission, with the mismatch named.</div>
+       </div>
+       <div class="step">
+         <div class="dot">10</div>
+         <h4>Twenty panels are judged</h4>
+         <div><span class="who">Assigned Tester</span></div>
+         <p>Two panels are wound from each bobbin, twenty in all, and read against the official standard photographs. Stripes are counted and sorted into evenness I, II and III. Cleanness defects are counted by class — on this lot, one major and six minor. Each panel is then rated for neatness.</p>
+         <div class="chip sys"><span class="k">What the system does</span>Cleanness is worked out from the weighted penalties rather than in the tester's head: one major at 0.4 per cent and six minors at 0.1 per cent each leaves 99.0 per cent. Low neatness is taken as the mean of the worst four panels of the twenty, because that is what the method says — not the mean of all twenty.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>Neatness is chosen from the standard photograph set — 100, 90, 80, 70, 60, 50, 30, 10 — and from nothing else. An 85 cannot be typed, because no such standard photograph exists.</div>
+       </div>
+       <div class="step">
+         <div class="dot">11</div>
+         <h4>Conditioned size in the oven</h4>
+         <div><span class="who">Assigned Tester</span></div>
+         <p>All forty sizing skeins go into the oven at 140 °C for the conditioned size. They are dried, weighed, dried again and weighed again. The conditioned size comes out at 21.34 denier against a marked 20/22 — a difference of roughly one and a half per cent.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It applies the official 11 per cent regain to the oven-dry mass itself, and it watches the drying: the run ends only when two successive weighings differ by no more than a quarter of one per cent. It then compares the conditioned size against the size marked on the bales.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>Had that difference exceeded 7 per cent either way, the system would have discarded every other test on this lot, created the repeat work automatically, and refused to let a certificate be built from the discarded run — which is what IS 15090 requires and what is easiest to overlook at four in the afternoon.</div>
+       </div>
+       <div class="step">
+         <div class="dot">12</div>
+         <h4>The numbers lock</h4>
+         <div><span class="who">System, then the Assigned Tester</span></div>
+         <p>Nobody types an average. From the forty weighings the system produces the average size of 21.34 denier, the size deviation of 1.12 denier, the maximum deviation of 2.8 denier taken from the four coarsest and four finest, and a coefficient of variation of 5.2 per cent. Cohesion comes out in whole strokes. The grade is computed — 3A from the major tests, lowered one class by the winding shortfall among the auxiliary tests, overall 2A. The tester presses Submit.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It shows the formula beside each figure, keeps every intermediate value, and prints the degrading arithmetic step by step, so a grade can be argued about with evidence rather than asserted. Rounding follows the method: two decimals for size deviation in denier, one for maximum deviation, whole numbers for cohesion strokes.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>After Submit the tester cannot change a reading. A correction is a fresh entry with a mandatory reason, and the original stays visible beside it — the same discipline as striking through, initialling and dating in the register, but impossible to skip.</div>
+       </div>
+       <div class="step">
+         <div class="dot">13</div>
+         <h4>Cohesion is sent back</h4>
+         <div><span class="who">Verifier — Sri B. Srinivas, Technical Assistant</span></div>
+         <p>The verifier works down a checklist already half-filled in for him: readings complete, balance in calibration at the time of test, method revision active, humidity in band, pre-conditioning done. On cohesion he stops. The tester's own note records a nib on test piece 6, and the method requires test pieces to be taken from portions free of such defects. He sends cohesion back with the reason &quot;specimen preparation questionable&quot;. It is re-prepared, re-run that afternoon, and verified.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It re-computes every figure from the raw readings on demand and blocks verification outright if anything comes out differently from what was stored. It counts the send-back against first-time-right, and it does not stop the clock, because a re-run is not extra time earned.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>The verifier has exactly two buttons — Verify, and Send back with a reason. He cannot touch a reading; if he could, the reading would no longer belong to the person who observed it. By default he must also not be the man who did the work, and where three staff make that impossible the exception is dated, justified and counted rather than silent.</div>
+       </div>
+       <div class="step">
+         <div class="dot">14</div>
+         <h4>The certificate is compiled</h4>
+         <div><span class="who">Report Writer</span></div>
+         <p>The nine verified results are compiled into a draft Grading Certificate, and every printed value is frozen at that moment. The draft carries a diagonal DRAFT — NOT FOR ISSUE watermark, no number, no code, no signature. The bale-2 caveat appears exactly as it was written at receipt, naming the results it may affect.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It checks the document against the accredited scope. Certificate NABLT0726AD18713 covers exactly seven entries, and only one of them is raw silk — Raw Silk Yarn / Count / IS 15090 (Part 5). Evenness, cleanness, neatness, cohesion, tenacity and winding all sit outside it.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>The system refuses to place the accreditation symbol or a Unique Laboratory Report number on a certificate carrying even one out-of-scope result, and it names the results responsible. Whether the count figure inside a grading order may be reported separately as accredited work is a question the specification deliberately leaves open, for the Quality Manager to answer in writing.</div>
+       </div>
+       <div class="step">
+         <div class="dot">15</div>
+         <h4>Authorised and signed</h4>
+         <div><span class="who">Unit Incharge, as Approving Authority</span></div>
+         <p>He opens the draft, satisfies himself of it, and signs. The document becomes DVM/GC/2026-27/00014, dated 25 August 2026, and can never again be edited by anyone, himself included — a mistake found later is corrected by an amendment or a replacement, never by a quiet change.</p>
+         <div class="chip sys"><span class="k">What the system does</span>In one action it confirms he is a declared signatory for every parameter on the document, allots the number, renders the file, takes its fingerprint, creates the verification code and the six-digit access code, and stores the exact bytes that were issued. A reprint in 2031 is the same file, letter for letter, whatever has happened since to the template or the letterhead.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>Signing demands his password again at the moment of signing — being logged in is not signing — and it is refused outright if he is not a declared signatory for even one parameter on the document.</div>
+       </div>
+       <div class="step">
+         <div class="dot">16</div>
+         <h4>Invoice and release</h4>
+         <div><span class="who">Accounts</span></div>
+         <p>The invoice is raised for the work actually done, at the rate in force on the request date: ₹400 for the BIS grading, plus tax. It is DVM/I/2627/00468. Sri Ramesh pays at the counter and takes the money receipt, and the despatch of the certificate is logged with the mode, the date and who received it.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It bills only tests that reached Verified — anything aborted through no fault of the customer never reaches the invoice at all. Whether an unpaid certificate is held back is a setting per unit, and the specification records honestly that the unit has not yet said how it should be set.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>A payment hold can block the issue of the document and nothing else. The verifier still verifies and the signatory still signs, because an unpaid bill must never be able to lean on a technical decision.</div>
+       </div>
+       <div class="step">
+         <div class="dot">17</div>
+         <h4>A buyer scans the code</h4>
+         <div><span class="who">Anyone holding the paper</span></div>
+         <p>A fortnight later a buyer at the market holds the certificate and scans the square on it with an ordinary phone. He gets a large banner: GENUINE — VALID. He sees the issuing laboratory, the certificate number and date, the sample number, the standard cited, a plain statement that the work was outside the accredited scope, and the customer's name masked. He sees not one measured value.</p>
+         <div class="chip sys"><span class="k">What the system does</span>The code carries a seal only this laboratory can produce, so the check works with no internet at all. Where there is no signal the page says so honestly — signature verified, amendment status could not be checked — rather than implying the certificate is still current when it cannot know.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>Results are never shown to an anonymous scan. A grade decides money in this cluster; to see it, the buyer needs the six-digit code printed on the paper, a one-time password to the mill's registered mobile, or a login of his own.</div>
+       </div>
+       <div class="step">
+         <div class="dot">18</div>
+         <h4>The silk goes home</h4>
+         <div><span class="who">Store Keeper</span></div>
+         <p>The forty sizing skeins, the twenty panels and the ten test pieces are gone, consumed in testing and recorded as consumed. The rest of the lot goes onto the retention shelf with a location and a date. In October Naidu comes to collect it and signs for it, and the handover is recorded with his name.</p>
+         <div class="chip sys"><span class="k">What the system does</span>It sets the retain-until date from the retention policy for raw silk and puts the lot on the retention list. It also knows honestly how much material is left, so a retest request against silk that no longer exists returns &quot;insufficient sample remaining&quot; instead of a promise nobody can keep.</div>
+         <div class="chip guard"><span class="k">The mistake it prevents</span>Nothing is ever disposed of by itself. Disposal needs the Unit Incharge's authorisation, a reason, a date and, where the material has value, a witness — and the retention period for raw silk is one of the settings the specification asks the unit to confirm rather than assume.</div>
+       </div>
+     </div>
+     <div class="note sage"><b>And afterwards</b>Certificate DVM/GC/2026-27/00014 reaches the customer six days after the bales came across the counter, carrying the grade, the degrading arithmetic that produced it, the bale-2 caveat, and a code anyone can check. The mill can hand it to a buyer, and the buyer can satisfy himself it is genuine without telephoning the laboratory or asking anyone's favour. The laboratory, meanwhile, can now answer in seconds and from any desk the questions a paper register could never answer: which balance weighed sizing skein 27, who checked the arithmetic and at what hour, why cohesion was run twice, and what the customer was told about bale 2 before the work began. And if that balance ever fails a calibration, the system can list every result and every certificate it ever touched — which is the difference between a filing cabinet and a laboratory that can defend its own work.</div>
+  </div>
+</section>
+    
+<section id="changes">
+  <div class="inner wide">
+    <div class="eyebrow">What changed</div>
+    <h2>Your ten points, and the six things we had to rethink</h2>
+    <p class="lede">The ten points were the right ten, and every one of them survives in the specification. The note put the customer record first, saw that each sample needs its own identity that can be followed through the building, and said plainly that the tester should not know whose silk is on the bench and that nothing goes out before approval. It also asked for a code on the certificate so a holder can check the document without telephoning the unit — the exact instinct behind the verification page. And it named equipment calibration and consumable stock as work in their own right, not as filing to be done afterwards; the specification has taken that further rather than corrected it. What follows is not a list of mistakes. It is the set of questions a conversation does not have to answer and a specification does.</p>
+    <div class="grid2">
+      <div class="chg">
+        <div class="hd"><h4>The invoice now follows the silk</h4></div>
+        <div class="bd">
+          <div class="row was"><span class="k">The note said</span>The note began with creating the customer and raising an invoice covering multiple tests, and only then receiving the samples.</div>
+          <div class="row now"><span class="k">What we do instead</span>Work now starts with a Test Request that a named officer formally reviews and accepts, followed by receipt and acceptance of the material. A quotation or an advance demand can still be given up front, but the tax invoice is raised at the end, for the work actually done.</div>
+          <div class="row why"><span class="k">Why it matters</span>The charge usually cannot be known until the material has been counted and inspected, because the rate card charges by bale, by warp, by thousand cocoons and by measurement point, with a minimum of five skeins. Invoicing first makes cancelling and re-raising invoices a routine habit, which is precisely what a government audit objects to.</div>
+          <div class="row eg"><span class="k">For example</span>A customer books grading for about twenty bales. Eighteen arrive and one is torn open at the counter, so an invoice raised the day before is already wrong.</div>
+        </div>
+      </div>
+      <div class="chg">
+        <div class="hd"><h4>One job becomes sample plus test</h4></div>
+        <div class="bd">
+          <div class="row was"><span class="k">The note said</span>The note said one job per sample, so five samples would make five jobs.</div>
+          <div class="row now"><span class="k">What we do instead</span>The specification keeps the sample as the physical silk, and adds a separate unit of work for each test on that sample. That unit of work is what gets assigned to a person, given a due date, and tied to one machine.</div>
+          <div class="row why"><span class="k">Why it matters</span>The thing a Section Head actually hands to a tester is one test on one sample, not the sample as a whole. If the sample is the unit of work, four testers cannot share it, and per-test status, per-test due date and per-test equipment become impossible to record.</div>
+          <div class="row eg"><span class="k">For example</span>Five hanks, each needing conditioned mass, winding, size and size deviation, are five samples and twenty separate pieces of assignable work — not five jobs, and not one.</div>
+        </div>
+      </div>
+      <div class="chg">
+        <div class="hd"><h4>A result is many readings</h4></div>
+        <div class="bd">
+          <div class="row was"><span class="k">The note said</span>The note described a test log entry in which the tester records observations, results and remarks.</div>
+          <div class="row now"><span class="k">What we do instead</span>The tester enters every original reading, one by one, and the system computes the average, the standard deviation, the coefficient of variation and the maximum deviation from them. A submitted reading is never overwritten; a correction keeps the original visible beside it, with who changed it, when and why.</div>
+          <div class="row why"><span class="k">Why it matters</span>The original observations are what an assessor asks to see, because they are what allows the test to be repeated or the arithmetic re-checked years later. A single free-text box holds none of that, and cannot be re-computed if a formula is later corrected.</div>
+          <div class="row eg"><span class="k">For example</span>Size deviation on forty sizing skeins is forty separate weights kept individually, with the maximum deviation drawn from the four coarsest and four finest. On coarser silk the system asks for eighty, not forty, because the method says so.</div>
+        </div>
+      </div>
+      <div class="chg">
+        <div class="hd"><h4>Approval is two separate acts</h4></div>
+        <div class="bd">
+          <div class="row was"><span class="k">The note said</span>The note had a single step called test log approval, done by the authorised person.</div>
+          <div class="row now"><span class="k">What we do instead</span>First a competent second person technically verifies the readings, the arithmetic, the machine and the room conditions for one test. Then the Approving Authority authorises and signs the whole certificate. The verifier may only verify or send back with a reason — never edit a reading.</div>
+          <div class="row why"><span class="k">Why it matters</span>These are two different acts, by two different people, with two different consequences, and merging them removes the check entirely. If the approver can quietly fix a figure, that figure is no longer attributable to the person who observed it.</div>
+          <div class="row eg"><span class="k">For example</span>A verifier who thinks a conditioned mass looks wrong sends it back with a reason; only the tester changes it, and the original figure stays visible. When the signatory is on tour, a dated delegation lets a named deputy sign, and the certificate prints the deputy's own name.</div>
+        </div>
+      </div>
+      <div class="chg">
+        <div class="hd"><h4>Issued certificates are amended, never edited</h4></div>
+        <div class="bd">
+          <div class="row was"><span class="k">The note said</span>The note ended at report generation and did not say what happens when a report has to change after it has gone out.</div>
+          <div class="row now"><span class="k">What we do instead</span>An issued certificate can never be quietly re-typed. A correction is a separately numbered amendment or replacement that refers to the original, prints a mandatory reason for the change, and leaves the original retrievable and marked superseded.</div>
+          <div class="row why"><span class="k">Why it matters</span>This is the single most common way a laboratory loses an audit, and a silently altered certificate is indefensible in a trade dispute. The unit's documents are exactly the kind that end up in such disputes, because money changes hands on a grade or a final kilogram figure.</div>
+          <div class="row eg"><span class="k">For example</span>A conditioning certificate goes out with the wrong number of bales, and the buyer already holds a printed copy. An amendment is issued, and the code on that old printed copy now reports that it has been superseded and names the document that replaces it.</div>
+        </div>
+      </div>
+      <div class="chg">
+        <div class="hd"><h4>The code proves the paper only</h4></div>
+        <div class="bd">
+          <div class="row was"><span class="k">The note said</span>The note asked that anyone scanning the code on the certificate should be able to view the report online.</div>
+          <div class="row now"><span class="k">What we do instead</span>Anyone scanning gets a plain verdict — genuine and current, genuine but superseded, genuine but withdrawn, or not genuine — with the laboratory, the report number, the date and the sample identity. The results themselves need a one-time password sent to the customer's registered number, or a login. Opening it fully is one setting, if the laboratory decides otherwise.</div>
+          <div class="row why"><span class="k">Why it matters</span>A grade or a size deviation decides payments in the local cluster, so a permanently open and guessable link would let anyone read a competitor's figures at leisure. Keeping the check public and the numbers protected preserves the whole benefit of the code without that exposure.</div>
+          <div class="row eg"><span class="k">For example</span>A buyer standing at the counter with a grading certificate can confirm in seconds that it is real and has not been superseded, without ever seeing another reeler's denier figures.</div>
+        </div>
+      </div>
+      <div class="chg">
+        <div class="hd"><h4>Most reports are not accredited</h4></div>
+        <div class="bd">
+          <div class="row was"><span class="k">The note said</span>The note assumed one report format for all work, and did not separate accredited from non-accredited testing.</div>
+          <div class="row now"><span class="k">What we do instead</span>The seven entries of the accredited scope are loaded into the system with their validity dates, and only a report whose every parameter is inside those entries carries the accreditation symbol and the Unique Laboratory Report number. Where one sample carries both kinds of test, the system produces two separate certificates by itself.</div>
+          <div class="row why"><span class="k">Why it matters</span>Only one of the seven entries is raw silk — Count, under IS 15090 (Part 5) — and five are fabric tests, so the plain report is the everyday document and the accredited one is the smaller stream. Marking a non-accredited test with an asterisk on an accredited report is not permitted, so the split cannot be left to a clerk to remember.</div>
+          <div class="row eg"><span class="k">For example</span>The Limited Test, about 98 per cent of the unit's samples, yields both a count and a size deviation, and the scope annexure names only Count. The specification's working assumption is that this splits into two documents — but that is an assumption, and the Quality Manager should settle it in writing before the first certificate is issued.</div>
+        </div>
+      </div></div>
+  </div>
+</section>
+    
+<section id="roles">
+  <div class="inner wide">
+    <div class="eyebrow">Who uses it</div>
+    <h2>Every person, and exactly what they see</h2>
+    <p class="lede">The system shows each person only what their job needs. That is not merely tidy — it is the
+     impartiality control your own note asked for, written into the software rather than left to habit.</p>
+    <div class="grid3">
+      <div class="role key">
+        <h4>Front Desk / Receipt Clerk<span class="star">DAILY</span></h4>
+        <p>Meets the customer at the counter: finds the reeler by mobile number, raises the test request, checks the skeins in with their condition and photographs, prints the labels and the numbered acknowledgement slip, and takes the money.</p>
+        <div class="kv"><b>Sees:</b> A counter screen of seven tiles — awaiting sample, received today, registration incomplete, reports ready to hand over, enquiries pending, money received today by mode, and any notification that failed to go out.<br><span class="no"><b>Cannot:</b> She cannot enter or change a single test reading, and she cannot waive a charge or alter a price on the rate card.</span></div>
+      </div>
+      <div class="role key">
+        <h4>Tester / Analyst<span class="star">DAILY</span></h4>
+        <p>Works the bench: scans the label, records sub-sample preparation and conditioning, enters the raw readings, attaches the instrument printout, notes the break causes, and submits.</p>
+        <div class="kv"><b>Sees:</b> His own queue in due-time order — say fourteen tests today, each shown as a sample number and a description such as 'Raw silk, 5 skeins, 20/22 D declared', with tiles for overdue work, tests sent back to him, specimens still conditioning, and controls due this run.<br><span class="no"><b>Cannot:</b> He cannot change a reading once he has submitted it — a correction has to come back to him as a recorded send-back with a reason, which is exactly the point.</span></div>
+      </div>
+      <div class="role key">
+        <h4>Verifier (technical checker)<span class="star">DAILY</span></h4>
+        <p>Checks somebody else's submitted result before it can become a certificate: the readings, the arithmetic, the instrument and reagent status, the room conditions, and whether the number is plausible at all.</p>
+        <div class="kv"><b>Sees:</b> A verification queue ordered by ageing, and behind each row the full check screen — readings shown read-only with any excluded ones struck through and their reasons, the computed values with the formula and a Recompute button, the calibration and authorisation status as they stood at the moment of test, and a checklist that must be answered before the decision.<br><span class="no"><b>Cannot:</b> He cannot change a reading or a computed value; the only two actions open to him are Verify and Send back with a coded reason, and he cannot sign the report — that is a separate act by a different office.</span></div>
+      </div>
+      <div class="role key">
+        <h4>Approving Authority — the Unit In-Charge<span class="star">DAILY</span></h4>
+        <p>Accepts or declines each test request, approves or sends back every result, authorises and signs the certificate, and takes the decisions reserved to the officer in charge: overrides, amendments, disposals, unmaskings.</p>
+        <div class="kv"><b>Sees:</b> A morning screen that states the position of the unit in one glance — samples in the building, tests not yet started, results waiting for his approval, tests already overdue, a balance due for calibration in six days, a consumable lot expiring this month, and whether this month's return to headquarters has gone.<br><span class="no"><b>Cannot:</b> He cannot alter a raw reading a tester recorded. He may approve it or send it back for correction, and nothing else — and an issued certificate can only be amended or withdrawn, never edited.</span></div>
+      </div>
+      <div class="role key">
+        <h4>Accounts / Cashier<span class="star">DAILY</span></h4>
+        <p>Raises the invoice or bill of supply, receipts the cash, demand draft, transfer or challan, reconciles the bank lines, and keeps the customer's running account.</p>
+        <div class="kv"><b>Sees:</b> Money received today split by mode with the receipt count, drafts and transfers tendered but not yet credited, bank lines still unmatched, reports held for payment, the over-90-day outstanding figure, completed work not yet invoiced, and an alert if any gap appears in a numbered financial series.<br><span class="no"><b>Cannot:</b> He cannot quietly stop a report going out. A payment hold is an explicit, separately recorded state with a reason on it — never a silent block on the science — and an issued invoice can be cancelled but never deleted.</span></div>
+      </div>
+      <div class="role">
+        <h4>Section Head (sectional supervisor)</h4>
+        <p>Allocates each test to a named tester on a named instrument, sets and adjusts due dates, puts work on hold or releases it, and watches the section's queue and its overdue list.</p>
+        <div class="kv"><b>Sees:</b> The allocation queue with Tatkal work at the top, then due date, then age of the sample; and a workload board showing each tester's open work weighted by standard turnaround, so it reads as capacity rather than a headcount.<br><span class="no"><b>Cannot:</b> He cannot enter or change a raw reading, and he cannot sign a certificate unless he is separately recorded as an authorised signatory for that parameter.</span></div>
+      </div>
+      <div class="role">
+        <h4>Report Writer</h4>
+        <p>Compiles the draft report from a sample's verified tests, picks the report type and template, and checks the printed particulars against the sample record before passing it up for signature.</p>
+        <div class="kv"><b>Sees:</b> The draft as it will actually print, with every value frozen at the moment of compilation, alongside the sample record it must agree with.<br><span class="no"><b>Cannot:</b> He cannot change a value or a grade, cannot compile from a test that is not yet verified, and cannot allot the report number — the number is allotted at authorisation, not before.</span></div>
+      </div>
+      <div class="role">
+        <h4>Technical Manager</h4>
+        <p>Owns the methods: creates and versions each one, records its verification, defines the parameters, formulae, rounding, replicate counts and grade tables, and retires a revision when the standard moves on.</p>
+        <div class="kv"><b>Sees:</b> One record per method revision — IS 15090 (Part 5):2002 and its fellows — carrying the required standard atmosphere, the pre-conditioning hours, the required reading counts, the rounding rule, the equipment types the method needs, and the dates between which it may be used.<br><span class="no"><b>Cannot:</b> He cannot record a reading and then authorise that same result without the system recording the overlap on the allocation and counting it on the monthly exception report.</span></div>
+      </div>
+      <div class="role">
+        <h4>Quality Manager</h4>
+        <p>Keeps the quality side honest: nonconformities, corrective actions, complaints, control charts, proficiency-testing rounds, internal audits, the risk register, document control, and the staff competence records.</p>
+        <div class="kv"><b>Sees:</b> The registers and the charts — control results plotted against their limits with the breach rules flagged, complaints against their target dates, corrective actions aged past due, and the monthly review of every override and every unblinding.<br><span class="no"><b>Cannot:</b> She cannot close a complaint about work she performed herself — the system refuses it — and she cannot approve a technical result or sign a certificate unless separately authorised as a signatory.</span></div>
+      </div>
+      <div class="role">
+        <h4>Store Keeper / Equipment Custodian</h4>
+        <p>Receives and controls the consumables and reference materials lot by lot, runs the retention shelf, records every physical movement of a sample, and hands samples back to customers.</p>
+        <div class="kv"><b>Sees:</b> The lot register — batch number, expiry, storage condition and certificate of analysis for each — with reorder and expiry alerts, the stock ledger, and the retention store down to rack level with the retention date on each sample.<br><span class="no"><b>Cannot:</b> He cannot authorise disposal of a retained sample on his own, and he cannot release a lot for use without the recorded acceptance check.</span></div>
+      </div>
+      <div class="role">
+        <h4>System Administrator</h4>
+        <p>Creates and closes logins, assigns roles, sets the numbering series, the working calendar and the templates, runs the backups and the restore drills, and applies updates under change control.</p>
+        <div class="kv"><b>Sees:</b> The user list with each person's role, last login and staff status for the quarterly access review; the backup schedule with the last successful run and the last tested restore; and the incident and change registers.<br><span class="no"><b>Cannot:</b> He cannot change or delete a single line of the audit trail, cannot enter or approve a result, and cannot grant himself signing authority.</span></div>
+      </div>
+      <div class="role">
+        <h4>Customer (self-service)</h4>
+        <p>Books a test in advance, tracks where the sample has reached, downloads the finished certificate and the invoice, and raises a complaint — without telephoning the counter.</p>
+        <div class="kv"><b>Sees:</b> Their own home screen: open requests, samples in progress, reports ready to download, balance due — and a button to make a time-limited link so a buyer or a bank can verify one specific certificate.<br><span class="no"><b>Cannot:</b> They cannot see a draft or unapproved result, any other customer's work, the laboratory's internal remarks, or which member of staff did the test.</span></div>
+      </div></div>
+     
+     <h3>Blinding the tester &mdash; your idea, and its honest limits</h3>
+     <div class="grid2">
+       <div class="card"><p>Blinding hides the customer's identity from the person performing the test, so that knowing whose skeins these are cannot influence a reading. It is treated as a control on a real, documented impartiality risk — the laboratory names the risk, and the software produces the evidence that the control is working.</p><p>The tester sees the sample number, the material, and everything the customer declared — 'Raw silk, 5 skeins, 20/22 D declared' — because size deviation cannot be computed without the declared denier; those declared values are labelled as declared by the customer and not verified by the laboratory. He does not see the name, address, mobile, GSTIN, sender, the customer's own lot number, mark or chop, and no price, invoice, receipt or acknowledgement slip; the customer appears as a steady code such as CUST-4417, so staff can still discuss 'the 4417 lot' without knowing whose it is, and none of the hidden fields is merely hidden from view — it is never sent to his screen in the first place, nor printed on the bench worksheet, nor reachable by searching or exporting. If he genuinely needs the identity — the marks are ambiguous, the sample does not match its description, a mix-up is suspected — he requests a reveal with a reason from a fixed list, the Unit In-Charge approves it, and it opens for that one sample for a set window, sixty minutes by default.</p></div>
+       <div class="card" style="border-color:var(--gold)"><p><strong>Where it cannot be absolute</strong></p><p>Blinding cannot be absolute here and the system must never be described as making it so: the filature's mark is stamped on the book, the tag is printed on the bale, the selvedge stamp is woven into the cloth, so the tester is quite literally holding the customer's identity in his hand. The answer is practical rather than perfect — at receipt the clerk transcribes the marks into a hidden field and over-labels the sample with the laboratory's own code, and where a mark cannot be covered she records 'identity not maskable', a count that is reported every month and is what the lab shows an assessor instead of a false claim. Every unblinding likewise is a request, a reason, a named approval and a line in the log reviewed monthly; and because CUST-4417 stays that customer's code, the monthly report states plainly that any single leak — one approved unblinding, one encounter at the counter, one unmaskable bale — resolves that customer's whole past and future history for that tester.</p></div>
+     </div>
+  </div>
+</section>
+    
+<section id="scope">
+  <div class="inner">
+    <div class="eyebrow">The accredited scope</div>
+    <h2>Seven entries &mdash; and why that changes everything</h2>
+    <p class="lede">You told us that a good deal of the unit's testing is done outside NABL. The scope annexure to
+     certificate &lt;strong&gt;NABLT0726AD18713&lt;/strong&gt; confirms it, and it turned out to be the single most
+     important thing anyone told us about this system.</p>
+    <table>
+      <tr><th>Material or product</th><th>Parameter</th><th>Method</th></tr>
+      <tr><td>Fabric</td><td>Length</td><td>IS 1954</td></tr><tr><td>Fabric</td><td>Mass</td><td>IS 1964</td></tr><tr><td>Fabric</td><td>Number of Threads Per Unit Length</td><td>IS 1963</td></tr><tr><td>Fabric</td><td>Percentage by Weight of Warp and Weft Yarn</td><td>IS 17208</td></tr><tr><td>Fabric</td><td>Width</td><td>IS 1954</td></tr><tr class="hl"><td>Raw Silk Yarn</td><td>Count</td><td>IS 15090 (Part 5)</td></tr><tr><td>Woven Fabric</td><td>Linear Density of Yarn Removed from Fabric</td><td>IS 3442</td></tr>
+    </table>
+    <div class="scopebar">
+      <div class="in">Inside scope</div>
+      <div class="out">Outside the accredited scope &mdash; grading, evenness, cohesion, twist, boil-off, tenacity, conditioning &amp; weight certificates</div>
+    </div>
+    <p style="font-size:13.5px;color:var(--muted);margin-top:0">Proportions above are illustrative of the
+    <em>work mix</em>, not of the annexure: five of the seven accredited entries are fabric tests, while the
+    unit's recorded revenue is overwhelmingly raw silk.</p>
+    <div class="note"><b class="g">What this means for the software</b>
+      The plain, non-accredited certificate is the <strong>everyday</strong> document, not the exception.
+      Where one sample carries both accredited and non-accredited tests, the system issues
+      <strong>two separate certificates</strong> &mdash; marking a non-accredited test with an asterisk on an
+      accredited report is not permitted. If that differs from current practice, the software will change it.
+    </div>
+    <div class="note silk"><b>The one question that decides the scale of this</b>
+      Does the <strong>Limited Test</strong> &mdash; about 98% of your samples &mdash; fall under
+      <em>Raw Silk Yarn / Count / IS 15090 (Part 5)</em>? It produces both a count and a size deviation, and
+      the annexure names only <em>Count</em>. This single answer decides whether the accreditation appears on
+      nearly every certificate you issue, or almost none of them.
+    </div>
+  </div>
+</section>
+    
+<section id="benefits">
+  <div class="inner wide">
+    <div class="eyebrow">Before and after</div>
+    <h2>What actually changes on the bench</h2>
+    <p class="lede">Not promises about efficiency &amp;mdash; just the specific things that are hard today and stop being hard.</p>
+    <div class="balabel"><span>Today</span><span></span><span>With the system</span></div>
+     
+       <div class="ba">
+         <div class="t">A sample is written into a bound register by hand, and the same customer's name is written again on the worksheet, again on the report and again on the bill.</div>
+         <div class="arrow">&#8594;</div>
+         <div class="a">The sample is entered once at the counter, and every later document draws on that one entry, so a mistake cannot be introduced by copying.</div>
+       </div>
+       <div class="ba">
+         <div class="t">Finding last year's report for a customer who has lost his copy means going through the register and then the file cabinet.</div>
+         <div class="arrow">&#8594;</div>
+         <div class="a">Any report from the last seven years is found by typing the report number, the customer's name, the bale mark or a date range, and is reprinted marked &quot;duplicate copy&quot;.</div>
+       </div>
+       <div class="ba">
+         <div class="t">If a tester is on leave, only he knows how far his samples have got.</div>
+         <div class="arrow">&#8594;</div>
+         <div class="a">Every sample's exact stage, its tester and whether it is late is on one screen the Unit Incharge can see at any time.</div>
+       </div>
+       <div class="ba">
+         <div class="t">Twenty skein weights are written on a slip of paper, the average and deviation are worked out by hand or on a calculator, and the slip is filed.</div>
+         <div class="arrow">&#8594;</div>
+         <div class="a">The readings are typed straight in, the average, deviation and grade are computed the same way every time, and the readings themselves are kept for ever and can be shown to anyone who questions the result.</div>
+       </div>
+       <div class="ba">
+         <div class="t">The monthly return to CSTRI headquarters is typed out from the registers, taking most of a day, and the figures depend on who added them up.</div>
+         <div class="arrow">&#8594;</div>
+         <div class="a">The return is produced in one action from the same records the work was done in, and a copy of exactly what was sent is kept so a later correction cannot quietly change it.</div>
+       </div>
+       <div class="ba">
+         <div class="t">A buyer in the market has no way to tell a genuine certificate from a photocopy with the numbers changed.</div>
+         <div class="arrow">&#8594;</div>
+         <div class="a">The buyer scans the code on the certificate with an ordinary phone and is told, on the laboratory's own page, whether that report is genuine and whether it has since been amended or cancelled.</div>
+       </div>
+       <div class="ba">
+         <div class="t">If a report has to be corrected, the practical choices are to re-type it under the same number or to write a letter.</div>
+         <div class="arrow">&#8594;</div>
+         <div class="a">A correction is issued as a proper amended or replacement report stating what changed and why, and the original stays on record marked as superseded, including on the verification page.</div>
+       </div>
+       <div class="ba">
+         <div class="t">A balance found out of calibration means somebody must guess which results were affected, from memory and the register.</div>
+         <div class="arrow">&#8594;</div>
+         <div class="a">The system lists every test, every sample and every issued report that used that balance since its last good check, in one action, and records what was decided about each.</div>
+       </div>
+       <div class="ba">
+         <div class="t">An expired reagent or an out-of-calibration instrument can be used by accident, and nobody knows until much later.</div>
+         <div class="arrow">&#8594;</div>
+         <div class="a">The system refuses to accept the result and names the reason, and if an authorised person overrides it, records who did so and why.</div>
+       </div>
+       <div class="ba">
+         <div class="t">Which tests earn money and which consume an afternoon for fifty rupees is not known in any usable form.</div>
+         <div class="arrow">&#8594;</div>
+         <div class="a">Revenue per test, per customer and per month comes out of the same records, which is the evidence needed when asking headquarters to revise a rate or buy an instrument.</div>
+       </div>
+       <div class="ba">
+         <div class="t">Five years of denier and grade results sit in registers where nobody can look at them together.</div>
+         <div class="arrow">&#8594;</div>
+         <div class="a">Grade distribution by district, by reeling technology and by season becomes a report, which is research output the unit is already expected to produce and currently cannot.</div>
+       </div>
+       <div class="ba">
+         <div class="t">An assessor's questions are answered by fetching files, and some answers take a day.</div>
+         <div class="arrow">&#8594;</div>
+         <div class="a">Most assessor questions — the calibration status on a given date, who signed what, what changed and why, the complete history of one sample — are answered from the screen while he watches.</div>
+       </div>
+     <div class="note"><b class="g">And what it will not fix</b>This system will not make a tensile test faster. The oven still takes its time, the twenty-four-hour conditioning is still twenty-four hours, and a seriplane panel still has to be looked at by a person against the standard photographs — the gains are in the time around the testing, the writing, copying, searching, totalling and explaining, not in the testing itself. It will not remove the need for discipline either: if a skein weight is written down wrongly the system will faithfully compute the wrong average, and if a reason for a change is typed as &quot;correction&quot; the record will say &quot;correction&quot; and mean nothing, so carelessness becomes visible and traceable but not harmless. And it will not run itself — it needs one named person in the unit who owns the master data (the test catalogue, the methods, the grade tables, the rate card, the holiday list), who keeps it right, and who has a trained deputy for when they are transferred. A laboratory system whose reference data has gone stale is worse than a register, because a register never pretends to be current.</div>
+  </div>
+</section>
+    
+<section id="plan">
+  <div class="inner">
+    <div class="eyebrow">The plan</div>
+    <h2>Seven phases, one developer</h2>
+    <p class="lede">Each phase ends with something you can actually use. The estimates are ranges, not promises, and they
+     exclude leave, holidays and the laboratory's own master-data work.</p>
+    <div class="card">
+      <div class="ph">
+        <div class="n">0</div>
+        <div><h4>Sit in the laboratory</h4><p>Nothing new appears on a screen. What the laboratory gets is a specification anchored to its own registers, worksheets, rate card and returns, a signed-off test catalogue, and twenty completed historical worksheets held back to prove that the machine's arithmetic matches the arithmetic the lab already does by hand.</p></div>
+        <div class="w"><b>2</b>weeks</div>
+      </div>
+      <div class="ph live">
+        <div class="n">1</div>
+        <div><h4>The first usable release</h4><p>The paper sample register stops being the primary record. Staff receive a sample at the counter and hand over an acknowledgement slip, record and review the test request before acceptance, print a label, allocate the test, key the readings straight in, have the average, deviation and grade computed, be refused when the balance is out of calibration or the tester is not authorised for that method, verify as a second person, and hand over a numbered, signed report with a working QR code — including the conditioned-mass certificate — with a proper path to amend or withdraw it if it is wrong.</p></div>
+        <div class="w"><b>32–38</b>weeks</div>
+      </div>
+      <div class="ph">
+        <div class="n">2</div>
+        <div><h4>Money and statutory returns</h4><p>The laboratory can quote for work, price an accepted request straight from the rate card for any customer class and any priority, issue and reconcile receipts against the bank, hold work for payment visibly and lawfully, and produce the monthly return to CSTRI headquarters in one action instead of retyping it out of the registers.</p></div>
+        <div class="w"><b>7–9</b>weeks</div>
+      </div>
+      <div class="ph">
+        <div class="n">3</div>
+        <div><h4>Equipment, stock and impact</h4><p>The unit knows what is due for calibration before it goes overdue, and can show an assessor the traceability chain from a single skein weighing back to a national standard. It can also answer the hardest question of all — which tests, samples and issued reports a failed balance or a bad reagent lot touched — and record what was decided about each, while competence, training, stock and supplier records move into the same place as the work.</p></div>
+        <div class="w"><b>4–6</b>weeks</div>
+      </div>
+      <div class="ph">
+        <div class="n">4</div>
+        <div><h4>The quality system</h4><p>The laboratory can state conformity against a specification under a named decision rule, keep the accreditation claim strictly inside the seven accredited entries by splitting a mixed order into two separate reports, refuse to release results sitting behind a failed control check, and walk an assessor through the nonconformity, complaint, corrective action and proficiency registers from the screen.</p></div>
+        <div class="w"><b>7–9</b>weeks</div>
+      </div>
+      <div class="ph">
+        <div class="n">5</div>
+        <div><h4>Outward facing</h4><p>The counter stops being a telephone exchange: the customer sees his own sample's stage and downloads his own report. The unit can also see where the days actually go, and can produce grade distribution by district, by reeling technology and by season — research output it is already expected to produce and currently cannot.</p></div>
+        <div class="w"><b>6–8</b>weeks</div>
+      </div>
+      <div class="ph">
+        <div class="n">6</div>
+        <div><h4>Depth</h4><p>A hundred balance readings arrive from the instrument's own file with nobody typing them, reports carry a stronger digital signature that an ordinary PDF reader validates, and work sent out to another laboratory is handled with the customer's recorded approval and identified as external on the report.</p></div>
+        <div class="w"><b>5–7</b>weeks</div>
+      </div></div>
+      <div class="note"><b class="g">Phase 0 is not optional</b>
+        Two weeks spent sitting in the laboratory watching the real work &mdash; and collecting one filled
+        copy of every form and register you use &mdash; will change more of this design than two months of
+        guessing at a desk.
+      </div>
+  </div>
+</section>
+    
+<section id="decisions">
+  <div class="inner wide">
+    <div class="eyebrow">Over to you</div>
+    <h2>24 decisions only you can make</h2>
+    <p class="lede">Every question below already has a recommended answer written into the specification, so nothing is waiting on you and no work is blocked while you read. But a default that nobody challenges quietly becomes a decision by accident — and a few of these decide things that cannot be undone once samples have been registered. Of the hundred-odd open questions in the full document, these twenty-four are the ones that genuinely need you personally; the rest can be settled with your staff or by handing us one real filled-in form.</p>
+    <div class="toolbar noprint">
+       <button class="btn on" data-filter="all">Show all 24</button>
+       <button class="btn" data-filter="urgent">Only the 10 urgent ones</button>
+       <button class="btn" onclick="window.print()">Print / save as PDF</button>
+     </div>
+     
+       <div class="qgroup" data-group>
+         <h3>The accreditation, and what may carry it<span class="cnt">3</span></h3>
+         
+           <div class="q urgent" data-urgent="1">
+             <div class="top">
+               <span class="id">OPEN-Q-C13</span>
+               <span class="flag">Needed before we start</span>
+             </div>
+             <div class="ask">Does the Limited Test count as an accredited test? Your scope annexure lists Raw Silk Yarn / Count / IS 15090 (Part 5), but the Limited Test yields both a count and a size deviation, and only Count is named there.</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> This one answer decides whether the NABL symbol and a Unique Laboratory Report number appear on almost every report you issue, or on almost none of them.</div>
+               <div><b>If you don't answer, we will assume:</b> Treat the count as inside the scope and the size deviation as outside it, so a Limited Test produces one accredited report and one plain report. Please put this to the Quality Manager in writing rather than let us assume it — being wrong in the permissive direction is an accreditation offence.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-D7</span>
+               
+             </div>
+             <div class="ask">Besides yourself, who is authorised to sign a test report today, and for which test areas? Is there a written declaration of signatories held with CSTRI or the accreditation body?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> If the signatory list is wrong, a report can go out signed by someone the accreditation body was never told about.</div>
+               <div><b>If you don't answer, we will assume:</b> You are the only signatory at go-live, for every test area performed here, with the declaration reference recorded as 'to be obtained' until the document is produced.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-C7</span>
+               
+             </div>
+             <div class="ask">Does NABL want one verification code printed on the certificate, or two — one for the report itself and a second pointing to the accreditation certificate and scope?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> We could not confirm the two-code requirement from any official source, and adding a second code position to a certificate layout already in use is awkward.</div>
+               <div><b>If you don't answer, we will assume:</b> Leave room on the certificate for two codes, print only the report code, and fill the second position if and when the requirement is confirmed.</div>
+             </div>
+           </div>
+       </div>
+       <div class="qgroup" data-group>
+         <h3>How a sample really moves through the lab<span class="cnt">4</span></h3>
+         
+           <div class="q urgent" data-urgent="1">
+             <div class="top">
+               <span class="id">OPEN-Q-B5</span>
+               <span class="flag">Needed before we start</span>
+             </div>
+             <div class="ask">For conditioning, is one bale one sample, or is the whole lot the sample with each bale contributing readings? And when a customer brings in twisted silk on several cones, is each cone a sample?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> Everything counted, charged and reported hangs off this, and it cannot be changed later without re-registering the whole history.</div>
+               <div><b>If you don't answer, we will assume:</b> Whatever you grade or settle on is the sample, and the bales, books, cones or skeins inside it are sub-samples — so for conditioning, the lot is the sample. We need this confirmed for each material before a line of code is written.</div>
+             </div>
+           </div>
+           <div class="q urgent" data-urgent="1">
+             <div class="top">
+               <span class="id">OPEN-Q-B10</span>
+               <span class="flag">Needed before we start</span>
+             </div>
+             <div class="ask">Do Physical Testing and Chemical Testing keep separate registers and separate number series here? Your monthly revenue sheets count PTS, PTA, CTS and CTA separately — what do those four stand for?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> A division cannot be inserted into a number series after samples have already been registered under it.</div>
+               <div><b>If you don't answer, we will assume:</b> Build the sample number so that a PT or CT part can be switched on, and leave it switched off until you confirm. Please tell us before the first sample is registered.</div>
+             </div>
+           </div>
+           <div class="q urgent" data-urgent="1">
+             <div class="top">
+               <span class="id">OPEN-Q-T30</span>
+               <span class="flag">Needed before we start</span>
+             </div>
+             <div class="ask">Do you still issue the conditioned-mass (weight) certificate yourself, and roughly how many lots and bales a month? Does it go out under the same report numbering and signature rules as an ordinary test report?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> Conditioning is the largest single piece of the first release and the highest-consequence calculation the unit performs, so a difference in volume or signing rules moves the schedule.</div>
+               <div><b>If you don't answer, we will assume:</b> You do issue it, it shares the numbering, signature and verification-code path of a test report, and it is built in the first release. A scan of one real conditioned-mass certificate would settle it.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-B3</span>
+               
+             </div>
+             <div class="ask">Should one certificate be allowed to cover several samples — a single certificate for a twenty-bale conditioning lot, say — or is it strictly one report per sample?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> Get it wrong and a conditioning or grading customer receives a stack of certificates where he expects one.</div>
+               <div><b>If you don't answer, we will assume:</b> Allow one report to cover many samples from the same order, switchable for each type of report.</div>
+             </div>
+           </div>
+       </div>
+       <div class="qgroup" data-group>
+         <h3>The numbers inside your methods<span class="cnt">4</span></h3>
+         
+           <div class="q urgent" data-urgent="1">
+             <div class="top">
+               <span class="id">OPEN-Q-D10</span>
+               <span class="flag">Needed before we start</span>
+             </div>
+             <div class="ask">Can we sit with you and write down every test you perform — the exact standard and edition, the parameters, how many readings each takes, the formula, the rounding, and the turnaround you promise?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> This is the single largest piece of information the project needs, and if it is discovered during the build rather than agreed beforehand, everything after it slips.</div>
+               <div><b>If you don't answer, we will assume:</b> Treat it as a scheduled sitting with you, not something to be found out along the way. Start with the Limited Test — roughly 98 per cent of your volume — then twist, denier of twisted silk, water analysis, and grading under both the Indian Standard and the ISA method.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-C11</span>
+               
+             </div>
+             <div class="ask">In your conditioning practice, is it six skeins drawn as two sets of three, oven at 140 °C, fifteen minutes then successive five-minute periods, weighings converging within 0.25 per cent, and the two sets agreeing within 0.5 per cent? Or does Dharmavaram do it differently?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> These constants decide the final kilogram figure on which money changes hands, so one wrong value is a wrong bill.</div>
+               <div><b>If you don't answer, we will assume:</b> We have loaded exactly those values from the governing standard and marked every one of them unconfirmed until you check them against a real Dharmavaram conditioning worksheet.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-C12</span>
+               
+             </div>
+             <div class="ask">On an ISA grading worksheet, which neatness values are permitted, and does the rounding rule — nearest 5 per cent above 50, nearest 10 per cent below — apply to each panel, or only to the reported average and low neatness?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> We could not confirm the ISA neatness list from any source, and inventing one would produce grades that disagree with your own worksheet.</div>
+               <div><b>If you don't answer, we will assume:</b> Use the BIS eight-value list for BIS grading, and hold the ISA list deliberately open until a real ISA worksheet is seen. We will not seed a value list we cannot verify.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-D15</span>
+               
+             </div>
+             <div class="ask">Is the testing area actually held at 27 ± 2 °C and 65 per cent RH, or only watched? What instrument reads the temperature and humidity, and how often is it read?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> If the room is monitored rather than controlled, recording an excursion has to be quick and honest instead of stopping the day's work.</div>
+               <div><b>If you don't answer, we will assume:</b> A monitored room with a wall-mounted thermometer and hygrometer, read twice each working day, with the Indian standard atmosphere as the limit and excursions expected and easy to record.</div>
+             </div>
+           </div>
+       </div>
+       <div class="qgroup" data-group>
+         <h3>Money and charging<span class="cnt">5</span></h3>
+         
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-D18</span>
+               
+             </div>
+             <div class="ask">Under which GST registration does this unit raise its invoices, and what address is printed on them — the Karnataka registration held by CSTRI, or a separate Andhra Pradesh one?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> It decides whether an Andhra Pradesh customer is billed as an intra-State or an inter-State supply, and a wrong answer is wrong on every single invoice.</div>
+               <div><b>If you don't answer, we will assume:</b> We are guessing nothing. The registration has been left deliberately empty, and we need a copy of one recent real invoice from you before the billing part is built.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-D17</span>
+               
+             </div>
+             <div class="ask">Where does the testing fee physically go — a Central Silk Board bank account, or the government account through a Pay and Accounts Office? And which routes are actually in use here: cash, demand draft, the non-tax receipt portal, a bank collection product, the national portal's gateway?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> This has the widest effect of any question on the money side, and it decides what your accounts staff see on the receipt screen every day.</div>
+               <div><b>If you don't answer, we will assume:</b> Build every route, assume none of them, and switch on only the ones you and your accounts staff confirm.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-B1</span>
+               
+             </div>
+             <div class="ask">Do you require payment before testing starts, before the report is released, or neither? And does the answer differ for a government department compared with a trader?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> Set it too tight and a government department's samples sit waiting for no reason; set it too loose and reports leave the counter with the fee uncollected.</div>
+               <div><b>If you don't answer, we will assume:</b> Payment before the report is released, not before testing begins, and not required at all for government departments, CSB units and internal research work.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-T18</span>
+               
+             </div>
+             <div class="ask">Is there an approved rate card later than 01.12.2023, and is the section covering RSTRS and STSC units still the one that applies to you?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> Wrong prices from day one, on every bill you raise.</div>
+               <div><b>If you don't answer, we will assume:</b> Load the 01.12.2023 card as it stands, and keep the 15.11.2019 card as a superseded version so an older invoice still reprints exactly as it was issued.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-C10</span>
+               
+             </div>
+             <div class="ask">Is the conditioning charge levied per bale, per kilogram, per lot, or per certificate?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> The published rate card shows no per-kilogram basis anywhere, so if you charge that way it is a local practice we would otherwise miss entirely.</div>
+               <div><b>If you don't answer, we will assume:</b> Per bale, with a minimum per certificate — and the basis kept as a rate-card setting, so any of the four can be selected later without changing the software.</div>
+             </div>
+           </div>
+       </div>
+       <div class="qgroup" data-group>
+         <h3>The paper you use today<span class="cnt">4</span></h3>
+         
+           <div class="q urgent" data-urgent="1">
+             <div class="top">
+               <span class="id">OPEN-Q-T12</span>
+               <span class="flag">Needed before we start</span>
+             </div>
+             <div class="ask">May we have the actual monthly and annual returns you sent to CSTRI headquarters over the last twelve months — the submitted copies themselves, not a description of them?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> If the software cannot produce the one return the unit is judged on, your staff will keep a parallel spreadsheet, and from that day the two sets of figures start to disagree.</div>
+               <div><b>If you don't answer, we will assume:</b> There is no safe guess here. We need at least one real submitted return before the sample record is designed, because its breakdowns decide what must be captured at the counter.</div>
+             </div>
+           </div>
+           <div class="q urgent" data-urgent="1">
+             <div class="top">
+               <span class="id">OPEN-Q-T11</span>
+               <span class="flag">Needed before we start</span>
+             </div>
+             <div class="ask">Which of today's paper registers should the software replace, and which must carry on existing in paper alongside it?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> A half-replaced launch is worse than a late one, and internal audit must accept the printed equivalent before any register is put away.</div>
+               <div><b>If you don't answer, we will assume:</b> Replace the sample, test, report, calibration and stock registers; keep the bound money-receipt book on paper for now; and switch nothing off until you confirm in writing that the printed version from the software is acceptable to audit.</div>
+             </div>
+           </div>
+           <div class="q urgent" data-urgent="1">
+             <div class="top">
+               <span class="id">OPEN-Q-T15</span>
+               <span class="flag">Needed before we start</span>
+             </div>
+             <div class="ask">On the day we go live, what is the last number used in each of your registers — report numbers, money receipts, conditioning certificates?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> A machine-issued number that collides with a hand-written one is a records-integrity incident that cannot be undone.</div>
+               <div><b>If you don't answer, we will assume:</b> Every series continues from its last used number, recorded and signed on cut-over day. No series starts again at 1 without your written confirmation.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-T21</span>
+               
+             </div>
+             <div class="ask">Does the customer expect a same-day acknowledgement slip and a money receipt at the counter, and in what form? Can we have one filled example of each?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> Staff will work around the software if it does not produce the piece of paper the customer walks away holding.</div>
+               <div><b>If you don't answer, we will assume:</b> A serially numbered acknowledgement slip from the first release and a money receipt in the second, both modelled directly on your existing paper forms.</div>
+             </div>
+           </div>
+       </div>
+       <div class="qgroup" data-group>
+         <h3>Your people, and who owns the system<span class="cnt">4</span></h3>
+         
+           <div class="q urgent" data-urgent="1">
+             <div class="top">
+               <span class="id">OPEN-Q-T10</span>
+               <span class="flag">Needed before we start</span>
+             </div>
+             <div class="ask">How many computers are here and of what age, is there a wired network between them, how reliable is the internet line, is there a UPS, and how many power cuts in a normal week?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> It decides the hardware to be bought and whether the software must keep working with the internet down — which we are assuming it must.</div>
+               <div><b>If you don't answer, we will assume:</b> Four computers of modest specification, a wired network to be installed, an unreliable broadband line, no UPS, and about five power cuts a week — with everything running on one server inside the laboratory.</div>
+             </div>
+           </div>
+           <div class="q urgent" data-urgent="1">
+             <div class="top">
+               <span class="id">OPEN-Q-T13</span>
+               <span class="flag">Needed before we start</span>
+             </div>
+             <div class="ask">Who owns the software, the records inside it, and the documentation — and is that written down before the first payment is made?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> A government unit that cannot get hold of its own code and records has bought a dependency rather than a system.</div>
+               <div><b>If you don't answer, we will assume:</b> Central Silk Board owns the code, the records and the documentation; everything is handed over before the final payment; the developer keeps no exclusive hold. Settle it in writing before work starts.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-A6</span>
+               
+             </div>
+             <div class="ask">Which named people here hold which roles, and are Section Head, Verifier, Report Writer and Technical Manager separate posts or all held by you? Who signs when you are on tour?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> The list decides who may enter, check and sign a result, and a wrong one either blocks the day's work or lets the wrong person sign a certificate.</div>
+               <div><b>If you don't answer, we will assume:</b> You hold Section Head, Technical Manager and Report Writer alongside Unit In-Charge; the Verifier is a different person wherever staffing allows; and one named alternate signs during tour or leave.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-A7</span>
+               
+             </div>
+             <div class="ask">In a unit this size the same person will sometimes have to both perform a test and approve it. Should the software stop it, allow it and record the overlap, or allow it only with a second person's countersignature?</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> Claiming a separation in the quality manual that the staffing cannot actually deliver is worse than recording the overlap honestly.</div>
+               <div><b>If you don't answer, we will assume:</b> Tester and checker must be different people as the rule, with any exception being your named, dated decision rather than a silent allowance, and a monthly count of how often it was used.</div>
+             </div>
+           </div>
+       </div>
+  </div>
+</section>
+    <footer>
+      <div class="cols">
+        <div>
+          <h4>This is the short version</h4>
+          <p>The full Software Requirements Specification carries every detail: 1,278 numbered
+          requirements, the complete data design, and 55 acceptance tests. This guide is a
+          strict subset of it, so the two cannot disagree.</p>
+        </div>
+        <div>
+          <h4>The companion documents</h4>
+          <p>Silk Testing Laboratory System &mdash; Full Specification (TTL&#8209;SRS&#8209;v1.0)<br>
+          Silk Testing Laboratory System &mdash; Overview for the Lab (TTL&#8209;BRIEF&#8209;v1.0)</p>
+        </div>
+        <div>
+          <h4>Next step</h4>
+          <p>Phase 0 &mdash; two days at the counter and the bench, and one filled copy of every form and
+          register in use. Then the questions in <a href="#decisions">Over to you</a>.</p>
+        </div>
+      </div>
+    </footer>
+  </main>
+</div>
+<script>
+(function(){
+  // Contents rail follows the reader.
+  var links = [].slice.call(document.querySelectorAll('.rail a'));
+  var secs  = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  function spy(){
+    var best = 0;
+    secs.forEach(function(s,i){ if(s && s.getBoundingClientRect().top <= 140) best = i; });
+    links.forEach(function(a,i){ a.classList.toggle('on', i === best); });
+  }
+  addEventListener('scroll', spy, {passive:true}); spy();
+
+  // Urgent-only filter on the decisions list.
+  var btns = [].slice.call(document.querySelectorAll('[data-filter]'));
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      btns.forEach(function(x){ x.classList.toggle('on', x === b); });
+      var only = b.getAttribute('data-filter') === 'urgent';
+      [].forEach.call(document.querySelectorAll('.q'), function(q){
+        q.style.display = (only && q.getAttribute('data-urgent') !== '1') ? 'none' : '';
+      });
+      [].forEach.call(document.querySelectorAll('[data-group]'), function(g){
+        var vis = g.querySelectorAll('.q:not([style*="none"])').length;
+        g.style.display = vis ? '' : 'none';
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

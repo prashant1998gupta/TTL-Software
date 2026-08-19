@@ -1,0 +1,15 @@
+{
+  "org": "Central Silk Board · CSTRI · RSTRS Dharmavaram",
+  "title": "The Silk Testing Laboratory System",
+  "railSub": "A visual guide for the Unit In-Charge",
+  "sub": "A system that knows where every sample is, who tested it, on which balance, in what room conditions, against which version of which method — and can prove all of it four years later.",
+  "howto": "Read it top to bottom in about twenty minutes, or jump straight to **Follow one lot** to see the whole thing working on a real consignment. The last section, **Over to you**, is the only part that needs anything from you. Nothing here is technical, and nothing here is decided without you.",
+  "facts": [
+    ["Prepared for", "Shri Sanjeev Gupta, Scientist-D, Unit In-Charge"],
+    ["Laboratory", "RSTRS / Silk Conditioning & Testing House, Dharmavaram"],
+    ["Accreditation", "NABL · ISO/IEC 17025:2017 · NABLT0726AD18713"],
+    ["Companion", "TTL-SRS-v1.0, the full specification"]
+  ],
+  "reqCount": "1,278",
+  "acCount": "55"
+}

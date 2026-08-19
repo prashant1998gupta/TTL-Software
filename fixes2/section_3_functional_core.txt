@@ -1,0 +1,31 @@
+====================================================================================================
+CROSS-FILE ITEM 1 of 8
+parts/section_3_functional_core.md, M9 field table Status banner row (around L1464): replace "One of the five states" with an explicit cross-reference instead of a bare count — "One of the four banners of M9-14 (GENUINE — VALID / GENUINE — SUPERSEDED / GENUINE — WITHDRAWN / NOT GENUINE), plus the distinct signature-check wordings of M9-17, M9-18 and M9-19". Keep the cell to the table's existing cell count and do not add a status.
+
+====================================================================================================
+CROSS-FILE ITEM 2 of 8
+parts/section_3_functional_core.md, M8-61 (around L1270), optional reader-clarity edit only: "current status (Issued / Superseded / Withdrawn — the report lifecycle status, distinct from the series number states of M8-62)". M8-61, M8-62 and Section 2 §10.1 are otherwise correct as written and must not be changed; the Issued / Cancelled / Missing vocabulary there is the numbering-series axis, not the report lifecycle.
+
+====================================================================================================
+CROSS-FILE ITEM 3 of 8
+parts/section_3_functional_core.md L216 (M1 field table): note that `Advance required` / `credit_terms` set the per-order Payment terms default consumed by M3-26 and are subordinate to WF-5's `payment_release_rule`, stating which wins when they disagree.
+
+====================================================================================================
+CROSS-FILE ITEM 4 of 8
+parts/section_3_functional_core.md L638 (M4 field table): with no label at Received, the Sample number note should read "Populated by lookup, or by scanning the acknowledgement slip; the sample label does not exist until acceptance." My §7.2 step 7 now names that acknowledgement slip, so the two need to agree. Also L514: expand `DVM/2627/RS/00411`…`00415` to the full financial year.
+
+====================================================================================================
+CROSS-FILE ITEM 5 of 8
+parts/section_3_functional_core.md L235-236 and parts/section_4_functional_support.md L840-841 (M17-05, M17-06): "order line" to "request line" in prose, leaving `txn_order_line` and `order_line_id` untouched. My file is now fully renamed, so these are the last four sites.
+
+====================================================================================================
+CROSS-FILE ITEM 6 of 8
+section_3_functional_core.md — M6-14 and M6-15 (SPEC.md lines 2127-2128): change 'Override requires the Unit Incharge' to 'the Lab In-Charge or the Unit Incharge (Approving Authority)', so the expired-lot and calibration gates agree with M11-20, the amended M12-11 and the M21.3 matrix. The same 'Unit Incharge only' wording appears in M5-06 (section_3_functional_core.md) and WF-64 (section_2_workflow.md) and should be swept in the same change.
+
+====================================================================================================
+CROSS-FILE ITEM 7 of 8
+parts/section_3_functional_core.md — M8-42 (approx. L1241) lists "computation of its checksum" before "the signature" in the same transaction. Re-order so the checksum is computed after signing, over the final stored bytes. I have stated the byte scope in DB-14, but M8-42's own ordering still reads the other way and NFR-42's weekly job would otherwise fail on every certificate-signed report from day one. (Finding 9)
+
+====================================================================================================
+CROSS-FILE ITEM 8 of 8
+parts/section_3_functional_core.md — §8.2 entity model: correct the `NONCONFORMITY 1---* CAPA ACTION` cardinality to 0/1, since M15-31 requires one corrective-action record and §25 embeds it on txn_ncr rather than in a separate txn_capa_action table. Note also that §8.2/§8.3 name `mst_test_method` and `txn_receipt`, neither of which is a §25 table name, so those diagrams are conceptual and should say so rather than being read as the physical schema. I have added txn_ncr.report_id, which closes the REPORT half of the same finding. (Finding 15)

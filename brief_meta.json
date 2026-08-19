@@ -1,0 +1,51 @@
+{
+  "org": "Central Silk Board, Ministry of Textiles, Government of India",
+  "unit": "Regional Silk Technological Research Station / Silk Conditioning & Testing House, Dharmavaram, Andhra Pradesh — under CSTRI, Bengaluru",
+  "title": "Silk Testing Laboratory Management System",
+  "subtitle": "Overview for the Laboratory — what is being built, and what we need you to decide",
+  "docCode": "TTL-BRIEF-v1.0",
+  "runningHead": "Silk Testing Laboratory Management System — Overview for the Laboratory",
+  "creator": "Prepared for Central Silk Board (CSTRI / RSTRS Dharmavaram)",
+  "facts": [
+    [
+      "Document code",
+      "TTL-BRIEF-v1.0"
+    ],
+    [
+      "What this is",
+      "The short version of the full specification, for the Unit In-Charge"
+    ],
+    [
+      "Relationship to the full document",
+      "A strict subset. Every statement here also appears in TTL-SRS-v1.0, so the two cannot disagree."
+    ],
+    [
+      "Companion document",
+      "TTL-SRS-v1.0 — the full Software Requirements Specification, for the developer"
+    ],
+    [
+      "Accreditation context",
+      "NABL accredited to ISO/IEC 17025:2017 in its own right — certificate NABLT0726AD18713, issued 17/07/2026, valid to 16/07/2030. Compliance requirements are mandatory."
+    ],
+    [
+      "Supersedes",
+      "\"Testing Software — Key Discussion Points\" (10-point discussion note), reproduced in Appendix A"
+    ],
+    [
+      "What is asked of you",
+      "Read the Executive Summary, then answer as many OPEN-Q items in Appendix B as you can"
+    ],
+    [
+      "Next step",
+      "A two-day sit-in at the laboratory to watch the real process and collect every existing form and register"
+    ]
+  ],
+  "howToRead": [
+    "**Start with the Executive Summary.** It answers one question: what did the original ten-point note get right, and what needed to change. About fifteen minutes of reading.",
+    "**Part A** describes the laboratory, the goals, who uses the system, and every term used in the document. If a word here is wrong or a role is missing, that is the most valuable correction you can make.",
+    "**Part B** is the important one. It describes how a sample will move through the laboratory, from the counter to the signed certificate. Please check it against how the work actually happens.",
+    "**Appendix A** is your original note, reproduced unchanged, so the two can be compared.",
+    "**Appendix B** lists every question only you can answer. Each has a recommended default, so nothing is waiting on you — but an unchallenged default becomes a decision by accident.",
+    "**You do not need to read the full specification.** It contains the database design, the technical requirements and the build plan, which are the developer's concern."
+  ]
+}

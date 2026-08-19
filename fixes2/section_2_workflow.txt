@@ -1,0 +1,35 @@
+====================================================================================================
+CROSS-FILE ITEM 1 of 9
+parts/section_2_workflow.md §8.3 (approx. L531): add a row legitimising the register's proper name — 'Register of persons authorised to sign | Authorised Signatory Register (the accreditation body's own term) | mst_signatory_scope | Authorised Signatory Register | Signatory list, Approver list' — and append to the 'Person authorised to sign' row: 'Approving Authority is the role and the screen label; Authorised Signatory Register is the proper name of the register of such persons, retained because it is the accreditation body's term.'
+
+====================================================================================================
+CROSS-FILE ITEM 2 of 9
+parts/section_2_workflow.md §8.3 (approx. L517): widen the sub-sample concept cell from 'Physical piece consumed by a test' to 'Physical piece below the Sample — an as-received package (bale, book, cone, skein) or a prepared specimen', and add 'Sub-unit' to that row's 'Do not call it' column. Without this, Part C's rename lands on a definition a bale in a 20-bale lot does not satisfy.
+
+====================================================================================================
+CROSS-FILE ITEM 3 of 9
+parts/section_2_workflow.md §10.1 (approx. L733): widen the sub-sample suffix from -P<2> to -P<3>. One raw-silk lot can need 22-30 bale rows plus bobbins, seriplane panels, sizing skeins and conditioned-mass skeins, which overflows two digits. Part C's M3-03 deliberately refers to 'the sub-sample suffix defined in Part B §10.1' rather than naming a width, so it stays correct either way.
+
+====================================================================================================
+CROSS-FILE ITEM 4 of 9
+parts/section_2_workflow.md WF-34 (approx. L1089 of SPEC.md): it gates Received-to-Accepted on 'the minimum quantity recorded on the test catalogue item for that sample type', a field that exists nowhere. Restate as: 'Received to Accepted is permitted only if the deduplicated required-quantity figure (M2-26) is met, and, per test, the technical minimum sample quantity on that test's Active method revision is satisfied.' Add the acceptance check 'Receive 10 skeins against a full BIS grading order; Accept is available. Receive 3 skeins; Accept is unavailable.' Note the requirement number: the order-level check is M2-26 in Part C, not the 'M2-08a' the finding drafted.
+
+====================================================================================================
+CROSS-FILE ITEM 5 of 9
+parts/section_2_workflow.md (approx. L347, SPEC.md:789): 'Average neatness (%, chosen from the standard set 100, 90, 80, 70, 60, 50, 30, 10)' conflates a computed value with a picked one. Average neatness is computed under M6-06 (mean of the panel ratings, then the method's rounding rule); only the individual panel rating comes from the photograph set. Also scope that line's major/auxiliary enumeration visibly to Category II and point it at the new M1 grade-computation annex, since it currently reads as general.
+
+====================================================================================================
+CROSS-FILE ITEM 6 of 9
+parts/section_2_workflow.md WF-50 (approx. L663): add 'Where the test is flagged batch-custody, the issue-to-bench and return-from-bench events for all samples on one worksheet may be written by a single confirmation action per M4-36. The per-sample trail printed by M4-27 must still show both hops for every sample.' Note the number: M4-36, not the 'M4-23a' the finding drafted.
+
+====================================================================================================
+CROSS-FILE ITEM 7 of 9
+section_2_workflow.md — section 9.2 Table B (Test Allocation state list: Pending, Allocated, Awaiting Conditioning, In Test, Result Entered, Under Verification, Verified, Reported, Discarded, Invalidated, On Hold, Subcontracted, Aborted, Cancelled): add 'Withheld', entered from any pre-Reported state, returning to the prior state on disposition, with the turnaround clock stopped; and add a WF rule beside WF-87 covering the equipment and batch causes. M11-24(g) and M12-12 now name a state this list does not contain.
+
+====================================================================================================
+CROSS-FILE ITEM 8 of 9
+parts/section_2_workflow.md — WF-80 (approx. L689): append to the existing sentence "Where the allocation appears on any report not yet Issued, the retraction automatically returns that report to Draft, marks its snapshot stale so it must be recompiled before it can be submitted for authorisation again, names the report number to the retracting user, and notifies the report writer and the signatory." Acceptance check: "Compile a draft covering a verified allocation, submit it for authorisation, then retract that allocation. The report drops back to Draft with its snapshot marked stale, the signatory is notified, and authorisation is refused until the report is recompiled." This reuses the existing PENDING_APPROVAL to DRAFT send-back transition and needs no new allocation state. DB-43 and AC-49 in my file depend on it. (Finding 2)
+
+====================================================================================================
+CROSS-FILE ITEM 9 of 9
+parts/section_2_workflow.md — WF-97 (approx. L771): replace "inside the same database transaction" with "by the server immediately before the business transaction commits (see DB-08)", keeping the rest of the clause and its acceptance check. Without this, WF-97 still contradicts DB-08 and DB-09 as now worded in my file. (Finding 8)

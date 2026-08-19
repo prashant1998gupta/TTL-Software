@@ -1,0 +1,118 @@
+## In one paragraph
+
+This document specifies a Laboratory Information Management System — software that runs the whole life of a test, from the moment a customer hands over silk at the counter to the moment a signed certificate is issued and can be verified by scanning a code on it. It is written for the Regional Silk Technological Research Station / Silk Conditioning and Testing House at Dharmavaram. It replaces the paper sample register, the hand-typed report, the hand-calculated conditioned weight, and the folder of calibration certificates with one system that can answer, at any moment, where a sample is, who tested it, on which balance, in what room conditions, against which version of which method, and who signed the result. It is built as its own application and connected to CloudZoo ERP, which continues to own customers, invoices, stock and assets.
+
+## The short answer to "can we do better than the first note?"
+
+Yes — and the first note was a good start. It named ten things, and all ten are in this specification. But a discussion note describes a conversation, while a specification has to survive a developer's questions and an auditor's questions. Eight changes matter more than the rest.
+
+**1. The order of the first two steps is reversed.** The first note began with creating a customer and raising an invoice, then receiving samples. In a testing laboratory that is backwards, for a practical reason: the charge cannot be known before the material is counted and inspected. A grading fee depends on how many bales are in the lot; a conditioning charge depends on weight. So the process now begins with a **Test Request** that the laboratory formally reviews and accepts, and the invoice follows from what was actually received. A quotation can still be given up front as an estimate, and advance payment can still be demanded where the laboratory wants it.
+
+**2. The word "job" is retired, because it was doing two jobs.** The first note said one job per sample. That is nearly right and it was the note's sharpest instinct. But one sample commonly carries four or five different tests, performed by different people on different days on different machines. So the specification separates the **sample** (the physical silk) from the **test on that sample** (the unit of work that gets assigned to a person). Five hanks needing three tests each is five samples and fifteen assignable units of work — not five jobs, and not one.
+
+**3. A test result is not a single number.** The first note described a "test log entry" with observations and remarks. Real silk testing produces many readings that are then averaged: six skeins for conditioned mass, ten bobbins for winding, twenty panels for evenness, forty or eighty sizing skeins for size deviation. The system must store **every original reading**, compute the average and the variation from them, and never overwrite a reading that has been submitted. A single free-text "results" box would lose exactly the data an auditor asks for.
+
+**4. Approval is two steps, not one.** The first note had one approval. A laboratory does two different things: someone technically competent **verifies** that the numbers and the arithmetic are right, and then the authorised signatory **authorises and signs** the certificate. These are different acts by different people with different consequences. The specification also covers what happens when the signatory is on tour, because that will happen.
+
+**5. A certificate that has been issued can never be quietly edited.** The first note did not mention what happens when a report has to change after it has gone out. This is the single most common way a laboratory loses an audit. The specification requires an **amendment** — a new, separately identified version that refers to the original, records why it changed, keeps the superseded version retrievable and marked as superseded, and updates what a person sees when they scan the code on the old copy.
+
+**6. The public QR code should not show everything to everybody.** The first note said anyone scanning the code should be able to see the report. The intent is right — digital verification instead of telephone calls — but a test report is a commercially sensitive trade document, and a permanently public, guessable link would let anyone harvest competitors' results. The specification keeps the benefit and removes the risk: an anonymous scan confirms that the certificate is **genuine, current, and not amended or withdrawn**, and shows enough to identify it; the actual results need a one-time password or a login. If the laboratory prefers the fully open version, it is a single setting — but the safer behaviour is the default.
+
+**7. Two modules were named in the first note but are much bigger than their names suggest.** "Equipment as an asset system" is really **calibration control**: the system must know whether a balance was within its calibration validity on the day it produced a weight, and — critically — when a machine is found out of calibration, it must be able to list every result that machine produced since its last good calibration, so the laboratory can decide whether any certificate must be recalled. "Internal stock" is really **reagent lot and expiry control**: the system must refuse to let an expired lot be used in a test and must record which lot was used for which result.
+
+**8. A record-keeping backbone has been added underneath everything.** The first note had no audit trail, no method versions, no environmental conditions, no retention and disposal, no competency control. These are not extras. Silk testing is done in a controlled atmosphere and the conditions at the time of test are part of the result. A method has versions, and a certificate issued three years ago must be reproducible against the version in force then. Only a person authorised for a method may run it. Every change to a technical record must keep the original value visible, with who changed it, when, and why. This backbone is what turns a workflow tool into a laboratory record.
+
+## Your ten points, and where each one now lives
+
+| # | Point in the original note | Where it is now | What was added to it |
+|---|---|---|---|
+| 1 | Customer creation | M1 Master Data | Customer categories that drive concession rates and the returns to headquarters; a frozen name-and-address snapshot on every issued certificate so a later edit cannot rewrite history; a path for zero-charge internal and research samples; duplicate-customer control |
+| 2 | Invoice with multiple tests | M2 Enquiry & Quotation, M17 Billing | Formal review and acceptance of the request before work starts; rate card with effective dates and concessions; quotation as an estimate; charge computed from what was actually received; government receipt and challan handling; gap-free financial-year invoice numbering |
+| 3 | Sample-based job creation | M3 Test Request & Sample Registration | The physical hierarchy of lot, bale, book, skein and specimen; the split of sample from assignable test; acceptance and rejection at receipt with recorded condition; a printed acknowledgement for the customer; label printing; due dates from a working-day calendar |
+| 4 | Job assignment, tester must not see customer | M5 Work Allocation | A competency gate so only an authorised person can be assigned a method; a calibration check on the equipment at the moment of assignment; a workload view; an honest account of where blinding cannot work, because the customer's own marks are physically on the silk |
+| 5 | Test log entry by tester | M6 Result Entry | Many readings per parameter with the required count enforced; automatic averages and variation; capture of which machine and which reagent lot were used; room temperature and humidity at test time; fast keyboard-only batch entry, because roughly ninety-eight per cent of this unit's work is one high-volume test |
+| 6 | Test log approval | M7 Verification & Approval | The split into technical verification and authorised signing; send-back with a reason; a verification checklist; delegation while the signatory is away; a stated decision rule for a result sitting right on a specification limit |
+| 7 | Test report generation | M8 Report & Certificate Generation | The full mandatory content required of an accredited laboratory's report; amendment and withdrawal control; draft versus final; a dispatch register; storage of the exact issued file, not just the data it was made from |
+| 8 | QR code online report access | M9 Public Verification by Code | Tiered disclosure; a signed code so a forged one can be detected; non-guessable links; rate limiting; correct behaviour for an amended or withdrawn certificate; a log of every verification attempt |
+| 9 | Equipment calibration as asset system | M11 Equipment & Calibration | Calibration validity and due alerts; intermediate checks; out-of-service blocking; and the impact analysis that lists every result produced by a machine later found out of calibration |
+| 10 | Internal stock for testing | M12 Consumables & Reagent Stock | Lot numbers, expiry and shelf life after opening; a hard block on using an expired lot; consumption traced to the individual result; reorder alerts; disposal records |
+
+Eleven further modules were added that the original note did not mention: sample handling and chain of custody (M4), personnel competency (M13), method and document control (M14), the quality system (M15), environment monitoring (M16), the customer portal (M18), notifications (M19), registers and dashboards (M20), administration and audit (M21), integration with CloudZoo ERP (M22), and — the one most specific to this unit — the **weight and conditioning certificate** (M10), which is a different document from a test report and is the highest-consequence calculation the unit performs, because money changes hands on the final kilogram figure.
+
+## What we need from you before coding starts
+
+The specification contains **105 questions marked OPEN-Q**, each carrying a recommended default so that nothing is blocked while answers are pending. They are lettered by the part that raises them — OPEN-Q-A1 in Part A, OPEN-Q-T1 in the technical part, and so on. The full register is in Appendix B. These are the ones worth answering first, because the answers prevent the most rework.
+
+| Question | Why it matters |
+|---|---|
+| **Does the Limited Test count as accredited?** (Accreditation and its scope are now both settled — see below.) | The Limited Test is about 98% of the unit's samples. Whether it falls under the one accredited raw-silk entry (*Raw Silk Yarn / Count / IS 15090 (Part 5)*) decides whether the accreditation appears on nearly every report or nearly none. It yields both a count and a size deviation, and only *Count* is accredited. Must be answered in writing by the Quality Manager, not assumed. |
+| How are mixed reports issued today — one report, or separate ones? | Where a sample carries both accredited and non-accredited tests, the system must issue **two separate reports**. Marking the non-accredited test with an asterisk on one report is not permitted. If that is the current practice, the software will change it. |
+| How does the existing national CSB online testing portal relate to this system? | Samples may already arrive through it. It is treated here as a source of incoming requests, not as something to replace — but the two must not keep separate, disagreeing records of the same sample. |
+| Are the published rate card and test list current for this unit? | Everything about charging depends on it. Please confirm or correct the catalogue and rates. |
+| Every existing paper form, register and report format | The system should print what the unit already prints. Please collect one filled example of each. |
+| The real daily volumes and the busiest hour | Decides the design of the batch entry screens. |
+| Who signs, who verifies, and who deputises when the signatory is away | Decides the permission matrix. |
+| Whether the sample is returned, retained or disposed, and for how long | Decides the storage and disposal module. |
+
+## What it takes to build
+
+One developer, full time. **Section 26.1 is the authoritative estimate** and carries the reasoning, the exclusions and the schedule risks; the summary below is only an orientation. If the two ever disagree, Section 26 is right.
+
+| Phase | What the laboratory gets | Developer-weeks |
+|---|---|---|
+| 0 | Two weeks sitting in the laboratory watching the real process, collecting every form, and settling the open questions | 2 |
+| 1 | **The paper sample register is replaced**, end to end: reviewed test request, registration, allocation, result entry with its equipment, reagent-lot, competency and environment gates, verification, signed certificate with a verification code, the conditioned-mass certificate, and report amendment and withdrawal | 32–38 |
+| 2 | Money: rate cards, enquiry and quotation, invoices, receipts, payment holds, statutory returns | 7–9 |
+| 3 | Equipment lifecycle and stock economics: the calibration programme, the traceability chain, the stock ledger, training records, and the out-of-calibration impact analysis | 4–6 |
+| 4 | Quality system: complaints, nonconforming work, corrective action, quality control, proficiency testing, decision rules, document control | 7–9 |
+| 5 | Outward-facing: customer portal, notifications, dashboards | 6–8 |
+| 6 | Depth: instrument file import, stronger signing, subcontracting, readiness for a second unit | 5–7 |
+
+The complete system is roughly **fifteen to eighteen months** of one person's full time, with the paper sample register replaced somewhere in **month eight or nine**.
+
+A word on why Phase 1 is large. An earlier draft of this plan put Phase 1 at twelve weeks by leaving the test request review, the equipment and reagent-lot capture, the competency check and report amendment to later phases. That was wrong, and reviewing the plan against the requirements showed why: Phase 1 is the release that goes live and starts issuing signed certificates, so everything a certificate depends on has to be inside it. A certificate issued in month nine without a record of which balance produced the weight, whether that balance was in calibration, and who was authorised to sign, cannot be defended afterwards — and there would have been no way to amend it except by re-typing it, which is the practice this system exists to end. Phase 1 is delivered in internal increments, but it has one go-live.
+
+Phase 0 is not optional. Two weeks of watching the real work will change more of this document than two months of guessing.
+
+## The accreditation position, now confirmed
+
+The laboratory holds accreditation **in its own right**, separate from the reference laboratory at Bengaluru. Confirmed from the certificate itself:
+
+| | |
+|---|---|
+| Legal entity | Central Silk Board |
+| Accredited facility | Textile Testing Laboratory, Regional Silk Technological Research Station, Central Silk Technological Research Institute |
+| Address on the certificate | D. No. 25-650, Parthasaradhi Nagar, Regetipalli Road, Dharmavaram, Sri Sathya Sai, Andhra Pradesh, India |
+| Standard | ISO/IEC 17025:2017 |
+| Field | Testing |
+| Certificate number | **NABLT0726AD18713** |
+| Issued | 17 July 2026 |
+| Valid until | 16 July 2030 |
+
+Three consequences that change how the software must be built, not merely what it prints:
+
+**The compliance requirements in this document are obligations, not good practice.** The audit trail that keeps original readings visible, the calibration validity check before a result is accepted, the block on an expired reagent lot, the competency gate, the method version recorded against every result, and amendment control on issued reports are the things an assessor will ask to see. They belong in the first release, which is why Phase 1 is as large as it is.
+
+**The certificate number is in the current 2026 format, so the report number format follows from it.** The Unique Laboratory Report number is the 26-character form: the certificate number, then the two-digit report year, then an eight-digit running number restarted each calendar year — for example `NABLT0726AD18713` `26` `00000001` for the first report of 2026. The unit never needs the older shorter forms. The system still builds this from configuration rather than fixed text, so a re-issued certificate in any future format costs no programming.
+
+**The accredited scope is small, and this changes the design.** The scope annexure has been obtained. It lists **seven** accredited entries, all under *Mechanical — Textile Materials*:
+
+| Material or product | Parameter | Method |
+|---|---|---|
+| Fabric | Length | IS 1954 |
+| Fabric | Mass | IS 1964 |
+| Fabric | Number of Threads Per Unit Length | IS 1963 |
+| Fabric | Percentage by Weight of Warp and Weft Yarn | IS 17208 |
+| Fabric | Width | IS 1954 |
+| **Raw Silk Yarn** | **Count** | **IS 15090 (Part 5)** |
+| Woven Fabric | Linear Density of Yarn Removed from Fabric | IS 3442 |
+
+The Unit In-Charge's own remark — that a good deal of the unit's testing is done outside NABL — is confirmed by this annexure, and it matters more than it first appears. Raw silk grading (BIS and ISA), evenness, neatness, cleanness, cohesion, twist, boil-off, winding breaks, tenacity, fibre identification, blend composition, cocoon work, and the whole of conditioning and weight certification are **not** in the accredited scope. Five of the seven entries are fabric tests, while the unit's recorded revenue is overwhelmingly raw silk work.
+
+So the software must treat non-accredited work as the **normal** case: the plain report is the document staff will see most days, the accredited report is the smaller stream, and where one sample carries both kinds the system issues **two separate reports** rather than one report with a footnote. Marking a non-accredited test with an asterisk on an accredited report is not permitted, which may differ from current practice and is worth checking.
+
+One question remains, and it is the most valuable one left: **does the Limited Test — roughly 98 per cent of the unit's samples — fall under *Raw Silk Yarn / Count / IS 15090 (Part 5)*?** The Limited Test yields both a count figure and a size-deviation figure, and the annexure names only *Count*. The answer decides whether accreditation appears on nearly every report or nearly none. The specification's working assumption is that *Count* is inside and *size deviation* is outside — which means a split report — but this must be confirmed in writing by the Quality Manager rather than assumed.
+
+## An honest word on what this will not do
+
+It will not make a tensile test faster. It will not remove the need for discipline in recording readings — it will only make undisciplined recording visible. It will need one person to own the master data, because a test catalogue and a rate card that nobody maintains will quietly become wrong. And it will not, by itself, make the unit accredited; it will make the unit's records defensible, which is a different and necessary thing.

@@ -1,0 +1,83 @@
+====================================================================================================
+CROSS-FILE ITEM 1 of 21
+parts/section_5_nfr_plan.md, NFR-69 (around L164): replace "the words GENUINE / NOT GENUINE / SUPERSEDED / CANCELLED" with "the words GENUINE — VALID, GENUINE — SUPERSEDED, GENUINE — WITHDRAWN or NOT GENUINE, exactly as enumerated in M9-14". This is the third and most dangerous variant, because NFR-69 is [MUST] and carries a black-and-white print acceptance check, so a developer implementing the banner from NFR-69 alone still ships CANCELLED. Part A is now consistent with M9-14; NFR-69 is not.
+
+====================================================================================================
+CROSS-FILE ITEM 2 of 21
+parts/section_5_nfr_plan.md §25.2 `txn_sample_test`: add `discarded_due_to_sample_test_id BIGINT NULL` (self-FK) — the Discarded row in my §9.2 promises to record the triggering allocation and neither `retest_of_id` nor `superseded_by_id` can hold it. Also seed `sys_state_transition_rule` with the seven new Discarded transitions I added to §9.2 (from Pending, Allocated, Awaiting Conditioning, In Test, Result Entered, Under Verification and Verified), or DB-15 will refuse the moves WF-74 [MUST] requires. `discard_reason_id` is optional; if added, define the value set of `validity VARCHAR(15)` at the same time.
+
+====================================================================================================
+CROSS-FILE ITEM 3 of 21
+parts/section_5_nfr_plan.md §25.1: rename `mst_method` to `mst_test_method` and `mst_method_equipment` / `_consumable` / `_parameter` to `mst_test_method_equipment` / `_consumable` / `_parameter` (L438-442). I deliberately left §8.3 at `mst_test_method`, so this is now the only remaining direction — do not also change §8.3, or the contradiction inverts instead of closing. Note that my new WF-96 clause deliberately cites no column names, so it survives either outcome.
+
+====================================================================================================
+CROSS-FILE ITEM 4 of 21
+parts/section_5_nfr_plan.md §25.2: rename `txn_payment` to `txn_receipt`, `txn_payment_reference` to `txn_receipt_reference` (L493), `txn_payment_allocation` to `txn_receipt_allocation` with `payment_id` to `receipt_id` (L494), and the same inside DB-37 (L586). §8.3 already settles "Receipt" / `txn_receipt` and needs no change.
+
+====================================================================================================
+CROSS-FILE ITEM 5 of 21
+parts/section_5_nfr_plan.md: apply finding 6 (add `txn_bank_statement_line` and `txn_import_batch`, an `idempotency_key` on the receipt table, the partial unique index on machine-generated `ref_type` values, DB-43, AC-49, and the traceability line at L643 from "DB-01 to DB-42" to "DB-01 to DB-43"), and finding 14's conditioning tables (`txn_conditioning_lot`, `_bale`, `_moisture_set`, `_dry_weighing`, `_skein`, plus the §25.6 constraint blocking a CONDITIONING report from reaching ISSUED without a matching lot). Also NFR-103's cross-reference should be AC-42, not AC-30, and NFR-109's should be AC-38, not AC-32.
+
+====================================================================================================
+CROSS-FILE ITEM 6 of 21
+Two items the findings flag as needing their own review, not folded in anywhere: (a) the appendix `mst_consumable_lot` schema has only `lot_no` and no column for the internal `DVM/LOT/...` identifier my §10.1 mandates; (b) §26's phase summary never mentions the conditioning certificate module — "M10" appears nowhere in section_5_nfr_plan.md.
+
+====================================================================================================
+CROSS-FILE ITEM 7 of 21
+parts/section_5_nfr_plan.md §24.4 Technology stack (approx. L5057, SPEC.md:5057): the PDF-signing interface lists 'an electronic-signature service provider' as one of three interchangeable implementations. M8-46 now forbids any signing tier that requires a call outside the laboratory network on the report-issue path, so this option must be either reworded to 'a remote signing service whose signing key remains inside the laboratory network' or annotated as available for non-report documents only.
+
+====================================================================================================
+CROSS-FILE ITEM 8 of 21
+parts/section_5_nfr_plan.md go-live checklist item 5 (approx. L5508 of SPEC.md): extend the master-data list to name 'the conditioning method's numeric constants' and 'the raw silk grade computation reference data', so the seeded values in the two new M10 and M1 tables are signed for rather than resting on OPEN-Q-C11 and OPEN-Q-C13 alone.
+
+====================================================================================================
+CROSS-FILE ITEM 9 of 21
+parts/section_5_nfr_plan.md database design: four columns the new Part C requirements depend on — is_provisional BOOLEAN on mst_customer (approx. L429, currently missing, required by M1-13); confirmed_on and confirmed_by on mst_gst_registration (approx. L428, required by M1-79); subsample_id NULL with an index on txn_observation, plus replacement of txn_sample_test.subsample_id with a txn_sample_test_subsample link table (required by M6-19 and by M4-12's many-to-many rule); and worksheet_id nullable on txn_custody_event (approx. L495, required by M4-36 as the batch authorisation reference, with a note that it does not change the append-only rule of M4-21 or the entity_type/entity_id grain).
+
+====================================================================================================
+CROSS-FILE ITEM 10 of 21
+parts/section_5_nfr_plan.md txn_sample (approx. L480): drop or demote no_of_bales INT and no_of_units INT / no_of_books INT to derived counts over txn_subsample, or state explicitly that they are denormalised caches. M3-03 now requires the counts to live as sub-sample rows, so the figure otherwise exists in two places and can disagree. Also update the txn_subsample description (approx. L481) to match the widened §8.3 concept, and record the as-received / prepared distinction as prep_type values (bale, book, cone, skein, bobbin, sizing_skein, panel, strip, swatch, aliquot) rather than as a new entity.
+
+====================================================================================================
+CROSS-FILE ITEM 11 of 21
+parts/section_5_nfr_plan.md mst_reeling_device comment (approx. L435): change 'Affects price and test recipe.' to 'Affects the test recipe. Not a pricing dimension; price resolves on the order line's concession category per M1 rules item 5.' Keep the is_arm BOOLEAN, which is what makes M3-34's consistency warning cheap to evaluate.
+
+====================================================================================================
+CROSS-FILE ITEM 12 of 21
+parts/section_5_nfr_plan.md mst_method_parameter (approx. SPEC.md:5158): either drop is_major_characteristic and is_auxiliary_characteristic or annotate them as non-authoritative report-ordering defaults. The new M1 grade-computation annex states that the authoritative classification lives on mst_grade_rule, keyed on spec_set_id and therefore per category, because a per-method-parameter boolean cannot express maximum deviation being major in Category III and auxiliary in Categories I and II.
+
+====================================================================================================
+CROSS-FILE ITEM 13 of 21
+parts/section_5_nfr_plan.md §26.3 Phase 1 'Included:' list: add 'the Sampling Record for samples the laboratory draws itself, with the sampling-plan reference held as a text reference in this phase'; note in §26.5 Phase 3 that the M13 authorisation check on the SAMPLE activity binds from that phase, and in §26.6 Phase 4 that the plan reference becomes a controlled-document link once document control exists. M4-35 is worded to degrade exactly this way.
+
+====================================================================================================
+CROSS-FILE ITEM 14 of 21
+section_5_nfr_plan.md — NFR-105 (line 243) and DB-04 (line 544): replace the 'How' column text 'No UPDATE or DELETE permission' with the full revoked privilege list now in M21-31 (UPDATE, DELETE, TRUNCATE, ALTER, DROP and the right to create, alter, disable or drop a trigger; audit tables not owned by the application account), plus the guard trigger that raises an error and records the attempt, and the per-row SHA-256 chain column that M21-31b re-computes.
+
+====================================================================================================
+CROSS-FILE ITEM 15 of 21
+section_5_nfr_plan.md — DB-39 (line 588): replace 'A complaint cannot be closed by a person who appears in the audit trail of the work complained about. | Trigger querying sys_audit_log and sys_state_transition for the related sample and report' with 'A complaint cannot be closed by a person in the involvement set of the work complained about, as defined in M15-20. | Trigger over the signature records, observation and result authorship columns, custody events, sys_state_transition rows for the related sample, test, report and invoice, and the unblind-approval records. sys_audit_log rows whose action is print, export, login, download or permission denial shall be excluded from the test.' Without this, DB-39 contradicts the amended M15-20.
+
+====================================================================================================
+CROSS-FILE ITEM 16 of 21
+section_5_nfr_plan.md — appendix data model (around line 5169 of SPEC.md): replace mst_prepared_solution.source_lot_ids JSON with a child table mst_prepared_solution_source (prepared_solution_id; nullable source_lot_id; nullable source_prepared_solution_id; qty_consumed; uom_id; exactly one of the two source columns non-null; index on both source columns). Extend DB-20 to read '...stores equipment_id and, where the method consumes one, consumable_lot_id or prepared_solution_id', so the single-query guarantee in the new M12-32 actually covers the prepared-solution path.
+
+====================================================================================================
+CROSS-FILE ITEM 17 of 21
+section_5_nfr_plan.md — add a DB rule mirroring DB-42: 'A test caught in an open impact analysis cannot be verified or reported until it has been dispositioned — trigger on the verification and report-issue transitions, checking txn_ncr_affected for an un-dispositioned row.' This is the database half of the new M11-24(g) and M12-12 withholding.
+
+====================================================================================================
+CROSS-FILE ITEM 18 of 21
+Part E, section 26.3 Phase 1 'Included:' — after 'roles, permissions and users;' insert: the staff register separate from the login account (M13-01, M13-02); the authorisation matrix with enforcement evaluated against the date of the action on allocate, submit, check, verify and sign (M13-07, M13-08, M13-09), with provisional authorisation per M13.5 rule 3 where no assessment record yet exists; the segregation-of-duties rule with the recorded, counted override (M13-10); the Authorised Signatory Register and the per-parameter signatory coverage check including the hold where no signatory covers a parameter (M13-11, M13-12, M7-25, M7-26, M7-35); the Delegation Register (M13-13, M13-14, M7-31 to M7-33); and the as-at-date authorisation query (M13-16).
+
+====================================================================================================
+CROSS-FILE ITEM 19 of 21
+Part E, section 26.5 Phase 3 'Included:' (SPEC.md line 5383) — replace the trailing 'the personnel register; and the competency authorisation matrix enforced as a guard on allocate, submit, check, verify and sign, evaluated against the date of the action' with 'the competence evidence behind the authorisations already enforced since Phase 1 — documented competence requirements per function, qualification and experience records, training records, competence assessments, supervision records, periodic re-authorisation with the warn-then-suspend ladder, the accreditation-body notification task, confidentiality and impartiality undertakings, and the printable competence file (M13-03 to M13-06, M13-15, M13-17 to M13-25)', and amend Phase 3's 'What the laboratory can do at the end' to 'evidence the competence behind each authorisation' rather than 'demonstrate that only authorised people did each activity'. Otherwise the capability is listed in both Phase 1 and Phase 3.
+
+====================================================================================================
+CROSS-FILE ITEM 20 of 21
+Part E, section 26.9 data migration — split the 'Personnel and competency' row into two: 'Staff records, authorisation matrix rows and the Authorised Signatory Register | under 20 people | Personnel file, the PLN-06 signatory list | Typed in with the authorising reference and dates | Phase 1 | Unit Incharge | Load per OPEN-Q-D7 and OPEN-Q-A6: the Unit In-Charge as signatory for all test areas performed, one named alternate, declaration reference recorded as to be obtained where the document has not yet been produced. Nothing can be signed until this exists (M7-25, M7-35), and no login can be created without it (M21-01).' and 'Training, qualification and assessment evidence | ... | Phase 3 | Unit Incharge | This is the file an assessor asks for.'
+
+====================================================================================================
+CROSS-FILE ITEM 21 of 21
+Part E, section 26.3 Phase 1 acceptance milestone — add 'and a signatory authorised for only one discipline is refused when signing a report carrying a parameter outside that discipline, the system naming the parameter (M7-25, M13-12)'. Section 26.13 go-live checklist — add the Authorised Signatory Register and the authorisation matrix to item 5's master-data list, and note against item 7 that each login must be linked to an existing staff record per M21-01.

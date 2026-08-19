@@ -1,0 +1,51 @@
+====================================================================================================
+CROSS-FILE ITEM 1 of 13
+parts/section_4_functional_support.md M21.3: resolve the LI/AA legend against Part A. If the LI column is relabelled SH (Section Head) rather than merged into AA, its "Payment hold — override" mark MUST change from "A" to "–", or the matrix grants exactly what WF-41's acceptance check in my file requires to be refused; audit LI's "A" marks on "Method version — activate", "Nonconformity / corrective action — close", "Concession / waiver (to limit)", "Equipment block — override" and "Expired batch — override" the same way.
+
+====================================================================================================
+CROSS-FILE ITEM 2 of 13
+parts/section_4_functional_support.md M12 block (L163-300) plus the M21.3 rows: rename "Batch" to "Consumable Lot" per finding 3, including "Lot tracked (Yes/No)", "lot-tracked item", "Lot identifier" sourced from §10.1's `DVM/LOT/<FY>/<4>` series, "LOT IMPACT ANALYSIS", and a sub-lot suffix on the §10.1 series rather than the invented `B-2026-014-A` format. Keep "Supplier's / manufacturer's batch or lot number" as-is, and do not run the replace outside M12/M21.3.
+
+====================================================================================================
+CROSS-FILE ITEM 3 of 13
+parts/section_4_functional_support.md M17-42 (L892): rewrite to defer to WF-5's `payment_release_rule` rather than independently keying the gate to customer category — my WF-5 now owns the whole rule, including the three values and the evaluation order. Update the configuration register (L1602) to `payment_release_rule` per unit, per order type with per-customer-category override, traced to WF-5 and M17-42. Replace OPEN-Q22 (L944) with a pointer to Part B OPEN-Q1, whose recommended default I have extended to cover the customer-category half.
+
+====================================================================================================
+CROSS-FILE ITEM 4 of 13
+parts/section_4_functional_support.md M22-06: add inbound idempotency symmetric with M22-02 — "An inbound message shall be recognised by its source identifier and applied at most once; a repeat delivery shall be logged and discarded, not re-applied."
+
+====================================================================================================
+CROSS-FILE ITEM 5 of 13
+parts/section_4_functional_support.md M21.11 configuration and feature-switch register (approx. L1578): it currently runs from M11 to M21 and lists no conditioning parameter. Add every row of the new M10 seeded method parameters table, including skein_draw_gap_warn_minutes.
+
+====================================================================================================
+CROSS-FILE ITEM 6 of 13
+parts/section_4_functional_support.md M14-10 (approx. L449): extend it with 'and the specimen level the draw produces plus the method whose output it draws from, so shared specimen chains are resolvable'. Part C's M1-36 now defers to M14-10 as the single definition of the sample draw rule, and M2-26 and M3 rules item 4 both read the chains from it.
+
+====================================================================================================
+CROSS-FILE ITEM 7 of 13
+parts/section_4_functional_support.md M14.4 document-type pick-list (approx. L3439 of SPEC.md): add 'Sampling plan'. M4-35 in Part C now holds a sampling plan reference and there is no such document type today.
+
+====================================================================================================
+CROSS-FILE ITEM 8 of 13
+parts/section_4_functional_support.md M21-16 (approx. L1462): rename CLIENT-4417 to CUST-4417 to match the token rename in Part C. This is the fifth of the five places the finding lists and the only one outside my file.
+
+====================================================================================================
+CROSS-FILE ITEM 9 of 13
+parts/section_4_functional_support.md — M21-50 (approx. L1511): replace the final sentence with "Defaults, which shall equal the objectives in NFR-95 and NFR-96: recovery point objective 15 minutes; recovery time objective 4 working hours for a software or data failure, extending to 1 working day for total loss of the server hardware. The laboratory may set a tighter objective but the system shall refuse a value looser than these without the Quality Manager's recorded authorisation." (Finding 7)
+
+====================================================================================================
+CROSS-FILE ITEM 10 of 13
+parts/section_4_functional_support.md — configuration-defaults row (approx. L1623): "| `recovery_point_objective` / `recovery_time_objective` | 15 minutes / 4 working hours, extending to 1 working day on total loss of server hardware | M21-50, NFR-95, NFR-96 |" (Finding 7)
+
+====================================================================================================
+CROSS-FILE ITEM 11 of 13
+parts/section_4_functional_support.md — `backup_schedule` row (approx. L1621): "| `backup_schedule` | Daily full; transaction logs every 15 minutes | M21-47, NFR-97 |". Without this the table still defaults to hourly incrementals and cannot meet the 15-minute RPO. (Finding 7)
+
+====================================================================================================
+CROSS-FILE ITEM 12 of 13
+parts/section_4_functional_support.md — M21-47 (approx. L1508): change "transaction-level backup at least hourly where the database supports it" to "transaction-level backup at least every 15 minutes where the database supports it". (Finding 7)
+
+====================================================================================================
+CROSS-FILE ITEM 13 of 13
+parts/section_4_functional_support.md — OPEN-Q30, assembled as OPEN-Q-D30 (approx. L1656): drop the stray five-year floor. "*Recommended default:* adopt the table above unchanged — issued reports ten years from date of issue, technical records ten years from date of test. No universal figure exists: the accreditation standard fixes none and leaves the period to laboratory policy, and the only figure the research verified is a three-year minimum that applies solely to certain regulatory schemes, which government audit requirements typically exceed. Confirm against CSTRI's and the Board's own record rules and the government audit requirement before any disposal is ever authorised." Do not name any NABL document number in body prose. My OPEN-Q-T6 now defers to the M21.12 table, so this is the surviving figure. (Finding 14)

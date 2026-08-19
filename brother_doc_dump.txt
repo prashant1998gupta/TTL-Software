@@ -1,0 +1,32 @@
+[Normal] 
+[Normal] Key Discussion Points
+[Normal] 1. Customer Creation
+[Normal] The process will start with the creation and maintenance of customer details in CloudZoo ERP. Customer master details will be used for invoice generation and report reference.
+[Normal] 2. Invoice Creation with Multiple Tests
+[Normal] An invoice can be created for a customer, and each invoice may contain multiple tests. The tests will be selected based on the samples received and the testing requirements.
+[Normal] 3. Sample-Based Job Creation
+[Normal] For each sample received, the system should automatically create a separate job.
+[Normal] Example:If 5 samples are received, the system should generate 5 individual jobs.
+[Normal] Each job will be uniquely identified by a Job Number, and the testing process will be tracked sample-wise.
+[Normal] 4. Job Assignment to Testing Team
+[Normal] The created jobs should be assigned to the respective testing team members.
+[Normal] A key requirement discussed was that the assigned team member should not be able to view customer details. The tester should only see the Job Number, sample details, assigned test, and required test parameters. This will help maintain confidentiality and avoid unnecessary exposure of customer information.
+[Normal] 5. Test Log Entry by Tester
+[Normal] The assigned tester will conduct the test and update the test log entry in the system. The test log will include the test observations, results, remarks, sample image if required, and other required testing details.
+[Normal] 6. Test Log Approval
+[Normal] Once the test log is entered by the tester, it should go through an approval process. The authorized person will verify and approve the test log before final report generation.
+[Normal] 7. Test Report Generation
+[Normal] After approval, the system should generate the final test report.
+[Normal] 8. QR Code-Based Online Report Access
+[Normal] Each generated test report should have a QR Code. Anyone scanning the QR code should be able to view the test report online. This will help customers, auditors, and authorized users verify the report digitally.
+[Normal] 9. Internal Lab Equipment Calibration Management
+[Normal] Apart from the testing workflow, it was discussed that the system should also maintain internal lab equipment details as an asset system.
+[Normal] 10. Internal Stock Maintenance for Testing
+[Normal] The system should also maintain the internal stock items used for testing purposes.
+[Normal] 
+[Normal] Proposed CloudZoo ERP Workflow
+[Normal] Customer Creation→ Invoice Creation with Multiple Tests→ Sample Received Entry→ Auto Job Creation for Each Sample→ Job Assignment to Testing Team→ Tester Log Entry→ Test Log Approval→ Test Report Generation with Sample Image→ QR Code-Based Online Report View
+[Normal] Additional modules discussed:
+[LIST] Lab Equipment / Asset Calibration Management
+[LIST] Internal Testing Stock Maintenance
+[Normal] 

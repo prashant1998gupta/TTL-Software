@@ -1,0 +1,51 @@
+{
+  "org": "Central Silk Board, Ministry of Textiles, Government of India",
+  "unit": "Regional Silk Technological Research Station / Silk Conditioning & Testing House, Dharmavaram, Andhra Pradesh — under CSTRI, Bengaluru",
+  "title": "Silk Testing Laboratory Management System",
+  "subtitle": "Software Requirements Specification — for build on / alongside CloudZoo ERP",
+  "docCode": "TTL-SRS-v1.0",
+  "runningHead": "Silk Testing Laboratory Management System — Software Requirements Specification",
+  "creator": "Prepared for Central Silk Board (CSTRI / RSTRS Dharmavaram)",
+  "facts": [
+    [
+      "Document code",
+      "TTL-SRS-v1.0"
+    ],
+    [
+      "Status",
+      "Draft for review by the Lab In-Charge"
+    ],
+    [
+      "Supersedes",
+      "\"Testing Software — Key Discussion Points\" (10-point discussion note)"
+    ],
+    [
+      "Prepared for",
+      "Unit In-Charge, RSTRS / Silk Conditioning & Testing House, Dharmavaram"
+    ],
+    [
+      "Accreditation context",
+      "NABL accredited to ISO/IEC 17025:2017 in its own right — certificate NABLT0726AD18713, issued 17/07/2026, valid to 16/07/2030, in the name of the Central Silk Board. Compliance requirements are mandatory, not optional."
+    ],
+    [
+      "Host system",
+      "CloudZoo ERP (customer master, invoicing, inventory, assets). The laboratory system is a separate application integrated with it."
+    ],
+    [
+      "Review needed on",
+      "Every item marked OPEN-Q. These are decisions only the laboratory can make."
+    ],
+    [
+      "Next step",
+      "Section 26 — Phase 0: two-day sit-in at the laboratory and collection of all existing forms and registers"
+    ]
+  ],
+  "howToRead": [
+    "**If you run the laboratory:** read sections 1 to 10 and section 29. They describe the work in laboratory language, with no programming terms. Sections 7 and 9 are the most important — they describe how a sample will move through the laboratory.",
+    "**If you are approving or funding this:** read section 3 (goals and success measures), section 26 (phasing and effort), and section 29 (what this buys the laboratory).",
+    "**If you are building it:** read the whole document. Sections 23 to 27 are the technical half. Section 28 lists every decision still outstanding.",
+    "**Requirement numbers** such as M3-07 or WF-14 are permanent. Quote them in meetings and emails so everyone is discussing the same line.",
+    "**[MUST]** = required for the first release. **[SHOULD]** = important, plan for it. **[LATER]** = deliberately deferred to a later phase.",
+    "**OPEN-Q** marks a question the laboratory must answer. Each one has a recommended default so work is not blocked while the answer is pending."
+  ]
+}

@@ -1281,7 +1281,47 @@ The Scope master required by M8-30 is not a hypothetical. The scope annexure to 
 
 > **Read this before assuming the accreditation covers the day's work.** Comparing the seven rows above with the unit's actual revenue mix has a blunt consequence for the design: **most of what this laboratory sells is outside its accredited scope.** Raw silk grading (both BIS and ISA), evenness, neatness, cleanness, cohesion, twist, boil-off, winding breaks, tenacity and elongation, fibre identification, blend composition, cocoon tests and the whole of conditioning and weight certification appear nowhere in the annexure. Five of the seven accredited entries are fabric tests, while the recorded revenue is overwhelmingly raw silk work. Therefore: the automatic split of M8-32 is the **normal case, not the exception**; the Unique Laboratory Report number will be allotted on a **minority** of reports; and the non-accredited report template is the one most staff will see most days. It must be designed as a first-class document, not as a degraded version of the accredited one.
 
-> **OPEN-Q13:** Does the *Limited Test* — the unit's workhorse, about 98 per cent of samples — fall inside scope row 6 (*Raw Silk Yarn / Count / IS 15090 (Part 5)*)? The Limited Test produces both a **count or size** figure and a **size deviation** figure, and the annexure names only *Count*. This single answer decides whether the accreditation appears on almost every report the unit issues or almost none. — *Recommended default:* treat **Count** as inside scope and **size deviation** as outside it, which under M8-31 and M8-32 means a Limited Test report splits into an accredited part and a non-accredited part. Do not adopt this default silently: put it to the Quality Manager in writing and record the answer, because the alternative readings differ enormously in effect and getting it wrong in the permissive direction is an accreditation offence.
+> **OPEN-Q14 — ANSWERED.** Does the *Limited Test* fall inside scope row 6 (*Raw Silk Yarn / Count / IS 15090 (Part 5)*)? **No.** The Unit In-Charge has confirmed it directly — "limited test will be non nabl" — and has supplied a status list, *RSTRS DMM Proposed testing charges*, marking the Limited Test and seventeen other catalogue items **Non-NABL**. He also confirmed that where accredited and non-accredited work meet, a **separate report** is required, which is exactly the split of M8-32. The recommended default in the earlier draft of this document (treating *Count* as inside scope) was therefore **wrong**, and is withdrawn. The seeded status list is §M8.6 below.
+
+### M8.6 Catalogue accreditation status, as seed data
+
+Confirmed by the Unit In-Charge. Every item below is **outside** the accredited scope and its reports carry no accreditation symbol and no Unique Laboratory Report number.
+
+| # | Catalogue item | Status |
+|---|---|---|
+| 3 | Limited test (5 skein) | Non-NABL |
+| 4 | Raw silk testing & Grading — BIS | Non-NABL |
+| 5 | Raw silk testing & Grading — ISA (IARM) | Non-NABL |
+| 6 | Raw silk testing & Grading — ISA | Non-NABL |
+| 7 | Fibre Identification | Non-NABL |
+| 8 | Composition of raw silk (Blend analysis) | Non-NABL |
+| 9 | Nature | Non-NABL |
+| 10 | Seriplane tests of raw silk — BIS | Non-NABL |
+| 11 | Serigraph test of raw silk — BIS | Non-NABL |
+| 12 | Cohesion test of raw silk — BIS | Non-NABL |
+| 13 | Twist (twisted silk) — single | Non-NABL |
+| 14 | Twist (twisted silk) — composite | Non-NABL |
+| 15 | Denier test of twisted silk | Non-NABL |
+| 18 | Computerized zari testing | Non-NABL |
+| 19 | Computerized zari testing at multiple point | Non-NABL |
+| 20 | Zari testing chemical method | Non-NABL |
+| 21 | Zari testing Handloom weavers | Non-NABL |
+| 27 | Reelability test (cocoons) | Non-NABL |
+| 28 | Reelability test with neatness | Non-NABL |
+| 29 | Cocoon Testing (Renditta, CQI) | Non-NABL |
+| 30 | Water Hardness / pH / Total dissolved solids | Non-NABL |
+
+**M8-72 [MUST]** — The accreditation status of a catalogue item is **explicit master data with a default of Non-NABL**. A newly created catalogue item is Non-NABL until somebody with the Quality Manager's authority sets it otherwise against a named row of the scope annexure, and the system records which annexure row was relied on. There is no derivation of status from a test's name, its method, or the fact that a similar test is accredited. **Acceptance check:** create a new catalogue item called "Denier test"; it is created Non-NABL, and setting it accredited demands the selection of a scope annexure row.
+
+**M8-73 [MUST]** — The **non-accredited certificate is the primary template**. It is designed first, tested first and is the default for a new catalogue item. The accredited template is the exception path. **Acceptance check:** issue reports for the twenty-one items above; every one uses the non-accredited template, carries no symbol and no Unique Laboratory Report number, and consumes no number from that series.
+
+> **The design consequence, stated plainly.** Every item on the unit's current proposed charge list is Non-NABL. The seven accredited scope entries are five fabric parameters, one woven-fabric parameter and *Raw Silk Yarn / Count*, and **none of the twenty-one items above maps to any of them**. On the present catalogue the accreditation symbol and the Unique Laboratory Report number would therefore appear on **no report at all**. That is not a defect in this design — the machinery is built and tested and waits behind a per-item flag — but it changes what is built first and what must be demonstrated at acceptance. Build the plain certificate properly; treat the accredited one as the smaller, later stream.
+
+> **OPEN-Q15:** The status list supplied by the unit is numbered 3 to 30 with gaps — serial numbers **1, 2, 16, 17 and 22 to 26 are absent**, and no fabric test appears anywhere on it, although five of the seven accredited scope entries are fabric parameters. What are the missing items, and are any of them the accredited ones? — *Recommended default:* assume the missing serial numbers correspond to the fabric and count parameters named in the scope annexure, and treat them as accredited **only** once the unit confirms both the item name and the annexure row it maps to. Until then every catalogue item is Non-NABL, which is the safe direction.
+
+> **OPEN-Q16:** Does the unit actually offer, and charge for, the seven accredited parameters — fabric length, mass, threads per unit length, warp and weft percentage by weight, width, raw silk yarn count, and linear density of yarn removed from fabric? None of them appears on the proposed charge list. If they are not offered, the accreditation covers work the unit does not sell, and the accredited template will never be used. — *Recommended default:* build the accredited path as specified but schedule its acceptance demonstration only once the unit confirms at least one accredited item is on the price list. Ask the Quality Manager whether these parameters are newly added, planned, or performed for another CSB unit.
+
+> **OPEN-Q17:** The file supplied is titled *Proposed testing charges* but contains only test names and their accreditation status — **no charges**. What are the current rates for each item, and are the "proposed" rates a revision awaiting approval or already in force? — *Recommended default:* seed the rate card from the published CSTRI schedule effective 01.12.2023 (Limited test ₹50, Denier test bobbin ₹30, Denier test skein ₹40, Raw silk testing & Grading BIS ₹400, ISA ₹1,100 or ₹2,000 by origin) and mark every rate **unconfirmed**, with an effective date, so a revision supersedes rather than overwrites it.
 
 > **OPEN-Q7:** Does the accreditation body require one verification code on the report or two (one to the report, one to the accreditation certificate and scope)? The research could not confirm the two-code requirement from an official source. — *Recommended default:* design the template with **two code positions**, populate only the report-verification code, and leave the second position empty until the requirement is confirmed.
 

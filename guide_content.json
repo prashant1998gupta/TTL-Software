@@ -322,10 +322,24 @@
     "theme": "The accreditation, and what may carry it",
     "questions": [
      {
-      "id": "OPEN-Q-C13",
-      "ask": "Does the Limited Test count as an accredited test? Your scope annexure lists Raw Silk Yarn / Count / IS 15090 (Part 5), but the Limited Test yields both a count and a size deviation, and only Count is named there.",
-      "whyItMatters": "This one answer decides whether the NABL symbol and a Unique Laboratory Report number appear on almost every report you issue, or on almost none of them.",
-      "ourGuess": "Treat the count as inside the scope and the size deviation as outside it, so a Limited Test produces one accredited report and one plain report. Please put this to the Quality Manager in writing rather than let us assume it — being wrong in the permissive direction is an accreditation offence.",
+      "id": "OPEN-Q-C15",
+      "ask": "Your status list is numbered 3 to 30, but numbers 1, 2, 16, 17 and 22 to 26 are missing, and no fabric test appears on it at all. What are those missing items, and are any of them the NABL ones?",
+      "whyItMatters": "Five of your seven accredited entries are fabric tests, and none of them is on the list we have — so we cannot tell which catalogue item, if any, the accreditation actually applies to.",
+      "ourGuess": "Every catalogue item stays Non-NABL until you name the item and the scope row it maps to. Safe direction, but it means the accreditation shows on nothing.",
+      "urgent": true
+     },
+     {
+      "id": "OPEN-Q-C16",
+      "ask": "Does the unit actually offer and charge for the seven accredited parameters — fabric length, mass, threads per unit length, warp and weft percentage, width, raw silk yarn count, and linear density of yarn removed from fabric?",
+      "whyItMatters": "If these are not on the price list, the accreditation covers work the unit does not sell, and the accredited certificate would never be printed.",
+      "ourGuess": "Build the accredited path but do not demonstrate it at acceptance until at least one accredited item is on the price list.",
+      "urgent": false
+     },
+     {
+      "id": "OPEN-Q-C17",
+      "ask": "The file you sent is titled Proposed testing charges but has no charges in it. What is the rate for each test today, and are the proposed rates already in force or still awaiting approval?",
+      "whyItMatters": "Every invoice, every estimate and every concession depends on the rate card, and a wrong rate is money.",
+      "ourGuess": "Seed from the published CSTRI schedule of 01.12.2023 (Limited test ₹50, grading BIS ₹400) and mark every rate unconfirmed, with an effective date.",
       "urgent": true
      },
      {

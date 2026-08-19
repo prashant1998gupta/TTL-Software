@@ -84,10 +84,13 @@ def check_ids(lines):
 
 def check_questions(lines):
     defined, referenced = {}, collections.defaultdict(list)
+    dupes = collections.defaultdict(list)
     for num, line in enumerate(lines, 1):
         stripped = line.strip()
         m = QDEF_RE.match(stripped)
         if m:
+            if m.group(1) in defined:
+                dupes[m.group(1)].append(num)
             defined.setdefault(m.group(1), num)
         elif stripped.startswith("|"):
             cells = [c.strip() for c in stripped.strip("|").split("|")]
@@ -97,7 +100,7 @@ def check_questions(lines):
         for m3 in QID_RE.finditer(stripped):
             referenced[m3.group(1)].append(num)
     undefined = {k: v for k, v in referenced.items() if k not in defined}
-    return defined, undefined
+    return defined, undefined, dupes
 
 
 def check_tables(lines):
@@ -158,7 +161,7 @@ def main():
     lines = load(path)
 
     defined, dupes, undefined = check_ids(lines)
-    qdefined, qundefined = check_questions(lines)
+    qdefined, qundefined, qdupes = check_questions(lines)
     tables = check_tables(lines)
     formats = check_number_formats(lines)
 
@@ -179,7 +182,12 @@ def main():
         print("   %-10s first referenced at L%d" % (k, undefined[k][0]))
     print()
 
-    print("3. Open questions referenced but never defined: %d" % len(qundefined))
+    print("3a. Open questions DEFINED MORE THAN ONCE: %d" % len(qdupes))
+    for k in sorted(qdupes):
+        print("   %-14s first at L%d, again at L%s" % (k, qdefined[k], qdupes[k]))
+    print()
+
+    print("3b. Open questions referenced but never defined: %d" % len(qundefined))
     for k in sorted(qundefined)[:15]:
         print("   %-14s referenced at L%s" % (k, qundefined[k][:4]))
     print()

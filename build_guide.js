@@ -354,11 +354,22 @@ function scopeSection(scope) {
       <strong>two separate certificates</strong> &mdash; marking a non-accredited test with an asterisk on an
       accredited report is not permitted. If that differs from current practice, the software will change it.
     </div>
-    <div class="note silk"><b>The one question that decides the scale of this</b>
-      Does the <strong>Limited Test</strong> &mdash; about 98% of your samples &mdash; fall under
-      <em>Raw Silk Yarn / Count / IS 15090 (Part 5)</em>? It produces both a count and a size deviation, and
-      the annexure names only <em>Count</em>. This single answer decides whether the accreditation appears on
-      nearly every certificate you issue, or almost none of them.
+    <div class="note sage"><b>Answered &mdash; and it settles the shape of the whole system</b>
+      You have confirmed that the <strong>Limited Test is Non&#8209;NABL</strong>, and your status list marks
+      all twenty&#8209;one items on the current charge list the same way. None of them maps to any of the seven
+      accredited entries above. So on today's catalogue, <strong>no certificate carries the symbol or the
+      report number at all</strong>.
+      <br><br>
+      That is not a problem &mdash; it is a decision that saves work. The plain certificate is now built
+      <em>first</em> and treated as the main document. The accredited machinery is still built and tested, but
+      it waits behind a switch until an accredited test is actually on your price list.
+    </div>
+    <div class="note"><b class="g">Which leaves three smaller questions</b>
+      Your list is numbered 3 to 30 with gaps &mdash; numbers <strong>1, 2, 16, 17 and 22 to 26</strong> are
+      missing, and no fabric test appears anywhere on it, although five of the seven accredited entries are
+      fabric tests. So: what are the missing items? Does the unit actually offer and charge for those seven
+      accredited parameters? And the file is titled <em>Proposed testing charges</em> but carries no charges
+      &mdash; what are the rates, and are the proposed ones already in force?
     </div>`);
 }
 

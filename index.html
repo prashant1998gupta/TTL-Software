@@ -81,6 +81,26 @@ h3{font-size:21px; margin:36px 0 12px}
 .stat .l{font-size:12.5px; font-weight:650; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin:9px 0 7px}
 .stat .n{font-size:13px; color:var(--muted); line-height:1.5}
 
+/* ---------- progress ---------- */
+.prog{display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:16px}
+.pcard{background:var(--card); border:1px solid var(--line); border-left-width:5px; border-radius:var(--radius); padding:20px 22px; box-shadow:var(--shadow)}
+.pcard.ok{border-left-color:var(--sage)}
+.pcard.find{border-left-color:var(--gold)}
+.pcard.you{border-left-color:var(--silk)}
+.pcard.todo{border-left-color:var(--line-2)}
+.phead{display:flex; gap:12px; align-items:flex-start; margin-bottom:11px}
+.pmark{flex:none; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-size:15px; font-weight:700; color:#fff; background:var(--muted)}
+.pcard.ok .pmark{background:var(--sage)}
+.pcard.find .pmark{background:var(--gold)}
+.pcard.you .pmark{background:var(--silk)}
+.pcard h4{font-size:18px; margin-bottom:2px}
+.pstate{font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted)}
+.pcard.ok .pstate{color:var(--sage)}
+.pcard.find .pstate{color:var(--gold)}
+.pcard.you .pstate{color:var(--silk)}
+.pcard p{font-size:14.5px; color:var(--ink-soft); margin-bottom:9px}
+.pcard .pwhy{font-size:13.5px; color:var(--muted); font-style:italic; margin:0}
+
 /* ---------- generic cards ---------- */
 .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow)}
 .grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:16px}
@@ -243,7 +263,7 @@ footer .dl a small{display:block; font-weight:400; font-size:12.5px; color:rgba(
 <div class="wrap">
   <aside class="rail noprint">
     <div class="brand">The Silk Testing Laboratory System<small>A visual guide for the Unit In-Charge</small></div>
-    <nav><a href="#top"><span class="num">&#9679;</span>Start here</a><a href="#facts"><span class="num">1</span>By the numbers</a><a href="#journey"><span class="num">2</span>Follow one lot</a><a href="#changes"><span class="num">3</span>What changed</a><a href="#roles"><span class="num">4</span>Who uses it</a><a href="#scope"><span class="num">5</span>Accredited scope</a><a href="#benefits"><span class="num">6</span>Before &amp; after</a><a href="#plan"><span class="num">7</span>The plan</a><a href="#decisions"><span class="num">8</span>Over to you</a></nav>
+    <nav><a href="#top"><span class="num">&#9679;</span>Start here</a><a href="#progress"><span class="num">1</span>Where we are now</a><a href="#facts"><span class="num">2</span>By the numbers</a><a href="#journey"><span class="num">3</span>Follow one lot</a><a href="#changes"><span class="num">4</span>What changed</a><a href="#roles"><span class="num">5</span>Who uses it</a><a href="#scope"><span class="num">6</span>Accredited scope</a><a href="#benefits"><span class="num">7</span>Before &amp; after</a><a href="#plan"><span class="num">8</span>The plan</a><a href="#decisions"><span class="num">9</span>Over to you</a></nav>
   </aside>
   <main>
     
@@ -261,6 +281,36 @@ footer .dl a small{display:block; font-weight:400; font-size:12.5px; color:rgba(
     </div>
   </div>
 </header>
+    
+<section id="progress">
+  <div class="inner wide">
+    <div class="eyebrow">Where we are now</div>
+    <h2>What is built, and what is waiting on you</h2>
+    <p class="lede">Work has started. Rather than beginning with the easy parts, we began with the two pieces that were genuinely in doubt — because if either had turned out to be impossible, it would have been far better to find out now than a year from now. Both are settled.</p>
+    <div class="prog"><div class="pcard ok">
+        <div class="phead"><span class="pmark">&#10003;</span>
+          <div><h4>The certificate itself</h4><span class="pstate">Working</span></div></div>
+        <p>A certificate can now be produced that carries Telugu, Hindi and English correctly, is digitally signed, and can be checked years later. The signature is invisible on the page, as the accessibility standard requires, and the text can be searched and copied out — so a customer can find their own name in it rather than looking at a picture of one.</p>
+        <p class="pwhy">This is the thing the whole system exists to produce, and the hardest part to change once certificates have been issued. It had to be first.</p>
+      </div><div class="pcard find">
+        <div class="phead"><span class="pmark">!</span>
+          <div><h4>A problem found by building it</h4><span class="pstate">Discovered</span></div></div>
+        <p>The standard software for putting text into a certificate crashes outright on Telugu — on ordinary words, including శ్రీ, the honorific in a great many Indian names. Not wrong output: it stops. A second piece of software now does that work instead.</p>
+        <p class="pwhy">No amount of design would have found this. Only running it did. A test now checks every release that the original defect is still there, so the workaround is removed the day it is fixed rather than living on forever.</p>
+      </div><div class="pcard you">
+        <div class="phead"><span class="pmark">&#9998;</span>
+          <div><h4>The calculations and the grade</h4><span class="pstate">Needs your tables</span></div></div>
+        <p>The arithmetic is built — averages and deviation from the individual skein weights, maximum deviation from the coarsest and finest, low neatness from the worst fifth of panels, conditioned size with the 11 per cent allowance, and the two-stage grade where the major tests set the grade and an auxiliary test can pull it down by one class.</p>
+        <p class="pwhy">But it will not produce a grade yet, and that is deliberate. The grade tables — the actual limit values for 4A, 3A, 2A and the rest — were not available to us, and we refused to invent them. A grade that looks right and is wrong is the worst thing this system could produce, because money is settled against it and nobody can tell by looking.</p>
+      </div><div class="pcard todo">
+        <div class="phead"><span class="pmark">&#8230;</span>
+          <div><h4>Everything else</h4><span class="pstate">Specified, not yet built</span></div></div>
+        <p>The register, the workflow, the calibration and competency checks, the billing and the portal are all written down in full — 1,291 numbered requirements — but not yet built.</p>
+        <p class="pwhy">The order is deliberate: prove the risky parts, then build the ordinary ones.</p>
+      </div></div>
+    <div class="note silk"><b>One decision has changed since the first draft</b>The earlier draft assumed this system would sit alongside a separate business software package that would hold the customer list, raise the invoices and keep the stock. The unit runs no such package, so that assumption has been withdrawn. <strong>This system now stands on its own</strong> — it keeps its own customer records, raises and numbers its own invoices and receipts, and holds its own consumable stock and equipment records. Nothing else has to be bought or installed before it can run. The accounts wing keeps the general ledger exactly as it does today; if the Board ever adopts an accounting package, a connection to it is already described and can be switched on then.</div>
+  </div>
+</section>
     
 <section id="facts">
   <div class="inner wide">
@@ -790,17 +840,50 @@ footer .dl a small{display:block; font-weight:400; font-size:12.5px; color:rgba(
 <section id="decisions">
   <div class="inner wide">
     <div class="eyebrow">Over to you</div>
-    <h2>26 decisions only you can make</h2>
+    <h2>29 decisions only you can make</h2>
     <p class="lede">Every question below already has a recommended answer written into the specification, so nothing is waiting on you and no work is blocked while you read. But a default that nobody challenges quietly becomes a decision by accident — and a few of these decide things that cannot be undone once samples have been registered. Of the hundred-odd open questions in the full document, these twenty-four are the ones that genuinely need you personally; the rest can be settled with your staff or by handing us one real filled-in form.</p>
     <div class="toolbar noprint">
-       <button class="btn on" data-filter="all">Show all 26</button>
-       <button class="btn" data-filter="urgent">Only the 11 urgent ones</button>
+       <button class="btn on" data-filter="all">Show all 29</button>
+       <button class="btn" data-filter="urgent">Only the 12 urgent ones</button>
        <button class="btn" onclick="window.print()">Print / save as PDF</button>
      </div>
      
        <div class="qgroup" data-group>
-         <h3>The accreditation, and what may carry it<span class="cnt">5</span></h3>
+         <h3>The accreditation, and what may carry it<span class="cnt">8</span></h3>
          
+           <div class="q urgent" data-urgent="1">
+             <div class="top">
+               <span class="id">OPEN-Q-C13</span>
+               <span class="flag">Needed before we start</span>
+             </div>
+             <div class="ask">Can we have the grade tables you actually work to — the limit values for 4A, 3A, 2A, A, B, C, D and E, for each characteristic, for each of the three size categories? A photocopy of the page you use is perfect.</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> The grading is built but will not produce a grade without them. We deliberately did not invent the numbers: a grade that looks right and is wrong is settled against in money, and nobody can tell by looking.</div>
+               <div><b>If you don't answer, we will assume:</b> Nothing. This is the one place the software refuses to guess and simply stops until you supply them.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-C14</span>
+               
+             </div>
+             <div class="ask">When you work out size deviation on a worksheet, do you divide by the number of skeins, or by one less than that? If you can send one completed worksheet with its printed answer, we can tell from the figures.</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> Both are used in practice and they give different answers near a grade boundary. No standard we could read settled which one this laboratory uses.</div>
+               <div><b>If you don't answer, we will assume:</b> Divide by the number of skeins, marked unconfirmed. One real worksheet settles it in a minute.</div>
+             </div>
+           </div>
+           <div class="q" data-urgent="0">
+             <div class="top">
+               <span class="id">OPEN-Q-C18</span>
+               
+             </div>
+             <div class="ask">For a size test, how many sizing skeins are actually weighed for one lot — and are they weighed in separate groups? We have two different figures from two sources: 40 or 80, and 200 or 400 in ten groups.</div>
+             <div class="meta">
+               <div><b>Why it matters:</b> It decides how many reading rows a test has and the whole shape of the entry screen the testers will use every day.</div>
+               <div><b>If you don't answer, we will assume:</b> Both figures are recorded side by side and neither is enforced until you confirm which is right.</div>
+             </div>
+           </div>
            <div class="q urgent" data-urgent="1">
              <div class="top">
                <span class="id">OPEN-Q-C15</span>
@@ -1131,6 +1214,8 @@ footer .dl a small{display:block; font-weight:400; font-size:12.5px; color:rgba(
           <h4>Next step</h4>
           <p>Phase 0 &mdash; two days at the counter and the bench, and one filled copy of every form and
           register in use. Then the questions in <a href="#decisions">Over to you</a>.</p>
+          <p class="dl"><a href="Phase%200%20Field%20Kit.html">&#8594;&nbsp; The Phase 0 field kit
+            <small>Print it and carry it &mdash; what to watch, what to bring back, what to count</small></a></p>
         </div>
       </div>
     </footer>

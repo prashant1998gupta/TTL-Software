@@ -100,6 +100,26 @@ h3{font-size:21px; margin:36px 0 12px}
 .stat .l{font-size:12.5px; font-weight:650; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin:9px 0 7px}
 .stat .n{font-size:13px; color:var(--muted); line-height:1.5}
 
+/* ---------- progress ---------- */
+.prog{display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:16px}
+.pcard{background:var(--card); border:1px solid var(--line); border-left-width:5px; border-radius:var(--radius); padding:20px 22px; box-shadow:var(--shadow)}
+.pcard.ok{border-left-color:var(--sage)}
+.pcard.find{border-left-color:var(--gold)}
+.pcard.you{border-left-color:var(--silk)}
+.pcard.todo{border-left-color:var(--line-2)}
+.phead{display:flex; gap:12px; align-items:flex-start; margin-bottom:11px}
+.pmark{flex:none; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-size:15px; font-weight:700; color:#fff; background:var(--muted)}
+.pcard.ok .pmark{background:var(--sage)}
+.pcard.find .pmark{background:var(--gold)}
+.pcard.you .pmark{background:var(--silk)}
+.pcard h4{font-size:18px; margin-bottom:2px}
+.pstate{font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted)}
+.pcard.ok .pstate{color:var(--sage)}
+.pcard.find .pstate{color:var(--gold)}
+.pcard.you .pstate{color:var(--silk)}
+.pcard p{font-size:14.5px; color:var(--ink-soft); margin-bottom:9px}
+.pcard .pwhy{font-size:13.5px; color:var(--muted); font-style:italic; margin:0}
+
 /* ---------- generic cards ---------- */
 .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow)}
 .grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:16px}
@@ -275,6 +295,28 @@ function heroSection(meta) {
     </div>
   </div>
 </header>`;
+}
+
+function progressSection(p) {
+  const STATE = {
+    'done':      { cls: 'ok',   mark: '&#10003;' },
+    'found':     { cls: 'find', mark: '!' },
+    'needs-you': { cls: 'you',  mark: '&#9998;' },
+    'spec':      { cls: 'todo', mark: '&#8230;' },
+  };
+  return section('progress', 'Where we are now', 'What is built, and what is waiting on you',
+    p.intro,
+    `<div class="prog">${p.items.map(i => {
+      const s = STATE[i.state] || STATE.spec;
+      return `<div class="pcard ${s.cls}">
+        <div class="phead"><span class="pmark">${s.mark}</span>
+          <div><h4>${esc(i.title)}</h4><span class="pstate">${esc(i.stateLabel)}</span></div></div>
+        <p>${rich(i.what)}</p>
+        <p class="pwhy">${rich(i.why)}</p>
+      </div>`;
+    }).join('')}</div>
+    ${p.standalone ? `<div class="note silk"><b>${esc(p.standalone.title)}</b>${rich(p.standalone.text)}</div>` : ''}`,
+    true);
 }
 
 function statsSection(stats) {
@@ -454,7 +496,7 @@ function section(id, eyebrow, title, lede, body, wide) {
 // --------------------------------------------------------------- assemble
 function build(content, meta) {
   const NAV = [
-    ['top', 'Start here'], ['facts', 'By the numbers'], ['journey', 'Follow one lot'],
+    ['top', 'Start here'], ['progress', 'Where we are now'], ['facts', 'By the numbers'], ['journey', 'Follow one lot'],
     ['changes', 'What changed'], ['roles', 'Who uses it'], ['scope', 'Accredited scope'],
     ['benefits', 'Before &amp; after'], ['plan', 'The plan'], ['decisions', 'Over to you'],
   ];
@@ -485,6 +527,7 @@ function build(content, meta) {
   </aside>
   <main>
     ${heroSection(meta)}
+    ${content.progress ? progressSection(content.progress) : ''}
     ${content.facts ? statsSection(content.facts.stats) : ''}
     ${content.journey ? journeySection(content.journey) : ''}
     ${content.changes ? changesSection(content.changes) : ''}
@@ -514,6 +557,8 @@ function build(content, meta) {
           <h4>Next step</h4>
           <p>Phase 0 &mdash; two days at the counter and the bench, and one filled copy of every form and
           register in use. Then the questions in <a href="#decisions">Over to you</a>.</p>
+          <p class="dl"><a href="Phase%200%20Field%20Kit.html">&#8594;&nbsp; The Phase 0 field kit
+            <small>Print it and carry it &mdash; what to watch, what to bring back, what to count</small></a></p>
         </div>
       </div>
     </footer>

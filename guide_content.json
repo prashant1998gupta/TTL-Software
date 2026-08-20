@@ -322,6 +322,27 @@
     "theme": "The accreditation, and what may carry it",
     "questions": [
      {
+      "id": "OPEN-Q-C13",
+      "ask": "Can we have the grade tables you actually work to — the limit values for 4A, 3A, 2A, A, B, C, D and E, for each characteristic, for each of the three size categories? A photocopy of the page you use is perfect.",
+      "whyItMatters": "The grading is built but will not produce a grade without them. We deliberately did not invent the numbers: a grade that looks right and is wrong is settled against in money, and nobody can tell by looking.",
+      "ourGuess": "Nothing. This is the one place the software refuses to guess and simply stops until you supply them.",
+      "urgent": true
+     },
+     {
+      "id": "OPEN-Q-C14",
+      "ask": "When you work out size deviation on a worksheet, do you divide by the number of skeins, or by one less than that? If you can send one completed worksheet with its printed answer, we can tell from the figures.",
+      "whyItMatters": "Both are used in practice and they give different answers near a grade boundary. No standard we could read settled which one this laboratory uses.",
+      "ourGuess": "Divide by the number of skeins, marked unconfirmed. One real worksheet settles it in a minute.",
+      "urgent": false
+     },
+     {
+      "id": "OPEN-Q-C18",
+      "ask": "For a size test, how many sizing skeins are actually weighed for one lot — and are they weighed in separate groups? We have two different figures from two sources: 40 or 80, and 200 or 400 in ten groups.",
+      "whyItMatters": "It decides how many reading rows a test has and the whole shape of the entry screen the testers will use every day.",
+      "ourGuess": "Both figures are recorded side by side and neither is enforced until you confirm which is right.",
+      "urgent": false
+     },
+     {
       "id": "OPEN-Q-C15",
       "ask": "Your status list is numbered 3 to 30, but numbers 1, 2, 16, 17 and 22 to 26 are missing, and no fabric test appears on it at all. What are those missing items, and are any of them the NABL ones?",
       "whyItMatters": "Five of your seven accredited entries are fabric tests, and none of them is on the list we have — so we cannot tell which catalogue item, if any, the accreditation actually applies to.",
@@ -682,5 +703,42 @@
    }
   ],
   "notFixed": "This system will not make a tensile test faster. The oven still takes its time, the twenty-four-hour conditioning is still twenty-four hours, and a seriplane panel still has to be looked at by a person against the standard photographs — the gains are in the time around the testing, the writing, copying, searching, totalling and explaining, not in the testing itself. It will not remove the need for discipline either: if a skein weight is written down wrongly the system will faithfully compute the wrong average, and if a reason for a change is typed as \"correction\" the record will say \"correction\" and mean nothing, so carelessness becomes visible and traceable but not harmless. And it will not run itself — it needs one named person in the unit who owns the master data (the test catalogue, the methods, the grade tables, the rate card, the holiday list), who keeps it right, and who has a trained deputy for when they are transferred. A laboratory system whose reference data has gone stale is worse than a register, because a register never pretends to be current."
+ },
+ "progress": {
+  "intro": "Work has started. Rather than beginning with the easy parts, we began with the two pieces that were genuinely in doubt — because if either had turned out to be impossible, it would have been far better to find out now than a year from now. Both are settled.",
+  "items": [
+   {
+    "title": "The certificate itself",
+    "state": "done",
+    "stateLabel": "Working",
+    "what": "A certificate can now be produced that carries Telugu, Hindi and English correctly, is digitally signed, and can be checked years later. The signature is invisible on the page, as the accessibility standard requires, and the text can be searched and copied out — so a customer can find their own name in it rather than looking at a picture of one.",
+    "why": "This is the thing the whole system exists to produce, and the hardest part to change once certificates have been issued. It had to be first."
+   },
+   {
+    "title": "A problem found by building it",
+    "state": "found",
+    "stateLabel": "Discovered",
+    "what": "The standard software for putting text into a certificate crashes outright on Telugu — on ordinary words, including శ్రీ, the honorific in a great many Indian names. Not wrong output: it stops. A second piece of software now does that work instead.",
+    "why": "No amount of design would have found this. Only running it did. A test now checks every release that the original defect is still there, so the workaround is removed the day it is fixed rather than living on forever."
+   },
+   {
+    "title": "The calculations and the grade",
+    "state": "needs-you",
+    "stateLabel": "Needs your tables",
+    "what": "The arithmetic is built — averages and deviation from the individual skein weights, maximum deviation from the coarsest and finest, low neatness from the worst fifth of panels, conditioned size with the 11 per cent allowance, and the two-stage grade where the major tests set the grade and an auxiliary test can pull it down by one class.",
+    "why": "But it will not produce a grade yet, and that is deliberate. The grade tables — the actual limit values for 4A, 3A, 2A and the rest — were not available to us, and we refused to invent them. A grade that looks right and is wrong is the worst thing this system could produce, because money is settled against it and nobody can tell by looking."
+   },
+   {
+    "title": "Everything else",
+    "state": "spec",
+    "stateLabel": "Specified, not yet built",
+    "what": "The register, the workflow, the calibration and competency checks, the billing and the portal are all written down in full — 1,291 numbered requirements — but not yet built.",
+    "why": "The order is deliberate: prove the risky parts, then build the ordinary ones."
+   }
+  ],
+  "standalone": {
+   "title": "One decision has changed since the first draft",
+   "text": "The earlier draft assumed this system would sit alongside a separate business software package that would hold the customer list, raise the invoices and keep the stock. The unit runs no such package, so that assumption has been withdrawn. **This system now stands on its own** — it keeps its own customer records, raises and numbers its own invoices and receipts, and holds its own consumable stock and equipment records. Nothing else has to be bought or installed before it can run. The accounts wing keeps the general ledger exactly as it does today; if the Board ever adopts an accounting package, a connection to it is already described and can be switched on then."
+  }
  }
 }

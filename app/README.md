@@ -7,6 +7,40 @@ Everything else in the LIMS — the register, the workflow, the calibration and 
 exists to make one signed PDF defensible years later. This directory proves that PDF can be
 produced correctly in Node.
 
+## Running it
+
+```bash
+npm install && npm test
+```
+
+Nine tests. Fonts are vendored, so nothing is fetched.
+
+The two PDF/UA conformance tests need veraPDF and Java 11+, both on the build machine only —
+never on the laboratory server. Without `VERAPDF` set they **skip loudly** rather than pass:
+
+```bash
+JAVA_HOME=/opt/homebrew/opt/openjdk VERAPDF=/path/to/verapdf npm test
+```
+
+To see a certificate rather than a test result:
+
+```bash
+node demo.mjs
+```
+
+That writes `demo-certificate.pdf`. Open it, search for `పట్టు`, and copy the Telugu out — if
+both work, the text layer is right. Judging whether the Telugu *looks* right still needs a
+Telugu reader; no assertion here can do it.
+
+If the golden shaping file needs regenerating after a deliberate change:
+
+```bash
+UPDATE_GOLDEN=1 npm test
+```
+
+Review the diff before committing. A golden file updated to silence a failure is worse than no
+golden file at all.
+
 ## What was verified here, by running it
 
 Measured on this machine: Node 24.16, pdfkit 0.19.1, fontkit 2.0.4, harfbuzzjs 1.6.0,

@@ -9,7 +9,9 @@ The laboratory is accredited to **ISO/IEC 17025:2017** (NABL certificate `NABLT0
 valid 17/07/2026 to 16/07/2030), so the compliance requirements in this specification are
 obligations rather than good practice.
 
-This repository contains the **specification only**. No application code yet.
+The repository holds two things: the **specification** in `parts/`, and the first application
+code in `app/` — the document component that produces the signed certificate. Nothing else of
+the system is built yet.
 
 ## Read it online
 
@@ -33,7 +35,45 @@ survives being emailed, and prints to PDF straight from the browser.
 `.nojekyll` is present because GitHub Pages otherwise runs Jekyll, which skips files beginning with an
 underscore. It makes Pages serve the repository verbatim.
 
-## Building
+## Working on this from a fresh machine
+
+Two independent tracks. Neither needs the other.
+
+**The specification** — needs Python 3 and Node:
+
+```bash
+npm install && bash build.sh && python3 lint_spec.py SPEC.md
+```
+
+All eight lint checks must report zero. Everything is generated from `parts/`.
+
+**The document component** — needs Node 20 or later:
+
+```bash
+cd app && npm install && npm test
+```
+
+Nine tests. The fonts are vendored in `app/vendor/fonts/`, so nothing is fetched.
+
+**To run the PDF/UA conformance tests** you also need veraPDF and a Java 11+ runtime. Both live
+on the build machine only and are never installed on the laboratory server, so they do not
+enlarge the dependency tree ARC-16 governs:
+
+```bash
+brew install openjdk
+```
+
+Download the veraPDF installer from `software.verapdf.org`, install it, then:
+
+```bash
+cd app && JAVA_HOME=/opt/homebrew/opt/openjdk VERAPDF=/path/to/verapdf npm test
+```
+
+Without `VERAPDF` those two tests **skip loudly** rather than passing — a silent skip would let
+a non-conforming certificate ship. `app/README.md` carries the detail of what conformance
+required and why each piece is there.
+
+## Building the documents
 
 ```bash
 npm install
@@ -84,6 +124,18 @@ build_guide.js          content → index.html, the published visual guide
 lint_spec.py            consistency checks
 fixes/, fixes2/         what the review found and what was changed
 review_*.json/.txt      the review audit trail
+
+app/                    the application — currently the document component only
+  README.md             what PDF/UA conformance actually required, and how it was proven
+  src/documents/
+    document.js         creates a document that can pass PDF/UA (title, language, XMP)
+    shaping.mjs         HarfBuzz shaping; stock fontkit THROWS on Telugu with these fonts
+    indic-text.js       /ActualText so Indic text survives into the text layer
+    sign.js             PAdES B-B, invisible signature
+    cidset-workaround.js  ARC-49
+    golden.mjs          PLN-28's golden shaping capture
+  test/                 nine tests, including veraPDF conformance signed and unsigned
+  vendor/fonts/         Noto Sans, Noto Sans Telugu, Noto Sans Devanagari (SIL OFL 1.1)
 ```
 
 ## How this was produced

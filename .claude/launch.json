@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "lims",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["app/src/server/index.js"],
+      "port": 8787
+    },
+    {
+      "name": "verify",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["app/verify-server.js"],
+      "port": 8788
+    }
+  ]
+}

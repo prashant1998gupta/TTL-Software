@@ -1,3 +1,53 @@
+# The application — Phase 1 core
+
+This directory now holds a WORKING system, not only the document component: the Limited Test
+path end to end, from the counter to a scanned QR code.
+
+## What runs
+
+| Piece | What it is |
+|---|---|
+| `src/server/` | The internal application — counter, worklist, bench, verification, issue |
+| `verify-server.js` | The public QR verification service — its own process, reads only the published table |
+| `src/documents/` | The certificate path — tagged PDF/UA, Telugu via HarfBuzz, digital signature |
+| `src/calc/` | The calculation and grading engine — every constant in configuration |
+
+## Running it
+
+Needs PostgreSQL 16 on the local socket and Node 20+:
+
+```bash
+npm install
+node src/server/migrate.js --demo     # creates schema + development users
+node src/server/index.js              # internal app  -> http://localhost:8787
+node verify-server.js                 # public verify -> http://localhost:8788
+```
+
+Sign in as **lakshmi** (counter), **ravi** (tester), **suma** (verifier) or **incharge**
+(signatory) — password `dvm`. These are development accounts seeded by `--demo`; they are
+deactivated at go-live.
+
+The working day: lakshmi registers at the counter (the number is allotted gap-free inside the
+transaction), ravi picks the sample up at the bench — the out-of-calibration balance cannot be
+chosen — and types 20 skein weights with Enter advancing the cursor, suma verifies (the system
+refuses to let ravi verify his own work), incharge signs and issues. The certificate is rendered
+as tagged PDF/UA, digitally signed, frozen with its SHA-256, and the QR on it answers
+GENUINE — CURRENT on the public page. Withdraw it and the same QR answers GENUINE — WITHDRAWN.
+
+Every state change lands in an append-only audit trail that refuses UPDATE and DELETE even from
+the table owner — enforced by trigger, and tested by attempting the attack.
+
+## Tests
+
+```bash
+npm test                              # 49 tests: calc, documents, server workflow
+```
+
+The server tests recreate a throwaway `ttl_lims_test` database each run. The two PDF/UA
+conformance tests need `VERAPDF` and Java 11+ (see below); they skip loudly without.
+
+---
+
 # Document component — proof of the certificate path
 
 **Build this before anything else.** It is the only part of the system whose feasibility was

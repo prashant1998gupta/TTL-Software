@@ -13,9 +13,12 @@
     "@signpdf/placeholder-plain": "^3.3.0",
     "@signpdf/signer-p12": "^3.3.0",
     "@signpdf/signpdf": "^3.3.0",
+    "express": "^5.2.1",
     "fontkit": "^2.0.4",
     "harfbuzzjs": "^1.6.0",
-    "pdfkit": "^0.19.1"
+    "pdfkit": "^0.19.1",
+    "pg": "^8.23.0",
+    "qrcode": "^1.5.4"
   },
   "devDependencies": {
     "pdfjs-dist": "^6.2.108"

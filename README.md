@@ -9,9 +9,14 @@ The laboratory is accredited to **ISO/IEC 17025:2017** (NABL certificate `NABLT0
 valid 17/07/2026 to 16/07/2030), so the compliance requirements in this specification are
 obligations rather than good practice.
 
-The repository holds two things: the **specification** in `parts/`, and the first application
-code in `app/` — the document component that produces the signed certificate. Nothing else of
-the system is built yet.
+The repository holds two things: the **specification** in `parts/`, and the **working Phase 1
+core** in `app/` — the Limited Test path end to end. A sample registered at the counter gets a
+gap-free number; the tester enters twenty skein weights on a keyboard-first bench screen against
+a calibration-checked balance; a second person verifies (the system refuses the tester's own
+verification); the Unit In-Charge signs; the issued certificate is a digitally signed, PDF/UA-
+conformant file frozen with its SHA-256; and the QR code on it answers GENUINE — CURRENT or
+GENUINE — WITHDRAWN on a physically separate public page. `app/README.md` has the ten-minute
+tour. The remaining modules (billing, stock, quality system, portal) are not built.
 
 ## Read it online
 

@@ -90,6 +90,14 @@ h3{font-size:21px; margin:36px 0 12px}
   margin-top:30px; background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.16);
   border-radius:var(--radius); padding:20px 22px; max-width:72ch;
 }
+.tryit{
+  display:block; margin-top:28px; max-width:72ch; text-decoration:none;
+  background:#fff; border-radius:var(--radius); padding:20px 24px;
+  border:1px solid rgba(255,255,255,.3); transition:.15s;
+}
+.tryit:hover{transform:translateY(-1px); box-shadow:0 10px 30px rgba(0,0,0,.22)}
+.tryit b{display:block; font-family:var(--sans); font-size:18px; color:var(--silk); margin-bottom:5px}
+.tryit span{display:block; font-size:14.5px; color:var(--ink-soft); line-height:1.5}
 .readfirst h4{font-size:15px; color:#fff; margin-bottom:8px; font-family:var(--sans); font-weight:650}
 .readfirst p{color:rgba(255,255,255,.82); font-size:14.5px; margin:0}
 
@@ -286,8 +294,13 @@ function heroSection(meta) {
     <div class="eyebrow">${esc(meta.org)}</div>
     <h1>${esc(meta.title)}</h1>
     <p class="sub">${esc(meta.sub)}</p>
+    <a class="tryit" href="prototype.html">
+      <b>&#9654;&nbsp; See the actual screens</b>
+      <span>A working demonstration &mdash; register a sample, enter the readings, print the report.
+      Two minutes, nothing to read.</span>
+    </a>
     <div class="readfirst">
-      <h4>How to read this</h4>
+      <h4>Or read about it</h4>
       <p>${rich(meta.howto)}</p>
     </div>
     <div class="meta">

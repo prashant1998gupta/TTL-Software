@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Silk Testing — working prototype</title>
+<style>
+/*
+  A WORKING prototype of the four screens that replace the paper register.
+  Everything here actually runs: registering allots a real number, the readings
+  are really averaged, the report really shows what was computed. Nothing is a
+  picture of a screen.
+
+  Deliberately small: four screens, no menus, no settings, nothing that is not
+  used on an ordinary day at the counter.
+*/
+:root{
+  --ink:#15120f; --soft:#4d443c; --mute:#82776c;
+  --bg:#f2efea; --card:#fff; --line:#ded5c8; --line2:#c8bcab;
+  --silk:#8c1d2f; --silk-lt:#fbeef0;
+  --ok:#3f6146; --ok-lt:#eaf2ec;
+  --warn:#a8801a; --warn-lt:#fdf5e3;
+  --f:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--f)}
+button,input,select{font:inherit}
+
+/* ---------- frame ---------- */
+.top{background:var(--silk);color:#fff;padding:10px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.top .brand{font-weight:700;font-size:15px;letter-spacing:.01em}
+.top .brand span{display:block;font-weight:400;font-size:11.5px;opacity:.75}
+.top .who{margin-left:auto;font-size:13px;opacity:.85}
+.tabs{display:flex;background:#fff;border-bottom:1px solid var(--line);padding:0 12px;gap:2px;overflow-x:auto}
+.tabs button{
+  border:0;background:none;padding:15px 20px;font-size:15.5px;font-weight:600;color:var(--mute);
+  border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap
+}
+.tabs button:hover{color:var(--silk)}
+.tabs button.on{color:var(--silk);border-bottom-color:var(--silk)}
+main{max-width:1000px;margin:0 auto;padding:24px 20px 60px}
+.screen{display:none} .screen.on{display:block}
+
+h2{font-size:23px;margin:0 0 4px}
+.hint{color:var(--mute);font-size:14px;margin:0 0 20px}
+
+/* ---------- form ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px}
+.row{display:grid;grid-template-columns:190px 1fr;gap:14px;align-items:center;margin-bottom:14px}
+.row label{font-weight:600;font-size:15px}
+.row .sub{display:block;font-weight:400;font-size:12.5px;color:var(--mute)}
+input,select{
+  width:100%;padding:11px 13px;border:1.5px solid var(--line2);border-radius:8px;background:#fff
+}
+input:focus,select:focus{outline:0;border-color:var(--silk);box-shadow:0 0 0 3px var(--silk-lt)}
+.inline{display:flex;gap:10px}
+.inline input{max-width:130px}
+.big{font-size:19px;font-weight:600}
+.btn{
+  background:var(--silk);color:#fff;border:0;border-radius:8px;padding:13px 26px;
+  font-size:16px;font-weight:600;cursor:pointer
+}
+.btn:hover{background:#75172796}
+.btn.ghost{background:#fff;color:var(--silk);border:1.5px solid var(--line2)}
+.btn.ghost:hover{border-color:var(--silk);background:var(--silk-lt)}
+.btn.sm{padding:8px 15px;font-size:14px}
+.actions{display:flex;gap:12px;align-items:center;margin-top:20px;flex-wrap:wrap}
+
+/* ---------- allotted number ---------- */
+.allot{
+  background:var(--ok-lt);border:1.5px solid var(--ok);border-radius:12px;
+  padding:20px 22px;margin-bottom:20px;display:none
+}
+.allot.show{display:block}
+.allot .lbl{font-size:12.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ok)}
+.allot .no{font-size:30px;font-weight:700;letter-spacing:.01em;margin:5px 0 3px}
+.allot .sub{font-size:14px;color:var(--soft)}
+
+/* ---------- table ---------- */
+.search{display:flex;gap:10px;margin-bottom:16px}
+.search input{flex:1}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th{background:#faf7f2;text-align:left;padding:11px 14px;font-size:12.5px;letter-spacing:.05em;
+   text-transform:uppercase;color:var(--soft);border-bottom:1px solid var(--line)}
+td{padding:12px 14px;border-bottom:1px solid #efe9e0;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tr.clickable{cursor:pointer}
+tr.clickable:hover td{background:#faf7f2}
+.no-mono{font-weight:600;letter-spacing:.01em}
+.chip{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.chip.wait{background:var(--warn-lt);color:var(--warn)}
+.chip.done{background:var(--ok-lt);color:var(--ok)}
+.chip.test{background:var(--silk-lt);color:var(--silk)}
+.empty{padding:40px;text-align:center;color:var(--mute)}
+
+/* ---------- readings ---------- */
+.pick{background:#faf7f2;border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin-bottom:18px;
+      display:flex;gap:22px;flex-wrap:wrap;align-items:center}
+.pick div span{display:block;font-size:12px;color:var(--mute)}
+.pick div b{font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:6px}
+.cell{position:relative}
+.cell i{position:absolute;top:-7px;left:8px;background:var(--card);padding:0 4px;font-size:10.5px;
+        font-style:normal;color:var(--mute)}
+.cell input{padding:12px 10px;text-align:center;font-size:15.5px;font-variant-numeric:tabular-nums}
+.cell input:invalid{border-color:var(--silk)}
+.den{text-align:center;font-size:11.5px;color:var(--mute);margin-top:3px;min-height:15px}
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:20px}
+.calc > div{background:var(--ok-lt);border:1px solid #cfe0d4;border-radius:10px;padding:14px}
+.calc .k{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ok)}
+.calc .v{font-size:25px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:3px}
+.calc .u{font-size:12px;color:var(--soft)}
+.calc > div.flag{background:var(--warn-lt);border-color:#e8d9ae}
+.calc > div.flag .k{color:var(--warn)}
+
+/* ---------- report ---------- */
+.paper{background:#fff;border:1px solid var(--line);border-radius:12px;padding:44px 46px;max-width:790px;margin:0 auto}
+.rep-h{text-align:center;border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:20px}
+.rep-h .org{font-size:12px;letter-spacing:.11em;text-transform:uppercase;color:var(--soft)}
+.rep-h h3{font-size:19px;margin:6px 0 3px}
+.rep-h .addr{font-size:12.5px;color:var(--mute)}
+.rep-h .te{font-size:14px;color:var(--soft);margin-top:5px}
+.rep-t{text-align:center;font-size:16px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;margin:18px 0}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:5px 26px;font-size:14px;margin-bottom:20px}
+.kv div{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px dotted var(--line)}
+.kv span{color:var(--mute)} .kv b{text-align:right}
+.rep-tbl{width:100%;border-collapse:collapse;font-size:14px;border:1px solid var(--ink);border-radius:0}
+.rep-tbl th{background:#f4f0ea;border:1px solid var(--ink);text-transform:none;font-size:13px;color:var(--ink)}
+.rep-tbl td{border:1px solid var(--ink);padding:9px 12px}
+.rep-note{font-size:12px;color:var(--mute);margin-top:16px;line-height:1.6}
+.sign{margin-top:44px;display:flex;justify-content:flex-end;text-align:center}
+.sign div{border-top:1px solid var(--ink);padding-top:6px;min-width:230px;font-size:13px}
+.stamp{display:inline-block;margin-top:8px;font-size:11px;color:var(--ok);border:1px solid var(--ok);
+       border-radius:5px;padding:3px 9px}
+
+@media (max-width:760px){
+  .row{grid-template-columns:1fr;gap:6px}
+  .grid{grid-template-columns:repeat(3,1fr)}
+  .kv{grid-template-columns:1fr}
+  .paper{padding:24px 16px}
+  /* Tables keep their shape and scroll sideways inside their own box, so the
+     page itself never goes wider than the phone. */
+  .scrollx{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px}
+  .scrollx table{min-width:520px;border-radius:0}
+  .rep-tbl{display:block;overflow-x:auto;white-space:nowrap}
+  .rep-h h3{font-size:16px}
+  .rep-h .org{font-size:10.5px;letter-spacing:.06em}
+}
+@media (max-width:430px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .tabs button{padding:13px 13px;font-size:14px}
+}
+@media print{
+  .top,.tabs,.hint,.actions,.no-print{display:none!important}
+  body{background:#fff} main{padding:0;max-width:none}
+  .paper{border:0;padding:0;max-width:none}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="brand">Silk Testing Laboratory
+    <span>RSTRS Dharmavaram &middot; Central Silk Board</span></div>
+  <div class="who">Signed in as <b>Unit In-Charge</b></div>
+</div>
+
+<div class="tabs">
+  <button class="on" data-go="register">1 &nbsp;Register a sample</button>
+  <button data-go="work">2 &nbsp;Today's work</button>
+  <button data-go="readings">3 &nbsp;Enter readings</button>
+  <button data-go="report">4 &nbsp;Report</button>
+</div>
+
+<main>
+
+  <!-- 1 ------------------------------------------------------------------ -->
+  <section class="screen on" id="register">
+    <h2>Register a sample</h2>
+    <p class="hint">Replaces the intake register. The number is allotted by the system, so two people at the counter can never give out the same one.</p>
+
+    <div class="allot" id="allot">
+      <div class="lbl">Registered</div>
+      <div class="no" id="allotNo">&mdash;</div>
+      <div class="sub" id="allotSub"></div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <label>Customer<span class="sub">Type to search, or add new</span></label>
+        <input id="f-cust" list="customers" placeholder="Sri Lakshmi Silks" value="Sri Lakshmi Silks">
+        <datalist id="customers">
+          <option>Sri Lakshmi Silks</option><option>Anjaneya Silk Traders</option>
+          <option>Balaji Twisting Unit</option><option>Venkateswara Reeling Co-op</option>
+          <option>Dharmavaram Handloom Society</option>
+        </datalist>
+      </div>
+      <div class="row">
+        <label>Brought by<span class="sub">If different from the customer</span></label>
+        <input id="f-sender" placeholder="Sri M. Naidu (broker)">
+      </div>
+      <div class="row">
+        <label>Lot mark<span class="sub">As marked on the bales</span></label>
+        <input id="f-lot" placeholder="SLS-118" value="SLS-118">
+      </div>
+      <div class="row">
+        <label>Declared denier<span class="sub">As declared by the customer</span></label>
+        <div class="inline"><input id="f-den" placeholder="20/22" value="20/22"></div>
+      </div>
+      <div class="row">
+        <label>Quantity</label>
+        <div class="inline">
+          <input id="f-bales" type="number" min="0" placeholder="Bales" value="2">
+          <input id="f-books" type="number" min="0" placeholder="Books" value="47">
+          <input id="f-wt" type="number" step="0.1" min="0" placeholder="kg" value="120.0">
+        </div>
+      </div>
+      <div class="row">
+        <label>Test</label>
+        <select id="f-test">
+          <option data-fee="50" data-n="20">Limited test (5 skein) — ₹50</option>
+          <option data-fee="40" data-n="20">Denier test, skein — ₹40</option>
+          <option data-fee="30" data-n="20">Denier test, bobbin — ₹30</option>
+          <option data-fee="400" data-n="40">Raw silk testing &amp; Grading, BIS — ₹400</option>
+          <option data-fee="55" data-n="20">Twist, single — ₹55</option>
+        </select>
+      </div>
+      <div class="actions">
+        <button class="btn" id="doRegister">Register</button>
+        <button class="btn ghost" id="doClear">Clear</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 ------------------------------------------------------------------ -->
+  <section class="screen" id="work">
+    <h2>Today's work</h2>
+    <p class="hint">Answers &ldquo;where is that sample?&rdquo; without walking to the bench.</p>
+    <div class="search">
+      <input id="q" placeholder="Search by number, customer or lot mark">
+      <button class="btn ghost" id="clearQ">Show all</button>
+    </div>
+    <div class="scrollx">
+    <table>
+      <thead><tr><th>Number</th><th>Customer</th><th>Lot</th><th>Test</th><th>Status</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- 3 ------------------------------------------------------------------ -->
+  <section class="screen" id="readings">
+    <h2>Enter readings</h2>
+    <p class="hint">Type the weight the balance shows. Denier and deviation are worked out as you go &mdash; no calculator, no re-typing.</p>
+
+    <div class="pick">
+      <div><span>Sample</span><b id="r-no">&mdash;</b></div>
+      <div><span>Lot</span><b id="r-lot">&mdash;</b></div>
+      <div><span>Declared</span><b id="r-den">&mdash;</b></div>
+      <div><span>Test</span><b id="r-test">&mdash;</b></div>
+      <div style="margin-left:auto"><button class="btn ghost sm" id="pickOther">Choose another sample</button></div>
+    </div>
+
+    <div class="card">
+      <div class="grid" id="grid"></div>
+      <div class="actions">
+        <button class="btn ghost sm" id="fillDemo">Fill with example readings</button>
+        <button class="btn ghost sm" id="clearReads">Clear</button>
+        <span class="hint" style="margin:0">Sizing skeins of 450 m &middot; weight in grams</span>
+      </div>
+
+      <div class="calc" id="calc"></div>
+
+      <div class="actions">
+        <button class="btn" id="doSave">Save readings</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 ------------------------------------------------------------------ -->
+  <section class="screen" id="report">
+    <h2 class="no-print">Report</h2>
+    <p class="hint no-print">What the customer receives. Printed straight from the readings &mdash; nothing is typed a second time.</p>
+    <div class="actions no-print" style="margin-top:0;margin-bottom:18px">
+      <button class="btn" onclick="window.print()">Print</button>
+      <button class="btn ghost" id="backWork">Back to today's work</button>
+    </div>
+    <div class="paper" id="paper"></div>
+  </section>
+
+</main>
+
+<script>
+'use strict';
+
+// ---------------------------------------------------------------- data
+// Denier = grams per 9000 m. A sizing skein is 450 m, so denier = grams * 20.
+var SKEIN_M = 450;
+var toDenier = function (g) { return g / SKEIN_M * 9000; };
+
+var FY = '26-27';
+var seq = 411;
+var samples = [];
+
+function seed(cust, custTe, lot, den, test, fee, n, status, reads) {
+  seq += 1;
+  samples.push({
+    no: 'DVM/' + FY + '/' + String(seq).padStart(5, '0'),
+    cust: cust, custTe: custTe, sender: '', lot: lot, den: den,
+    bales: 2, books: 47, wt: 120, test: test, fee: fee, n: n,
+    status: status, reads: reads || [], at: '19 Aug 2026'
+  });
+}
+seed('Anjaneya Silk Traders', 'అంజనేయ సిల్క్ ట్రేడర్స్', 'AST-77', '20/22', 'Limited test (5 skein) — ₹50', 50, 20, 'Reported',
+     [1.048,1.052,1.041,1.061,1.055,1.049,1.038,1.057,1.044,1.050,
+      1.046,1.059,1.043,1.054,1.051,1.047,1.056,1.042,1.053,1.045]);
+seed('Venkateswara Reeling Co-op', 'వేంకటేశ్వర రీలింగ్ కో-ఆప్', 'VRC-204', '20/22', 'Limited test (5 skein) — ₹50', 50, 20, 'In test');
+seed('Balaji Twisting Unit', 'బాలాజీ ట్విస్టింగ్ యూనిట్', 'BTU-19', '22/24', 'Twist, single — ₹55', 55, 20, 'Waiting');
+
+var current = null;
+
+// ---------------------------------------------------------------- maths
+// Mirrors app/src/calc — mean and standard deviation with divisor n, which is
+// the seeded (and still unconfirmed) basis in config/is15090-bis.json.
+function mean(a){ return a.reduce(function(t,x){return t+x;},0)/a.length; }
+function sd(a){
+  var m = mean(a), s = 0;
+  a.forEach(function(x){ s += (x-m)*(x-m); });
+  return Math.sqrt(s/a.length);
+}
+function round(v,p){
+  var f = Math.pow(10,p), x = v*f, fl = Math.floor(x), r = x-fl;
+  return ((r>=0.5 ? fl+1 : fl)/f);
+}
+function fixed(v,p){ return round(v,p).toFixed(p); }
+function declaredMid(den){
+  var m = String(den).match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
+  if (m) return (parseFloat(m[1])+parseFloat(m[2]))/2;
+  var one = parseFloat(den);
+  return isNaN(one) ? null : one;
+}
+
+// ---------------------------------------------------------------- nav
+var screens = document.querySelectorAll('.screen');
+var tabs = document.querySelectorAll('.tabs button');
+function go(id){
+  screens.forEach(function(s){ s.classList.toggle('on', s.id===id); });
+  tabs.forEach(function(t){ t.classList.toggle('on', t.dataset.go===id); });
+  if (id==='work') drawRows();
+  if (id==='readings') drawReadings();
+  if (id==='report') drawReport();
+  window.scrollTo(0,0);
+}
+tabs.forEach(function(t){ t.onclick = function(){ go(t.dataset.go); }; });
+document.getElementById('backWork').onclick = function(){ go('work'); };
+
+// ---------------------------------------------------------------- 1 register
+document.getElementById('doRegister').onclick = function(){
+  var cust = document.getElementById('f-cust').value.trim();
+  var lot  = document.getElementById('f-lot').value.trim();
+  if (!cust || !lot){ alert('Customer and lot mark are needed.'); return; }
+  var sel = document.getElementById('f-test');
+  var opt = sel.options[sel.selectedIndex];
+  seq += 1;
+  var s = {
+    no: 'DVM/' + FY + '/' + String(seq).padStart(5,'0'),
+    cust: cust, custTe: '', sender: document.getElementById('f-sender').value.trim(),
+    lot: lot, den: document.getElementById('f-den').value.trim(),
+    bales: +document.getElementById('f-bales').value || 0,
+    books: +document.getElementById('f-books').value || 0,
+    wt: +document.getElementById('f-wt').value || 0,
+    test: opt.text, fee: +opt.dataset.fee, n: +opt.dataset.n,
+    status: 'Waiting', reads: [], at: '20 Aug 2026'
+  };
+  samples.unshift(s);
+  current = s;
+  document.getElementById('allotNo').textContent = s.no;
+  document.getElementById('allotSub').textContent =
+    s.cust + ' · lot ' + s.lot + ' · ' + s.test + ' · slip printed for the customer';
+  document.getElementById('allot').classList.add('show');
+  document.getElementById('f-lot').value = '';
+  document.getElementById('f-sender').value = '';
+};
+document.getElementById('doClear').onclick = function(){
+  ['f-cust','f-sender','f-lot','f-den'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('allot').classList.remove('show');
+};
+
+// ---------------------------------------------------------------- 2 work
+function chip(st){
+  var c = st==='Reported' ? 'done' : st==='In test' ? 'test' : 'wait';
+  return '<span class="chip '+c+'">'+st+'</span>';
+}
+function drawRows(){
+  var q = document.getElementById('q').value.trim().toLowerCase();
+  var list = samples.filter(function(s){
+    return !q || (s.no+' '+s.cust+' '+s.lot).toLowerCase().indexOf(q) >= 0;
+  });
+  var tb = document.getElementById('rows');
+  if (!list.length){ tb.innerHTML = '<tr><td colspan="5" class="empty">Nothing matches.</td></tr>'; return; }
+  tb.innerHTML = list.map(function(s,i){
+    return '<tr class="clickable" data-i="'+samples.indexOf(s)+'">'
+      + '<td class="no-mono">'+s.no+'</td><td>'+s.cust+'</td><td>'+s.lot+'</td>'
+      + '<td>'+s.test.split('—')[0].trim()+'</td><td>'+chip(s.status)+'</td></tr>';
+  }).join('');
+  tb.querySelectorAll('tr.clickable').forEach(function(tr){
+    tr.onclick = function(){
+      current = samples[+tr.dataset.i];
+      go(current.status==='Reported' ? 'report' : 'readings');
+    };
+  });
+}
+document.getElementById('q').oninput = drawRows;
+document.getElementById('clearQ').onclick = function(){
+  document.getElementById('q').value=''; drawRows();
+};
+
+// ---------------------------------------------------------------- 3 readings
+function drawReadings(){
+  if (!current) current = samples.find(function(s){ return s.status!=='Reported'; }) || samples[0];
+  document.getElementById('r-no').textContent   = current.no;
+  document.getElementById('r-lot').textContent  = current.lot;
+  document.getElementById('r-den').textContent  = current.den;
+  document.getElementById('r-test').textContent = current.test.split('—')[0].trim();
+
+  var g = document.getElementById('grid');
+  g.innerHTML = '';
+  for (var i=0;i<current.n;i++){
+    var v = current.reads[i]!=null ? current.reads[i] : '';
+    g.insertAdjacentHTML('beforeend',
+      '<div class="cell"><i>'+(i+1)+'</i>'
+      + '<input type="number" step="0.001" min="0" data-i="'+i+'" value="'+v+'">'
+      + '<div class="den"></div></div>');
+  }
+  g.querySelectorAll('input').forEach(function(inp){
+    inp.oninput = recalc;
+    inp.onkeydown = function(e){
+      if (e.key==='Enter'){
+        e.preventDefault();
+        var nx = g.querySelector('input[data-i="'+(+inp.dataset.i+1)+'"]');
+        if (nx) nx.focus(); else document.getElementById('doSave').focus();
+      }
+    };
+  });
+  recalc();
+}
+function values(){
+  return Array.prototype.slice.call(document.querySelectorAll('#grid input'))
+    .map(function(i){ return i.value===''? null : parseFloat(i.value); });
+}
+function recalc(){
+  var raw = values();
+  document.querySelectorAll('#grid .cell').forEach(function(c,i){
+    c.querySelector('.den').textContent = raw[i]!=null && raw[i]>0 ? fixed(toDenier(raw[i]),2)+' d' : '';
+  });
+  var got = raw.filter(function(v){ return v!=null && v>0; });
+  var box = document.getElementById('calc');
+  if (got.length < 2){
+    box.innerHTML = '<div><div class="k">Readings</div><div class="v">'+got.length+' of '+current.n+'</div>'
+      + '<div class="u">enter at least two</div></div>';
+    return;
+  }
+  var dens = got.map(toDenier);
+  var avg = mean(dens), dev = sd(dens);
+  var decl = declaredMid(current.den);
+  var offBy = decl ? (avg-decl)/decl*100 : null;
+  var flagged = offBy!==null && Math.abs(offBy) > 7;
+
+  box.innerHTML =
+    tile('Readings', got.length + ' of ' + current.n, got.length===current.n ? 'complete' : 'still entering')
+  + tile('Average size', fixed(avg,2), 'denier')
+  + tile('Size deviation', fixed(dev,2), 'denier')
+  + tile('Variation', fixed(dev/avg*100,2) + '%', 'of the average')
+  + (offBy===null ? '' : tile('Against declared', (offBy>0?'+':'') + fixed(offBy,1) + '%',
+      flagged ? 'more than 7% — repeat the test' : 'within 7%', flagged));
+}
+function tile(k,v,u,flag){
+  return '<div'+(flag?' class="flag"':'')+'><div class="k">'+k+'</div>'
+       + '<div class="v">'+v+'</div><div class="u">'+u+'</div></div>';
+}
+document.getElementById('fillDemo').onclick = function(){
+  var base = declaredMid(current.den) || 21;
+  var wob = [0,4,-6,9,3,-2,-11,7,-5,1,-3,8,-7,5,2,-4,6,-9,4,-1,0,3,-2,5,-6,2,-4,7,-3,1,
+             2,-5,4,-1,3,-7,6,-2,5,-4];
+  document.querySelectorAll('#grid input').forEach(function(inp,i){
+    var d = base * 1.012 + (wob[i % wob.length] * 0.03);   // ~1.2% over declared, as real silk runs
+    inp.value = (d * SKEIN_M / 9000).toFixed(3);
+  });
+  recalc();
+};
+document.getElementById('clearReads').onclick = function(){
+  document.querySelectorAll('#grid input').forEach(function(i){ i.value=''; });
+  recalc();
+};
+document.getElementById('pickOther').onclick = function(){ go('work'); };
+document.getElementById('doSave').onclick = function(){
+  var got = values().filter(function(v){ return v!=null && v>0; });
+  if (got.length < current.n){
+    if (!confirm('Only ' + got.length + ' of ' + current.n + ' readings entered. Save anyway?')) return;
+  }
+  current.reads = values().map(function(v){ return v==null?null:v; });
+  current.status = 'Reported';
+  go('report');
+};
+
+// ---------------------------------------------------------------- 4 report
+function drawReport(){
+  var p = document.getElementById('paper');
+  if (!current || !current.reads.filter(Boolean).length){
+    p.innerHTML = '<div class="empty">No readings yet. Enter readings first.</div>';
+    return;
+  }
+  var dens = current.reads.filter(Boolean).map(toDenier);
+  var avg = mean(dens), dev = sd(dens);
+  var decl = declaredMid(current.den);
+  var offBy = decl ? (avg-decl)/decl*100 : null;
+
+  p.innerHTML =
+    '<div class="rep-h">'
+    + '<div class="org">Central Silk Board &middot; Ministry of Textiles &middot; Government of India</div>'
+    + '<h3>Regional Silk Technological Research Station</h3>'
+    + '<div class="addr">Regetipalli Road, Dharmavaram, Sri Sathya Sai, Andhra Pradesh</div>'
+    + '<div class="te">పట్టు పరీక్షా ప్రయోగశాల</div>'
+    + '</div>'
+    + '<div class="rep-t">Test Report</div>'
+    + '<div class="kv">'
+    + kv('Report No.', current.no.replace(FY+'/', FY+'/R/'))
+    + kv('Date', '20 Aug 2026')
+    + kv('Customer', current.cust)
+    + kv('Sample No.', current.no)
+    + kv('Lot mark', current.lot)
+    + kv('Received', current.at)
+    + kv('Declared denier', current.den)
+    + kv('Quantity', current.bales + ' bales, ' + current.books + ' books, ' + current.wt + ' kg')
+    + '</div>'
+    + '<table class="rep-tbl"><thead><tr><th>Characteristic</th><th>Result</th><th>Unit</th><th>Method</th></tr></thead><tbody>'
+    + tr('Average size', fixed(avg,2), 'denier', 'IS 15090 (Part 5)')
+    + tr('Size deviation', fixed(dev,2), 'denier', 'IS 15090 (Part 5)')
+    + tr('Variation', fixed(dev/avg*100,2), '%', 'computed')
+    + tr('Readings taken', String(dens.length), 'sizing skeins of 450 m', '—')
+    + '</tbody></table>'
+    + '<div class="rep-note">'
+    + (offBy!==null ? 'Average size is ' + (offBy>0?'+':'') + fixed(offBy,1)
+        + '% against the declared ' + current.den + '.<br>' : '')
+    + 'The results relate only to the sample as received and tested.<br>'
+    + 'This report shall not be reproduced except in full without the written approval of the laboratory.<br>'
+    + '<b>This test is not within the laboratory\\u2019s NABL accredited scope.</b>'
+    + '</div>'
+    + '<div class="sign"><div>Authorised Signatory<br><span style="color:#82776c">Unit In-Charge</span>'
+    + '<br><span class="stamp no-print">signed digitally</span></div></div>';
+}
+function kv(k,v){ return '<div><span>'+k+'</span><b>'+v+'</b></div>'; }
+function tr(a,b,c,d){ return '<tr><td>'+a+'</td><td><b>'+b+'</b></td><td>'+c+'</td><td>'+d+'</td></tr>'; }
+
+drawRows();
+</script>
+</body>
+</html>

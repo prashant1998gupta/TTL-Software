@@ -13,17 +13,36 @@ The certificate that comes out is a computer-signed document with a QR code on i
 **anyone who scans that code sees at once whether the certificate is genuine** — no
 phone calls, no doubt.
 
-## Before you start
+## Setting the computer up yourself — three installs and a double-click
 
-One thing is technical and is **not your job**: preparing the computer (about 15 minutes,
-done once). Prashant does that part. When it is done, he will give you:
+Done once. Each install is a normal "download, Next, Next, Finish". About 20 minutes.
 
-- an address to open (like an internet page), and
-- four practice sign-ins: **lakshmi** (counter), **ravi** (tester), **suma** (checker),
-  **incharge** (In-Charge) — password **dvm** for all four.
+1. **Node.js** — go to `nodejs.org`, download the **LTS** version, install it.
+2. **PostgreSQL** (the database) —
+   - **Windows:** `enterprisedb.com/downloads/postgres-postgresql-downloads`, version 16.
+     During install it asks you to **choose a password — write it on paper.**
+   - **Mac:** `postgresapp.com`, download, open, press **Initialize**.
+3. **The system itself** — open
+   `github.com/prashant1998gupta/TTL-Software`, press the green **Code** button →
+   **Download ZIP**, and unzip it anywhere (Desktop is fine).
 
-These four are pretend staff for practice. The real accounts are made later, by you,
-inside the system.
+Then open the unzipped folder, go into **app**, and double-click:
+
+- **Start-LIMS.bat** on Windows  ·  **Start-LIMS.command** on a Mac
+
+A black window opens and checks everything itself. If something is missing it tells you,
+in plain words, exactly what to do — it never shows computer gibberish. On Windows it will
+ask once for the PostgreSQL password from your paper. It asks one question — *practice data?*
+— answer **y**. When it says **AB KHOLIYE: http://localhost:8787**, open that address in
+your browser. **That black window is the system — keep it open; closing it switches the
+system off.**
+
+Practice sign-ins: **lakshmi** (counter), **ravi** (tester), **suma** (checker),
+**incharge** (In-Charge) — password **dvm**. These are pretend staff; real accounts are
+made later, by you, inside the system.
+
+If the black window says something this page did not predict, take a photo of it and send
+it to Prashant. That is not a bother — that is testing.
 
 ---
 

@@ -9,14 +9,20 @@ The laboratory is accredited to **ISO/IEC 17025:2017** (NABL certificate `NABLT0
 valid 17/07/2026 to 16/07/2030), so the compliance requirements in this specification are
 obligations rather than good practice.
 
-The repository holds two things: the **specification** in `parts/`, and the **working Phase 1
-core** in `app/` — the Limited Test path end to end. A sample registered at the counter gets a
-gap-free number; the tester enters twenty skein weights on a keyboard-first bench screen against
-a calibration-checked balance; a second person verifies (the system refuses the tester's own
-verification); the Unit In-Charge signs; the issued certificate is a digitally signed, PDF/UA-
-conformant file frozen with its SHA-256; and the QR code on it answers GENUINE — CURRENT or
-GENUINE — WITHDRAWN on a physically separate public page. `app/README.md` has the ten-minute
-tour. The remaining modules (billing, stock, quality system, portal) are not built.
+The repository holds two things: the **specification** in `parts/`, and the **working
+application** in `app/` — the Limited Test path complete, from a walk-in at the counter to a
+scanned QR code. A sample gets a gap-free number continuing the paper register's series; the
+tester enters twenty skein weights on a keyboard-first bench screen against a
+calibration-checked balance; a second person verifies (the system refuses the tester's own
+verification); the Unit In-Charge signs; and the issued certificate is a digitally signed,
+PDF/UA-conformant file frozen with its SHA-256, whose QR answers GENUINE — CURRENT,
+SUPERSEDED or WITHDRAWN on a physically separate public page. A wrong certificate is
+**amended, never edited**: the correction is a new report naming what it supersedes and why,
+and the old QR points at the replacement. Administration screens, the monthly sample register
+with CSV export, the day sheet, a first-run setup wizard that continues the paper numbering,
+and a deploy kit (systemd, backups, a daily integrity check) round it out — installing it is
+`app/SETUP.md`, seven steps. The remaining modules (billing, stock, the quality system, the
+customer portal) are not built.
 
 ## Read it online
 
@@ -130,16 +136,16 @@ lint_spec.py            consistency checks
 fixes/, fixes2/         what the review found and what was changed
 review_*.json/.txt      the review audit trail
 
-app/                    the application — currently the document component only
-  README.md             what PDF/UA conformance actually required, and how it was proven
-  src/documents/
-    document.js         creates a document that can pass PDF/UA (title, language, XMP)
-    shaping.mjs         HarfBuzz shaping; stock fontkit THROWS on Telugu with these fonts
-    indic-text.js       /ActualText so Indic text survives into the text layer
-    sign.js             PAdES B-B, invisible signature
-    cidset-workaround.js  ARC-49
-    golden.mjs          PLN-28's golden shaping capture
-  test/                 nine tests, including veraPDF conformance signed and unsigned
+app/                    the working application (see app/README.md and app/SETUP.md)
+  SETUP.md              installing the laboratory server, seven steps
+  src/server/           the internal application: counter, bench, verification, issue,
+                        amendment, administration, registers, first-run setup
+  verify-server.js      the public QR verification service — its own process
+  src/documents/        the certificate path: tagged PDF/UA, HarfBuzz Telugu, /ActualText,
+                        digital signature, the ARC-49 /CIDSet workaround
+  src/calc/             the calculation and grading engine; every constant in configuration
+  deploy/               systemd units, backup and restore, the one cron entry point
+  test/                 52 tests, including veraPDF conformance signed and unsigned
   vendor/fonts/         Noto Sans, Noto Sans Telugu, Noto Sans Devanagari (SIL OFL 1.1)
 ```
 
@@ -157,7 +163,18 @@ closing 71 cross-file inconsistencies.
 
 ## Status and next step
 
-**Phase 0** — two days at the counter and the bench, watching the real process and collecting one
-filled copy of every form and register in use. Then the questions in the visual guide's
-*Over to you* section. The specification's own working assumptions about how the laboratory
-operates today are marked as assumptions and exist to be corrected.
+The Limited Test path — about 98 per cent of the unit's samples — runs end to end in `app/`,
+twice adversarially reviewed, with 52 tests green. Two things stand between this and issuing a
+real certificate, and both need a person, not a program:
+
+**Phase 0** — two days at the counter and the bench, watching the real process and collecting
+one filled copy of every form and register in use, plus twenty completed historical worksheets
+for the calculation regression suite. The specification's working assumptions about how the
+laboratory operates today are marked as assumptions and exist to be corrected — and the data
+model's biggest open question, *what counts as one sample*, can only be answered from the paper.
+
+**The signing credential** — certificates are signed with a development key marked NOT FOR
+ISSUE until the Central Silk Board provides the laboratory's Document Signer credential
+(`LIMS_P12` in `app/SETUP.md`). The open questions register also still awaits written
+confirmation that a valid signature, not long-term validation, is what the quality system
+requires (OPEN-Q-T31).

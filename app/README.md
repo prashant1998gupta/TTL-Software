@@ -28,11 +28,22 @@ Sign in as **lakshmi** (counter), **ravi** (tester), **suma** (verifier) or **in
 deactivated at go-live.
 
 The working day: lakshmi registers at the counter (the number is allotted gap-free inside the
-transaction), ravi picks the sample up at the bench — the out-of-calibration balance cannot be
-chosen — and types 20 skein weights with Enter advancing the cursor, suma verifies (the system
-refuses to let ravi verify his own work), incharge signs and issues. The certificate is rendered
-as tagged PDF/UA, digitally signed, frozen with its SHA-256, and the QR on it answers
-GENUINE — CURRENT on the public page. Withdraw it and the same QR answers GENUINE — WITHDRAWN.
+transaction; the acknowledgement slip carries a QR the bench can scan), ravi picks the sample
+up at the bench — the out-of-calibration balance cannot be chosen — and types 20 skein weights
+with Enter advancing the cursor, suma verifies (the system refuses to let ravi verify his own
+work), incharge signs and issues. The certificate is rendered as tagged PDF/UA, digitally
+signed, frozen with its SHA-256, and the QR on it answers GENUINE — CURRENT on the public page.
+
+When a certificate is wrong it is **amended, never edited**: the sample returns to the bench
+with a mandatory reason, the correction is a new generation of readings, and the re-issued
+certificate names what it supersedes — the old file stays retrievable, and its QR answers
+GENUINE — SUPERSEDED naming the current version. Withdrawing outright answers
+GENUINE — WITHDRAWN.
+
+Around the workflow: **Administration** (accounts with one-time passwords, calibration
+recording, fees — no psql, everything audited), the monthly **sample register** with an
+Excel-safe CSV export, and the **day sheet** — samples in, fees for the day, reports out,
+what is still on the bench.
 
 Every state change lands in an append-only audit trail that refuses UPDATE and DELETE even from
 the table owner — enforced by trigger, and tested by attempting the attack.

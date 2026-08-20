@@ -1,0 +1,99 @@
+====================================================================================================
+FINDING 1 of 7  [Blocker]
+LOCATOR: §25.2, table `mst_consumable_lot`
+EXACT TEXT IN THE DOCUMENT:
+`consumable_id`, `lot_no`, `internal_lot_code VARCHAR(30)`, `supplier_id`, `po_ref`, `manufacture_date`, `received_date`, `qty_received`, `qty_on_hand DECIMAL(18,6)`, `expiry_date DATE`, `opened_at TIMESTAMPTZ`, `open_shelf_life_days INT`, `storage_location_id`, `storage_conditions`, `certified_value DECIMAL(18,6)`, `certified_uncertainty DECIMAL(18,6)`, `producer_iso17034 BOOLEAN`, `coa_attachment_id`, `status VARCHAR(20)`
+PROBLEM:
+The schema has no column for what the lot cost or which supplier bill it arrived on, because M22.1 made the external accounting system the master of value and the source of cost. That system does not exist, so these columns have no other home, and M12.6 rule 9 already asserts that the LIMS 'carries both the quantity and the value of what is in store' against a table that physically cannot.
+REQUIRED FIX (paste-ready):
+Replace the key-columns cell of `mst_consumable_lot` with:
+
+`consumable_id`, `lot_no`, `internal_lot_code VARCHAR(30)`, `supplier_id`, `indent_id NULL`, `po_ref`, `supplier_invoice_no VARCHAR(40)`, `supplier_invoice_date DATE`, `purchase_rate DECIMAL(14,4)`, `lot_value DECIMAL(14,2)`, `purchase_doc_attachment_id`, `manufacture_date`, `received_date`, `qty_received`, `qty_on_hand DECIMAL(18,6)`, `expiry_date DATE`, `opened_at TIMESTAMPTZ`, `open_shelf_life_days INT`, `storage_location_id`, `storage_conditions`, `certified_value DECIMAL(18,6)`, `certified_uncertainty DECIMAL(18,6)`, `producer_iso17034 BOOLEAN`, `coa_attachment_id`, `status VARCHAR(20)`
+
+and extend its foreign-key cell to `consumable_id`, `supplier_id`, `indent_id` → `txn_purchase_indent`, `storage_location_id`, `coa_attachment_id`, `purchase_doc_attachment_id`, and its index cell with `supplier_invoice_no`. `purchase_rate` and `lot_value` are recorded figures from the supplier's bill; no costing method or revaluation is computed from them (M12-33).
+
+====================================================================================================
+FINDING 2 of 7  [Blocker]
+LOCATOR: §25.2, transaction tables — no stock ledger table exists
+EXACT TEXT IN THE DOCUMENT:
+| `txn_consumable_issue` | Consumable or reference material used, linked to the test. | `consumable_id`, `lot_id`, `prepared_solution_id`, `sample_test_id`, `worksheet_id`, `qty_issued`, `uom_id`, `issued_at`, `issued_by_user_id` |
+PROBLEM:
+This is the only stock-movement table in the whole database design, and it can hold exactly one of the eight movement types M12-13 [MUST] requires. Receipt, acceptance, return to store, physical-count adjustment, expiry write-off and disposal have nowhere to be written, because M22.1 assigned 'the accounting stock ledger' to the external system. That system is gone, so M12-13, M12-14 (balance never below zero), M12-18 (variance approval before the book quantity moves) and M12-19 (permanent disposal records) are all unbuildable as specified, and `qty_on_hand` becomes a hand-maintained number with no audit trail behind it.
+REQUIRED FIX (paste-ready):
+Add to §25.2, immediately after the `txn_consumable_issue` row:
+
+| `txn_stock_ledger` | **Every movement of every lot, append-only** — the stock ledger M12-13 requires. One row per receipt, acceptance, issue, return to store, physical-count adjustment, expiry write-off and disposal, so that `mst_consumable_lot.qty_on_hand` is a cache of the sum of this table and never a figure typed by hand. `txn_consumable_issue` records which test consumed which lot; it is not a ledger and cannot hold the other movement types. | `unit_id`, `lot_id`, `prepared_solution_id NULL`, `movement_type VARCHAR(25)`, `qty_delta DECIMAL(18,6)`, `uom_id`, `balance_after DECIMAL(18,6)`, `moved_at TIMESTAMPTZ`, `moved_by_user_id`, `reason_id`, `reason_text TEXT`, `consumable_issue_id NULL`, `verification_line_id NULL`, `disposal_id NULL`, `approved_by_personnel_id NULL`, `approved_at NULL` | `id` | `unit_id`, `lot_id`, `uom_id`, `consumable_issue_id` → `txn_consumable_issue` | — | `lot_id, moved_at`; `movement_type` |
+| `txn_stock_verification` / `txn_stock_verification_line` | A physical count run and its lines: counted quantity, book quantity, variance, mandatory reason, Lab In-Charge approval. No adjustment posts to `txn_stock_ledger` until the line is approved (M12-18). | `unit_id`, `run_no`, `started_at`, `closed_at`, `state`, `approved_by_personnel_id`, `approved_at` / `run_id`, `lot_id`, `book_qty`, `counted_qty`, `variance_qty`, `reason_id`, `reason_text`, `ledger_id NULL` | `id` | as named | `unit_id, run_no` / `run_id, lot_id` | `state` |
+| `txn_consumable_disposal` | Disposal of expired, rejected or unwanted material. Permanent (M12-19). | `unit_id`, `disposal_no`, `lot_id`, `qty`, `uom_id`, `method`, `disposed_on DATE`, `authorised_by_personnel_id`, `carried_out_by_personnel_id`, `witness_personnel_id NULL`, `agency_name`, `agency_ref`, `attachment_id` | `id` | as named | `unit_id, disposal_no` | `lot_id` |
+
+and add to DB-03's neighbourhood, in §25.6: `txn_stock_ledger` is append-only; `mst_consumable_lot.qty_on_hand` is maintained only by trigger from it, and a CHECK refuses a negative balance (M12-14).
+
+====================================================================================================
+FINDING 3 of 7  [Major]
+LOCATOR: §25.2 Transaction tables — `txn_receipt_allocation`
+EXACT TEXT IN THE DOCUMENT:
+| `txn_receipt_allocation` | Which receipt settles which invoice or advance — supports part payments and running accounts. | `receipt_id`, `invoice_id`, `amount DECIMAL(14,2)` | `id` | both | — | `invoice_id` |
+PROBLEM:
+The table can only allocate a receipt to an invoice. M17-13b [MUST] requires the opposite: applying an advance to an order "shall be recorded as a row in the 'Applied to orders' child table of the originating advance Payment", and the M17.6 field table defines that child table as "order, amount applied". An advance is taken before any invoice exists — that is what makes it an advance — so with `invoice_id` as the only target there is nowhere to record the application, and M17-13b's acceptance check ("Post one advance of Rs 10,000 and consume it across three orders; the customer ledger is correct at each step, exactly one Payment record exists") cannot be built on this schema. The shape is a leftover of the withdrawn design, where the ERP held the running account and the LIMS only needed to know which invoice a receipt settled; §25.2 accordingly names no customer-ledger table at all, and M17-21, M17-46 and M20-30 ("the totals reconcile to the customer ledgers") have no storage behind them.
+REQUIRED FIX (paste-ready):
+Replace the row with:
+
+| `txn_receipt_allocation` | Which receipt settles which invoice **or which order**, and what remains unapplied — supports part payments, advances taken before any invoice exists, and the running account. Exactly one of `invoice_id` and `order_id` is set: `invoice_id` where the receipt settles an issued document, `order_id` where an advance is applied to work not yet invoiced (M17-13b). Unallocated receipt amount is the customer's advance balance and is never a row here. | `receipt_id`, `invoice_id BIGINT NULL`, `order_id BIGINT NULL`, `amount DECIMAL(14,2)`, `allocated_at`, `allocated_by_user_id` | `id` | `receipt_id`, `invoice_id`, `order_id` | — | `invoice_id`; `order_id`; `receipt_id` |
+
+and add, in §25.6 or §25.2's notes: "`CHECK ((invoice_id IS NULL) <> (order_id IS NULL))` — an allocation targets an invoice or an order, never both and never neither."
+
+Extend DB-37 to read: "A receipt's allocations cannot exceed the receipt amount, and an invoice's paid amount cannot exceed its total. | `CHECK (paid_amount <= total_amount)` plus a trigger summing `txn_receipt_allocation` (over both invoice and order allocations) against `txn_receipt.amount`."
+
+Add one sentence to the §25.2 preamble: "**The customer ledger of M17-21 is a derived view, not a table:** it is `txn_invoice` (charges, credit notes and debit notes) plus `txn_receipt` (money in and, under M17-33a, money out) plus `txn_receipt_allocation` (what has been applied to what), ordered by document date. There is deliberately no stored balance column, because a stored balance and its underlying documents cannot be made to disagree if the balance is never stored."
+
+====================================================================================================
+FINDING 4 of 7  [Major]
+LOCATOR: §25.2, table `mst_equipment`
+EXACT TEXT IN THE DOCUMENT:
+`intermediate_check_interval_days INT`, `next_intermediate_check_due DATE`, `is_reference_standard BOOLEAN`, `erp_asset_id`
+PROBLEM:
+The equipment table keeps the link to the external asset register (`erp_asset_id`) and not one of the working asset fields M11-28 and M11.3 require — no supplier, no purchase document, no cost, no date put to use, no useful life, no physical verification, no condemnation reference. That is the ERP assumption fossilised in the schema: the asset facts were going to live over there and only the foreign key was going to live here. With no external system, M11-28's acceptance check ('the Asset tab prints an asset card containing all listed fields') cannot be met, and the laboratory has no record of what any instrument cost or who supplied it.
+REQUIRED FIX (paste-ready):
+Replace the key-columns cell of `mst_equipment` with:
+
+`unit_id`, `code`, `name`, `equipment_type_code`, `make`, `model`, `serial_no`, `software_version`, `firmware_version`, `lab_section_id`, `location`, `ownership VARCHAR(20)`, `range_text`, `least_count`, `install_date`, `status VARCHAR(25)`, `requires_calibration BOOLEAN`, `no_calibration_reason TEXT`, `calibration_interval_months SMALLINT`, `last_calibration_date DATE`, `next_calibration_due DATE`, `intermediate_check_interval_days INT`, `next_intermediate_check_due DATE`, `is_reference_standard BOOLEAN`, `supplier_id NULL`, `indent_or_po_ref`, `supplier_invoice_no VARCHAR(40)`, `supplier_invoice_date DATE`, `purchase_cost DECIMAL(14,2)`, `date_put_to_use DATE`, `warranty_start DATE`, `warranty_end DATE`, `funding_source VARCHAR(80)`, `asset_class VARCHAR(40)`, `useful_life_years SMALLINT`, `condemnation_ref`, `disposal_date DATE`, `disposal_value DECIMAL(14,2)`, `erp_asset_id NULL`
+
+and extend its foreign-key cell to `unit_id`, `lab_section_id`, `supplier_id` → `mst_supplier`. `erp_asset_id` stays nullable and unused: it is the dormant M22-07 link and no screen may require it (M22-19). There are deliberately no depreciation or book-value columns (M11-28). Add alongside it `mst_equipment_amc` (vendor, contract_no, start, end, coverage, visits_per_year, visits_used, annual_value, renewal_alert_days) for M11-27 and `txn_equipment_verification` / `_line` for the annual physical verification of M11-29, neither of which has a table today.
+
+====================================================================================================
+FINDING 5 of 7  [Minor]
+LOCATOR: §26, Phase 3 — Included
+EXACT TEXT IN THE DOCUMENT:
+the annual maintenance contract, asset and depreciation tabs and the annual physical verification (M11-27 to M11-29)
+PROBLEM:
+The build plan still puts a depreciation tab in Phase 3, so the phase that is costed and signed off carries work the specification elsewhere places outside scope. A developer estimating Phase 3 from this line prices depreciation screens nobody may build.
+REQUIRED FIX (paste-ready):
+Replace with:
+
+the annual maintenance contract register, the working asset record tab — supplier, purchase document, cost, date put to use, useful life, condemnation, with no depreciation or book-value field — and the annual physical verification (M11-27 to M11-29)
+
+====================================================================================================
+FINDING 6 of 7  [Minor]
+LOCATOR: §25.1 preamble (line 438); columns at lines 446, 465, 468 and 511; M22-07 (section_4 line 1785)
+EXACT TEXT IN THE DOCUMENT:
+`is_provisional BOOLEAN NOT NULL DEFAULT false`, `erp_customer_id`, `is_active`
+PROBLEM:
+Four `erp_` columns survive in the schema — `mst_customer.erp_customer_id`, `mst_consumable.erp_item_id`, `mst_equipment.erp_asset_id`, `txn_invoice.erp_invoice_id` — with nothing anywhere in §25 saying they are dormant placeholders for a system that does not exist. Keeping them is the right call, but unlabelled they read as live foreign keys, and the first developer to see one will look for the process that populates it. They also disagree with M22-07, which names six identifiers: `erp_receipt_id` and `erp_employee_id` appear in the requirement but in no table. And no table carries the "last-synchronised timestamp" M22-07 also demands, which is correct today but leaves the requirement and the schema visibly out of step.
+REQUIRED FIX (paste-ready):
+Add as a third paragraph of the §25 preamble, after the sentence ending "...with `p` total digits and `s` after the point.":
+
+**Four columns are dormant and deliberately kept.** `mst_customer.erp_customer_id`, `mst_consumable.erp_item_id`, `mst_equipment.erp_asset_id` and `txn_invoice.erp_invoice_id` exist so that an external accounting system, if one is ever mandated, can be linked without a schema change to four large tables. While M22 is switched off — which is the only state this system is built and validated in — they are nullable, carry no foreign key and no constraint, are written by nothing and read by nothing. They are the only four: the `erp_receipt_id`, the `erp_employee_id` and the last-synchronised timestamp that M22-07 also names are **not** created now, and arrive in the migration that commissions the interface, if one ever is.
+
+====================================================================================================
+FINDING 7 of 7  [Minor]
+LOCATOR: §26.3 Phase 1, "Requirement identifiers from this section that must be satisfied" (line 678)
+EXACT TEXT IN THE DOCUMENT:
+ARC-01 to ARC-12, ARC-16 to ARC-32, ARC-33 to ARC-53
+PROBLEM:
+The list jumps from ARC-12 to ARC-16, silently dropping three rules. ARC-13 belongs out — it is the "Not operative" branch. But ARC-14 is the **operative** standalone-architecture rule, [MUST], the one that says the system owns its customer master, numbering, invoices, receipts and stock outright; and ARC-15 is the [MUST] against proprietary managed-service lock-in. Both are Phase 1 obligations. The paragraph immediately below (line 680) carefully explains every deliberate exclusion — DB-36, DB-37, DB-40, DB-44, DB-27, DB-39, DB-42, NFR-68, NFR-121 — and says nothing about this gap, which reads as leftover from when ARC-13 and ARC-14 were two open branches rather than one decided one.
+REQUIRED FIX (paste-ready):
+Replace the ARC range with:
+
+ARC-01 to ARC-12, ARC-14, ARC-15, ARC-16 to ARC-32, ARC-33 to ARC-53
+
+and add to the exclusion paragraph that follows: "ARC-13 is the single architecture rule Phase 1 does not have to satisfy, because it is not operative: there is no accounting package to build inside, and the rule becomes live only if somebody proposes one."

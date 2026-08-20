@@ -1,0 +1,189 @@
+====================================================================================================
+FINDING 1 of 15  [Blocker]
+LOCATOR: M17-35 (M17.4 Requirements — tax invoice, credit note and refund)
+EXACT TEXT IN THE DOCUMENT:
+an approver, and where a refund of money follows, a link to the refund payment.
+PROBLEM:
+"The refund payment" is referenced but never created anywhere in the specification. M17-13 lists nine payment modes and every one of them is money coming in; M17-13a then binds the Daily Collection Register and the collection-versus-remittance reconciliation to Payment records only; the M17.6 Payment field table has no outward mode, no sanction reference and no sanctioning officer; M17.7 rules 2 and 4 twice instruct staff to "refund ... with the sanction reference recorded" against a field that does not exist; M17-15 offers a status *Refunded* that no requirement ever sets; and §25.2 of section_5 holds only `txn_receipt` ("Money tendered"). Under the withdrawn assumption the LIMS raised the refund voucher and the ERP posted and paid it — the M22.1 row "Credit note and refund voucher" still shows that split. With no ERP, money leaving the laboratory has no record, no series, no authorisation and no place in any register, and the refund path the rewrite was supposed to bring in-house is only half here.
+REQUIRED FIX (paste-ready):
+Insert this row immediately after M17-33 in M17.4:
+
+| M17-33a | [MUST] | The system shall record every **refund of money paid out** as a **Refund Payment** in its own gap-free financial-year series, carrying: the credit note (M17-35) or refund voucher (M17-33) it discharges, as a hard link and not a free-text note; the customer; the amount; the outward mode from a controlled list (cash at the counter; demand draft; bank transfer; reversal to the instrument the money arrived on; adjustment against the customer's advance balance); the outward reference values with their types, dates and evidence files, on the same reference table as M17-14; the **sanction reference and the sanctioning officer, both mandatory**, the officer being the Approving Authority where the amount exceeds `waiver_approval_limit`; and the date the money actually left. The originating Payment moves to status *Refunded* only when a Refund Payment is committed against it, never by editing the status. A Refund Payment is money **out**: it shall never be counted as a collection in the Daily Collection Register (M17-24) or in the collection-versus-remittance reconciliation (M17-25), shall appear on both as a separate outward total, and shall post to the customer ledger (M17-21) as a debit on the date the money left. No money shall be refunded except against a committed credit note or refund voucher, and no Refund Payment shall be deleted (M17-26 applies unchanged). | Approve a credit note with a refund and attempt to pay it with the sanction reference blank; refused. Record it with the sanction reference; the originating payment reads *Refunded*, the day's collection total is unchanged, the refund shows in its own outward total, and the customer ledger carries the debit. Attempt to set a payment to *Refunded* directly; refused. |
+
+Then add to the M17.6 Payment field table: `| Direction | In / Out | Yes | Default In; Out only on a Refund Payment (M17-33a) |`, `| Refund of payment | Link | Conditional | Required where Direction is Out; the payment being refunded |`, `| Sanction reference and sanctioning officer | Text + link to staff | Conditional | Mandatory where Direction is Out |`; add a row `| Refund payment — record / sanction | – | – | – | C | A | – | C (raise) | – | – | R own |` to the M21.3 permission matrix beside "Credit note / refund voucher"; and add `Refund Payment` to the series list in M1-68 and to §10.1 and WF-99 of section_2_workflow.md.
+
+====================================================================================================
+FINDING 2 of 15  [Blocker]
+LOCATOR: M12.4 Field table — Consumable Lot Record
+EXACT TEXT IN THE DOCUMENT:
+| Purchase order / indent reference | Text or link | Yes where purchased | |
+PROBLEM:
+The lot record captures the supplier, the indent reference and the certificate of analysis, but nothing about the commercial document the material actually arrived on and nothing about price. Under M22.1 the external system was 'Master of value' and sent 'item identity and cost' to the LIMS, so the purchase facts were never specified here. With that system withdrawn, an assessor tracing a reagent lot back to its supplier can reach the certificate of analysis but cannot reach the bill it came on, and the laboratory has no record of what any reagent cost — which M12-28's consumption report and M12-20's estimated value both silently assume exists.
+REQUIRED FIX (paste-ready):
+Insert these four rows into M12.4 immediately after '| Purchase order / indent reference | Text or link | Yes where purchased | |':
+
+| Supplier's invoice / bill number | Text | Yes where purchased | The commercial document the material arrived on. A lot received without purchase records the source in Remarks under M12.6 rule 7 |
+| Supplier's invoice / bill date | Date | Yes where purchased | |
+| Purchase rate per unit | Amount | Yes where purchased | As billed, exclusive of tax |
+| Lot value as received | Amount | System-computed | Quantity received x purchase rate. A stores figure copied from the supplier's bill, not an accounting valuation: no costing method, revaluation or ledger posting is computed anywhere in this system |
+| Purchase document file | File upload | Yes where purchased | The scanned bill or cash memo, held with the lot alongside the certificate of analysis |
+
+And add this requirement to M12.2 after M12-32:
+
+| M12-33 | [MUST] | The system shall record, for every purchased lot, **what was bought, from whom, on what document and at what price**: the supplier, the supplier's invoice or bill number and date, the purchase rate per unit and the resulting lot value, and shall retain the scanned purchase document with the lot alongside the certificate of analysis. These are facts copied from documents the laboratory holds. The system shall **not** compute a costing method, a stock revaluation or any ledger posting; those stay with the unit's accounts wing, which keeps the books. | Receive a lot against a supplier's bill; the Consumable Lot Register and the lot card show the supplier, the bill number and date, the rate and the value, with the scanned bill attached; searching that bill number finds the lot and, through M12-12, every test that used it. |
+
+====================================================================================================
+FINDING 3 of 15  [Blocker]
+LOCATOR: M11-28
+EXACT TEXT IN THE DOCUMENT:
+The system shall hold **asset and depreciation fields** for the parent institute's asset register: purchase order reference, supplier, invoice number and date, capitalised cost, date put to use, funding source or scheme, asset classification, expected useful life, depreciation method and rate, accumulated depreciation, book value, physical verification date and outcome, condemnation reference.
+PROBLEM:
+The requirement still names the parent institute's asset register as the thing being fed, and demands depreciation method, depreciation rate, accumulated depreciation and book value — figures nobody in this system can maintain once the general ledger is out of scope. It contradicts M22.1 head-on, which states that the financial asset register 'with its capitalised cost and depreciation' is 'not held here in any configuration', and contradicts N4 in Part A, which keeps capitalisation and depreciation with the accounts wing. A developer reading M11-28 and M11.3 will build depreciation columns the specification elsewhere forbids.
+REQUIRED FIX (paste-ready):
+Replace the whole M11-28 row with:
+
+| M11-28 | [SHOULD] | The system shall hold a **working asset record** for each instrument — what it is, what it cost, where it came from and whether it is still fit to hold: purchase indent or order reference, supplier, supplier's invoice number and date, purchase cost, date put to use, warranty start and end, funding source or scheme, asset classification, expected useful life, physical verification date and outcome, condemnation order reference, disposal date and disposal value. These are facts copied from documents the laboratory holds, and calibration planning, replacement planning and traceability need them. The system shall **not** compute or store depreciation method, depreciation rate, accumulated depreciation or book value: depreciation accounting and the financial fixed-asset register stay with the unit's accounts wing and the parent institute, outside this software (N4, M22.1). The record shall print as an asset card the accounts wing can use, and shall be exportable through the dormant interface in M22 should an accounting system ever be adopted. | The Working Asset Record tab prints an asset card containing every listed field, and the same data is available as an export file. No depreciation, accumulated-depreciation or book-value field exists anywhere in the interface or the schema. |
+
+====================================================================================================
+FINDING 4 of 15  [Blocker]
+LOCATOR: M22-19 (line 1797)
+EXACT TEXT IN THE DOCUMENT:
+The system shall provide a **manual override entry** for every ERP-supplied reference — invoice number, receipt number, asset number, purchase order number — so that a value can be typed in. With no external system in place this is the only path and it shall be a first-class one, not a fallback: no screen shall require an externally supplied reference before it will save.
+PROBLEM:
+This is the sharpest surviving assumption that an external system allocates numbers. With no ERP, the tax invoice number and the money receipt number are NOT typed in — they are allotted by this system's own locked counter (WF-97, WF-98, DB-08), are gap-free and statutory (WF-99, M17-28, DB-11, DB-35), and OPEN-Q36 has already been answered "the LIMS masters the series". A developer implementing M22-19 literally puts an editable invoice-number field on the invoice screen, which breaks rule 46(b) consecutiveness and the series register of WF-102. The sentence "with no external system in place this is the only path" also contradicts M22.2's own statement that only M22-17, M22-18 and M22-20 bind today, since M22-19 is not one of the three.
+REQUIRED FIX (paste-ready):
+| M22-19 | [SHOULD] | The system shall provide a **manual entry field for every reference an external system would otherwise supply** — the external asset number, the external purchase-order number, the external customer identifier and the external system's own document reference — so that a value can be typed in, and **no screen shall require any such reference before it will save**. This does **not** extend to the tax invoice number, the bill of supply number, the advance receipt voucher number, the refund voucher number, the credit note number or the money receipt number: those are allotted by this system's own locked counter under WF-97, WF-98 and DB-08, are gap-free under WF-99, and are **never typed in by a user** — today, or after any interface is ever commissioned. | Save each record carrying an external reference with that reference left blank; accepted. Then look for a way to type the invoice number: there is no such field, and the number shown is the one the counter allotted. |
+
+====================================================================================================
+FINDING 5 of 15  [Major]
+LOCATOR: M21.11 Configuration and feature switches introduced by this document
+EXACT TEXT IN THE DOCUMENT:
+The register covers M10 to M22.
+PROBLEM:
+The register claims to cover M10 to M22 and to be "the single place an assessor looks for every value the laboratory can change without a developer", but it contains no switch for the M22 interface itself. Four requirements branch on a configuration state the document never names or defaults: M12-20 ("Where an external accounting system has been configured under M22, the approved indent shall also be transmitted to it"), the M12.3 item-master field ("Populated by the M22 interface where it is enabled; empty otherwise"), M21-72a ("Where the optional interface in M22 is ever enabled") and M22-17 itself ("The LIMS shall run with the integration switched off entirely"). The whole standalone position rests on that off state, and it is the one setting in the money and stock area with no configuration key, no recorded default and nothing for the go-live checklist or an assessor to inspect.
+REQUIRED FIX (paste-ready):
+Insert this row in the M21.11 table immediately after the `returns_filed_upto` row:
+
+| `external_accounting_interface_enabled` | **Off**, and off at delivery | M22-17, M22-01, M12-20, M12.3 item master, M21-72a. While Off, no outbound accounting message is produced and no external reference is required on any screen (M22-19); the external-reference fields on the customer, item, invoice and asset records stay empty and hand-editable. Turning it On is a change subject to M21-57 change control and requires the ownership table of M22.1 to have been agreed in writing first. |
+
+====================================================================================================
+FINDING 6 of 15  [Major]
+LOCATOR: M11.3 Field table — Equipment Master, Asset tab paragraph
+EXACT TEXT IN THE DOCUMENT:
+depreciation method, depreciation rate, accumulated depreciation, book value as at date, last physical verification date, verification outcome, condemnation order reference, disposal date, disposal value.
+PROBLEM:
+This is the field list a developer will actually build from, and it still spells out four accounting fields — depreciation method, depreciation rate, accumulated depreciation and book value — that require a general ledger behind them. It also opens with 'capitalised cost', which is an accounting term of art for a figure the accounts wing determines, not a purchase price the laboratory can copy off a bill.
+REQUIRED FIX (paste-ready):
+Replace the whole paragraph beginning 'Asset tab (see M11-28):' with:
+
+Working asset record tab (see M11-28): purchase indent or order reference, supplier, supplier's invoice number, invoice date, purchase cost, date put to use, warranty start, warranty end, funding source or scheme name, asset class, expected useful life (years), last physical verification date, verification outcome, condemnation order reference, disposal date, disposal value. There is deliberately no depreciation method, depreciation rate, accumulated depreciation or book-value field: those belong to the financial fixed-asset register, which stays with the unit's accounts wing and the parent institute and is outside this system's scope (N4, M22.1).
+
+====================================================================================================
+FINDING 7 of 15  [Major]
+LOCATOR: M12-20
+EXACT TEXT IN THE DOCUMENT:
+Where an external accounting system has been configured under M22, the approved indent shall also be transmitted to it, and shall queue and retry while that system is unreachable.
+PROBLEM:
+A [MUST] requirement carries a transmit-and-retry leg to a system that does not exist, and its acceptance check ends 'With the M22 interface enabled, it also appears in the outbound queue and, on success, carries the external purchase-requisition number back' — a purchase sync that cannot be executed at go-live, against machinery OPEN-Q-D35 forbids building. Worse is what the ERP was carrying and nobody replaced: the external purchase-requisition number coming back was the return leg. Today the indent is printed and then falls off the end of the specification. There is no record of who it was handed to, no state, no worklist, and no way to enter the sanction or purchase order reference the accounts wing supplies — which M12.4 then makes mandatory on goods receipt ('Purchase order / indent reference ... Yes where purchased').
+REQUIRED FIX (paste-ready):
+Replace the whole M12-20 row with:
+
+| M12-20 | [MUST] | The system shall raise a **purchase indent** listing items, quantities, required-by date, technical acceptance criteria per item, suggested supplier and estimated value, and route it for Lab In-Charge approval. On approval it shall **print for hand-over to the unit's accounts wing**, which runs the procurement chain outside this software (N3). The system shall record the hand-over — date, the officer it was given to, and a scan of the receipted copy where one is returned — and shall allow the Store Keeper to enter, against that indent, the **sanction or purchase order reference** the accounts wing supplies, so that a goods receipt has a purchase document to name. An indent shall carry a state — Draft, Approved, Handed over, Ordered (reference recorded), Received, Closed, Cancelled — and shall stay on an open-indent worklist until it is closed, so that a request nobody acted on is visible rather than forgotten. Where an external accounting system is ever configured under M22 the approved indent may additionally be transmitted to it; that path is switched off, and is neither built nor tested at go-live (M22-17, OPEN-Q-D35). | Approve an indent; it prints, the hand-over is recorded with a date and a named officer, and it appears on the open-indent worklist. Enter the purchase order reference the accounts wing returns; receiving a lot against that indent offers the reference automatically. Close the indent; it leaves the worklist. No step in the test requires an external system. |
+
+Add the matching table to §25.2 of Part E: `txn_purchase_indent` / `txn_purchase_indent_line` (`unit_id`, `indent_no`, `raised_by_personnel_id`, `raised_on`, `required_by DATE`, `approved_by_personnel_id`, `approved_at`, `handed_over_on DATE`, `handed_over_to`, `handover_attachment_id`, `sanction_or_po_ref`, `po_dated DATE`, `state` / `indent_id`, `line_no`, `consumable_id`, `qty`, `uom_id`, `acceptance_criteria TEXT`, `suggested_supplier_id`, `estimated_value`).
+
+====================================================================================================
+FINDING 8 of 15  [Major]
+LOCATOR: M12.6 rule 9
+EXACT TEXT IN THE DOCUMENT:
+None exists at present, so the LIMS carries both the quantity and the value of what is in store, which is what a stock register needs
+PROBLEM:
+The rule promises a stock value the specification never delivers: no field in M12.4 holds a price, no requirement in M12.2 records one, `mst_consumable_lot` has no cost column, and neither M20-06 (Reagent and Consumable Register) nor M20-29 (Stock position and consumption) prints a value. The sentence is left over from the position where the external system supplied cost. As written it also over-claims in the other direction — 'the value of what is in store' reads as a stock valuation, which is a costing exercise that only makes sense with a ledger behind it.
+REQUIRED FIX (paste-ready):
+Replace the whole of rule 9 with:
+
+9. **Stock value, and how far it goes.** No external accounting system exists, so nothing outside this software holds a figure for what is in store. The LIMS therefore records, per lot, the price it was bought at and the document it was bought on (M12-33), and the stock position report of M20-29 shows quantity and that recorded value side by side. It goes no further: the system runs **no costing method, no stock revaluation and no ledger posting**. Those follow from the movements and stay with the unit's accounts wing, which keeps the books. If an accounting system is ever adopted it becomes the system of record for money value, and the LIMS remains the system of record for **fitness for use** — quarantine, acceptance, expiry, blocking. The two must not both decide whether a lot may be used. See M22.
+
+And extend M20-06 and M20-29 to carry the recorded purchase rate and lot value as columns.
+
+====================================================================================================
+FINDING 9 of 15  [Major]
+LOCATOR: M11, opening paragraph
+EXACT TEXT IN THE DOCUMENT:
+It is actually two registers that happen to describe the same physical objects: a **money register** for the parent institute's asset and depreciation records, and a **measurement control register** for calibration and traceability. This module builds both and keeps them linked.
+PROBLEM:
+The module's framing sentence still says it builds a money register for somebody else's asset and depreciation records. It is the sentence M11-28, M11.3 and the M11.1 screen list all descend from, and it directs the reader to a register the specification elsewhere says stays with the accounts wing. Depreciation records are outside this system's scope; the laboratory keeps a working record of the object, not an accounting one.
+REQUIRED FIX (paste-ready):
+Replace both sentences with:
+
+It is actually two registers that happen to describe the same physical objects: a **working asset record** — what the instrument is, what it cost, who supplied it, where it stands and whether it is still fit to hold — and a **measurement control register** for calibration and traceability. This module builds both and keeps them linked. It does not build an accounting asset register: capitalisation, depreciation and book value stay with the unit's accounts wing and the parent institute, outside this software (N4, M22.1).
+
+====================================================================================================
+FINDING 10 of 15  [Major]
+LOCATOR: M21.11 Configuration and feature switches (preamble line 1605; table ends line 1666)
+EXACT TEXT IN THE DOCUMENT:
+The register covers M10 to M22.
+PROBLEM:
+The register covers M10 to M21 and stops. There is no row for the external accounting interface, and no switch is named anywhere in the document — a grep for `integration_enabled`, `accounting_integration` and `erp_enabled` across all five parts returns nothing. M22-17 is one of the three requirements that bind from day one and it says the system "shall run with the integration switched off entirely", so the switch is load-bearing; M21.11 is described as "the single place an assessor looks for every value the laboratory can change without a developer", and the one switch the whole M22 rewrite turns on is missing from it.
+REQUIRED FIX (paste-ready):
+Add as a new final row of the M21.11 table, after the `working_calendar` row:
+
+| `external_accounting_interface_enabled` | **Off**, and off is the only state the system is built, tested and validated in | M22-17, M22-19. The switch exists so that an interface can be commissioned later without a schema change. Turning it on requires OPEN-Q35 to have been answered with a named system, and is a change under M21-57. While it is off, nothing in M22 outside M22-17, M22-18 and M22-20 is present in the running system. |
+
+====================================================================================================
+FINDING 11 of 15  [Major]
+LOCATOR: M22-02 (line 1780); same defect in M22-08 and M22-13; assumption table M22.3 (lines 1804-1813)
+EXACT TEXT IN THE DOCUMENT:
+Send the same invoice twice with the same key; the ERP holds one invoice.
+PROBLEM:
+This acceptance check tests the unseen system, not this one. An idempotency key only prevents a duplicate if the receiver honours it, and M22.3 — the checklist that exists precisely to list what must be learned about whatever system is eventually named — has eight rows and none of them covers it. The same gap sits under M22-08 ("receipts in the ERP with no LIMS match; stock quantity differences" needs read access to the far side's receipts and stock, a capability no assumption row claims) and M22-13 ("the previous version is still accepted for the configured period" is the far side's behaviour, not ours). These are the three places where M22 claims a capability of a system nobody has seen, which is the one thing M22.3 was written to prevent.
+REQUIRED FIX (paste-ready):
+Add three rows to the M22.3 table, after row 8:
+
+| 9 | The system honours an idempotency key supplied by the caller, so a retried message cannot create a second invoice, receipt or indent on its side | M22-02's acceptance check cannot be run at all. Deduplication moves to this side — hold the message, query the far side for the record, send only if it is absent — and the reconciliation report of M22-08 becomes the only guard against a duplicate invoice in what is, on our side, a gap-free statutory series |
+| 10 | The system can be **read** as well as written: its receipts, its customer records, its item master and its stock balances can be listed through the same interface | M22-08 shrinks to a one-way check — it can list what this system sent and never got an acknowledgement for, and nothing else. Every other mismatch then surfaces only when a person compares two printouts |
+| 11 | The system tolerates a message carrying a schema version, and does not fail on a version it does not recognise | M22-13 cannot be honoured from this side alone. The transition period becomes a scheduled cut-over — both systems changed on the same day with the interface stopped in between — and M22-14's test becomes mandatory rather than prudent |
+
+====================================================================================================
+FINDING 12 of 15  [Minor]
+LOCATOR: M11.1 Screens and functions
+EXACT TEXT IN THE DOCUMENT:
+| Asset / Depreciation tab | Accounts | Fields the parent institute's asset register and the unit's accounts wing need |
+PROBLEM:
+The screen list names a Depreciation tab and describes its purpose as feeding the parent institute's asset register — a system that will not receive anything, because none exists and the general ledger is out of scope. It also assigns the screen to Accounts alone, when the custodian is the person who knows the supplier, the bill and the condition of the instrument.
+REQUIRED FIX (paste-ready):
+Replace the row with:
+
+| Working Asset Record tab | Equipment Custodian, Accounts (read) | What the instrument cost, who supplied it, on what document, when it was put to use, its expected life, and its physical verification and condemnation history — printable as an asset card the accounts wing can use |
+
+====================================================================================================
+FINDING 13 of 15  [Minor]
+LOCATOR: M22.2 "When these apply" preamble (line 1775)
+EXACT TEXT IN THE DOCUMENT:
+No external accounting system exists, so most of this table is built only if and when the parent body names such a system and the interface is commissioned; the acceptance checks are run then.
+PROBLEM:
+The prose says it, but the table below does not: M22-01 to M22-14 and M22-20 all carry a bare [MUST] and M22-15, M22-16 and M22-19 a bare [SHOULD], with no dormancy marker on any row. The document has its own precedent for this and does not follow it here — NFR-121 opens with "**Dormant under the OPEN-Q-T31 default, and deliberately kept.**" and ARC-13 opens with "**Not operative.**", both inside the requirement text where anyone scanning the table sees it. Anyone counting MUSTs for a phase scope, a validation pack under M21.9 or an acceptance run under §27 will pick up seventeen obligations that cannot be met and that §26 does not schedule.
+REQUIRED FIX (paste-ready):
+Append to the end of the M22.2 preamble paragraph:
+
+**How to read the priority column below.** Except for M22-17, M22-18 and M22-20, every priority in this table is the priority that requirement would carry **once an interface is commissioned**. None of the others is a go-live obligation; none may be counted into a phase scope in §26, into the validation pack of M21.9, or into the acceptance run of §27, until OPEN-Q35 has been answered with a named system. Read them as [MUST-WHEN-COMMISSIONED].
+
+====================================================================================================
+FINDING 14 of 15  [Minor]
+LOCATOR: M22.1 ownership table, row "New customer created at the laboratory counter" (line 1747)
+EXACT TEXT IN THE DOCUMENT:
+| **New customer created at the laboratory counter** | Master, eventually | Creates a provisional record | LIMS → ERP, then ERP → LIMS to confirm | On acceptance of the first order | The provisional customer works fully in the LIMS with a temporary reference; the ERP identifier is filled in when the push succeeds; **sample receipt is never blocked** |
+PROBLEM:
+"Provisional" is a settled word in this document with a different meaning. M1-13 and `mst_customer.is_provisional` define a provisional customer as a walk-in created from name, mobile and category alone, against whom no tax invoice may be issued until the State is present. M22.1 reuses the same word for a complete customer record that merely lacks an external identifier — and today every customer record lacks one, because there is no external system. §8.3 requires exactly one word per concept, and this table exists specifically to stop two records of the same thing drifting apart.
+REQUIRED FIX (paste-ready):
+| **New customer created at the laboratory counter** | Master, eventually | **Master today; creates the definitive customer record** | LIMS → ERP, then ERP → LIMS to confirm | On acceptance of the first order | The customer record works fully in the LIMS with no external identifier at all; the identifier is filled in when the push succeeds; **sample receipt is never blocked**. This is **not** the `is_provisional` record of M1-13, which means something else entirely — a walk-in whose own details are not yet complete — and the two must never be conflated in the schema or on screen |
+
+====================================================================================================
+FINDING 15 of 15  [Minor]
+LOCATOR: M22-14 (line 1792)
+EXACT TEXT IN THE DOCUMENT:
+The integration shall be **tested against an ERP upgrade** before the upgrade goes live in production, and the test shall be part of the change-control record in M21-57.
+PROBLEM:
+As worded this is a [MUST] on this project that this project cannot satisfy on its own: it requires notice of somebody else's upgrade, from somebody who does not exist and who, per OPEN-Q40, has given no such commitment ("who maintains it, and will they commit to a stable interface and to notifying this project before an upgrade?"). The acceptance check — "An ERP upgrade is recorded in the change register with an integration test result" — is a record of the far side's behaviour. Rewriting it to bind only what this side controls, and to name the written commitment as a precondition, makes it a real requirement rather than an aspiration.
+REQUIRED FIX (paste-ready):
+| M22-14 | [MUST] | Before any upgrade of the external system goes live in production, the integration shall be tested against the upgraded version in staging, and the result recorded in the Change Control Register of M21-57. **This binds this project's side only, and it depends on notice that nobody has yet undertaken to give (OPEN-Q40): if an interface is ever commissioned, a named contact and a written commitment to give notice before an upgrade shall be obtained first and held with the interface's configuration record. Without that commitment the interface is run on the assumption that it may break without warning, and the reconciliation report of M22-08 is the detector.** | The change register holds an entry for the upgrade naming the version tested against and the outcome, and the interface configuration record names the contact who gave the notice. |

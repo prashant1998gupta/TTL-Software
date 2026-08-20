@@ -1,0 +1,371 @@
+{
+ "intro": "Two days inside the laboratory, not a meeting in a room. Section 2.2 of the specification, which describes how this unit works today, says in its own words that every sentence in it should be treated as a question rather than a finding — it was reconstructed from published figures and from how comparable government laboratories operate, and it has never been checked against Dharmavaram. These two days succeed if the developer leaves with one Limited Test batch timed minute by minute from counter to report, one filled example of every piece of paper the unit actually uses, and a one-page answer sheet the Unit In-Charge has been through in a single sitting. They fail if they become a discussion instead of a watching exercise, if the developer collects blank forms instead of used ones, or if he asks questions during the morning rush instead of standing quietly at the counter with a stopwatch.",
+ "observe": [
+  {
+   "what": "The counter, from before the first sample of the day arrives",
+   "watchFor": "Whether lots arrive one at a time in a customer's hand or as one bundle of ten to thirty from a single sender walking over from the cocoon market. The whole high-volume design assumes two batch intakes a day with market-day spikes; if instead forty separate people arrive across the morning, batch entry is the wrong screen entirely. Also watch whether the person at the counter is the owner of the silk or a runner sent by him.",
+   "writeDown": "Clock time of every arrival; who brought it; how many lots in that arrival; declared denier stated (18/20, 20/22, 22/24 or other); which book the entry went into; the order the columns were filled in; and the stopwatch time for the first lot of a bundle against the tenth lot of the same bundle."
+  },
+  {
+   "what": "What is written on the sample itself, and what is written in the register",
+   "watchFor": "How many separate identifiers one lot ends up carrying. The specification assumes one laboratory sample number with suffixes hanging off it; the paper may carry a register serial, the customer's own lot mark or chop, a tag number and something chalked on the bundle, none of which derive from each other.",
+   "writeDown": "Copy out one full register row column by column, verbatim, including abbreviations and anything struck through. Photograph one tied tag with the handwriting legible. Note who writes the tag and whether it is written before or after the register entry."
+  },
+  {
+   "what": "One Limited Test batch, start to finish — the single most important observation of the two days",
+   "watchFor": "Where the batch waits and for how long; how many pairs of hands touch it; and above all whether the twenty weighings are twenty skeins from one lot, or one weighing taken from each of twenty different lots. The specification assumes twenty readings belong to one lot result, and every table in the data model follows from that. Also watch whether five skeins is a real minimum or a nominal one.",
+   "writeDown": "A minute-by-minute line for the whole batch, from the moment it leaves the counter to the moment the last report prints: batch size in lots, people on it, machines running, every wait with its cause, and each point at which a lot number is copied out again by hand."
+  },
+  {
+   "what": "Winding, wrap-reel and kilcha making",
+   "watchFor": "Kilcha making is manual and is the historical throughput bottleneck. Watch the reel length used: local practice may use about 225 metres for cottage-basin silk and about 450 metres for multi-end, which means the test recipe changes with where the silk came from. The specification holds that length as data rather than a fixed constant, and this is the step that confirms or corrects it.",
+   "writeDown": "Reel length used and for which kind of silk (charkha, cottage basin, multi-end, ARM); minutes to load; minutes per lot at each machine; number of workers; and whether anything at all is written down at this stage or the batch simply moves on."
+  },
+  {
+   "what": "The denier computer and the software already running on it",
+   "watchFor": "Whether the readings are typed into that software or read off it; whether it keeps anything on disk after the printout comes out; and whether it can produce a file rather than only paper. The specification assumes it cannot export and that the size and deviation statistics must be written afresh — a working export would remove a great deal of typing.",
+   "writeDown": "The software name and version if it shows anywhere on screen; a photograph of the screen with real readings on it; the folder path if any file is saved; the printer it prints to; and keep one printout for the same lot whose worksheet was collected."
+  },
+  {
+   "what": "The arithmetic — average, deviation and coefficient of variation",
+   "watchFor": "Who does it and on what: the denier software, a hand calculator, or in the head. And whether anything is rounded before it is written down. The specification assumes nobody ever types an average, that the machine computes it from the raw readings, and that every raw reading is kept for good.",
+   "writeDown": "For one lot: the twenty raw values as written, the average, the deviation, the coefficient of variation and the maximum deviation, in the order they were produced, together with how many decimal places each was written to."
+  },
+  {
+   "what": "The checking step, if there is one",
+   "watchFor": "Whether a second person looks at the numbers before the report is typed, whether that check leaves any mark on the paper, and what happens when the checker disagrees — is the figure struck out and rewritten, or is a fresh sheet started. This is a three-or-four person unit and a separate checker may simply not be available on every batch.",
+   "writeDown": "Who checked, what they actually looked at, how long it took, and any words or initials written on the sheet. If there is no separate checker, write that down plainly with the number of technical staff present that day."
+  },
+  {
+   "what": "Report typing, numbering, signing and stamping",
+   "watchFor": "The exact moment the report number is allotted — before the report is typed, or at the signature. And how many values are typed a second time from the worksheet: customer name, declared denier, lot mark, results. Also whether the report goes onto pre-printed letterhead or plain paper, and whether a rubber stamp is part of the finished document.",
+   "writeDown": "Minutes to produce one finished report; the number format exactly as printed, character by character including prefixes and slashes; which fields were re-typed rather than carried across; the stationery used; the stamp impression; and who signed."
+  },
+  {
+   "what": "Handover of the report, and the money",
+   "watchFor": "Whether money is taken when the sample arrives or when the report goes out, and whether the report is held back until it is paid. Also how a customer telephoning for status is answered, and what has to be searched to answer him.",
+   "writeDown": "For each handover: time, who collected, what they signed, which receipt was written and from which book. Separately, time one telephone status enquiry with a stopwatch from the moment the handset is picked up to the moment an answer is given."
+  },
+  {
+   "what": "Whatever runs that day that is not a Limited Test",
+   "watchFor": "Grading (BIS or ISA), twist, twisted-yarn denier, zari, cocoon or water work runs at a different pace and produces a differently shaped document. The specification assumes these are about two per cent of the lots; they may take a far larger share of the counter time, the bench time and the revenue than that share suggests.",
+   "writeDown": "Which test, how many lots, how many readings per lot, how long start to finish, how many people, and whether the finished report uses a different template or the same one with different rows."
+  },
+  {
+   "what": "A bale weighing or conditioning job, if one runs — otherwise the last one on file",
+   "watchFor": "Whether the tare is itemised line by line (shirt, wrapping papers and labels of the sampled books, middle cotton bands times three, tare of one book, tare of all books in that bale) or simply weighed as one lump. The specification reproduces the itemised build-up line by line because the customer audits it; a single lump figure would change the whole module.",
+   "writeDown": "Every tare line and its value as written; number of bales in the lot and books in each bale; which platform balance, which skein balance, which oven; the oven temperature used; the drying intervals actually used; and both moisture sets with their two results."
+  },
+  {
+   "what": "A lot that is not straightforward",
+   "watchFor": "Short quantity, wet or torn packing, an unmarked bundle, a declared denier the test contradicts, or a customer disputing a figure. This is where the paper has no column and the practice lives entirely in somebody's judgement — and it is the part of the design most likely to be wrong.",
+   "writeDown": "What was wrong; who decided what; whether the customer was telephoned before work went on; whether it was still charged and at what; and where, if anywhere, the decision was written down."
+  },
+  {
+   "what": "The end of the day, and the retained-sample shelf",
+   "watchFor": "What is totalled and by whom, what is carried forward on a loose slip of paper rather than in a book, and how a sample already tested is found again on the shelf weeks later. The specification assumes a retention period per sample type with a recorded disposal; the shelf may be governed by space rather than by a period.",
+   "writeDown": "The day's closing totals as written and how long the close took; the number of samples on the retention shelf; how the oldest one on the shelf is identified and roughly how old it is; and who decides when material leaves the shelf."
+  },
+  {
+   "what": "The rooms themselves, walked once when empty and once when busy",
+   "watchFor": "Computers and their age; printers and whether any is a dot-matrix on multi-part stationery; whether there is a cable network between the machines or none at all; where the power comes in; and how often the lights go during the two days. The specification assumes four computers, a network still to be laid, no battery backup and about five power cuts a week.",
+   "writeDown": "A sketch of the rooms with benches, instruments, computers and power points marked; make, model and rough age of every computer and printer; count of working network points; battery backup and what it covers; and the clock time and duration of every power cut and internet drop across both days."
+  }
+ ],
+ "collect": [
+  {
+   "item": "Sample intake register — a full working day's pages",
+   "whyItMatters": "Its columns are the field list for sample registration, and a filled page shows which columns are actually written in and which stay empty.",
+   "filled": true
+  },
+  {
+   "item": "Acknowledgement slip or counter receipt given to the customer",
+   "whyItMatters": "The system must print the piece of paper the customer already expects to be handed at the counter, in the same shape.",
+   "filled": true
+  },
+  {
+   "item": "Sample tag as tied to a bundle",
+   "whyItMatters": "Decides what the printed label must carry, and confirms that nothing identifying the customer is written where the tester can see it.",
+   "filled": true
+  },
+  {
+   "item": "Limited test worksheet — twenty completed sheets with the hand-written readings and the hand-worked results",
+   "whyItMatters": "These twenty become the calculation regression suite: every one must produce the same result from the software as it did on paper, or the engine is wrong.",
+   "filled": true
+  },
+  {
+   "item": "Denier printout from the test-room computer, for the same lot as one of those worksheets",
+   "whyItMatters": "Shows whether the existing software can be read from, and what the mandatory attached instrument printout will look like.",
+   "filled": true
+  },
+  {
+   "item": "Test report as issued for a Limited test — signed, stamped, on the stationery used",
+   "whyItMatters": "This is the template most staff will see most days, and it fixes the letterhead, the field order, the statements and the signatory block.",
+   "filled": true
+  },
+  {
+   "item": "Grading Certificate as issued (BIS and ISA, if both are done)",
+   "whyItMatters": "Fixes the grade table layout and confirms whether one certificate covers one lot or several.",
+   "filled": true
+  },
+  {
+   "item": "Record and Report of Conditioned Mass — a weight certificate as issued, if the unit has ever issued one",
+   "whyItMatters": "Decides whether the conditioning module is a live daily document or a dormant one, and fixes the tare build-up lines the customer audits.",
+   "filled": true
+  },
+  {
+   "item": "Record and Report of Preliminary Examination of Raw Silk, if the unit uses one",
+   "whyItMatters": "Confirms whether the accept-or-reject examination before grading is a separate numbered document here or part of receipt.",
+   "filled": true
+  },
+  {
+   "item": "Report issue or despatch register — a full month's pages",
+   "whyItMatters": "Gives the report number format, the last number used, and whether the series runs gap-free.",
+   "filled": true
+  },
+  {
+   "item": "Money receipt book — used counterfoils",
+   "whyItMatters": "Fixes the money receipt format and the last receipt number, so the system's series cannot collide with the book still in the drawer.",
+   "filled": true
+  },
+  {
+   "item": "Tax invoice as issued to an outside party",
+   "whyItMatters": "Settles which tax registration and registered address the unit bills under, which decides the tax split on every future invoice.",
+   "filled": true
+  },
+  {
+   "item": "Daily collection and remittance register — a full month",
+   "whyItMatters": "Defines what the day's collection sheet must balance against, and how many receipts a normal day carries.",
+   "filled": true
+  },
+  {
+   "item": "Monthly return to CSTRI headquarters — last month's copy exactly as submitted",
+   "whyItMatters": "Its breakdowns decide which facts must be captured at the counter and at the bench; this is the single highest-risk document of the two days.",
+   "filled": true
+  },
+  {
+   "item": "Annual return or annual performance statement — the last completed year",
+   "whyItMatters": "Adds the counters the monthly return does not carry, including trainings, demonstrations, participants and field visits.",
+   "filled": true
+  },
+  {
+   "item": "Approved testing charges in force — the copy carrying actual rupee figures",
+   "whyItMatters": "The list supplied so far is headed Proposed testing charges and carries no charges; without the priced card every invoice is wrong from day one.",
+   "filled": true
+  },
+  {
+   "item": "Calibration certificates for the skein balance, the platform balance and the drying oven",
+   "whyItMatters": "The first release refuses a result on an instrument with no valid calibration, so these dates must exist in the system before the first sample.",
+   "filled": true
+  },
+  {
+   "item": "Consumable and chemical stock register — pages showing lot numbers and expiry dates",
+   "whyItMatters": "The first release blocks an expired lot at the observation date, so the open lots and their expiries must be loaded on day one.",
+   "filled": true
+  },
+  {
+   "item": "Authorised signatory list or declaration, naming who may sign for which test areas",
+   "whyItMatters": "Nothing can be signed and no account can be opened until the system knows who is authorised for what.",
+   "filled": true
+  },
+  {
+   "item": "Quality manual extracts on report amendment, record retention and the format register",
+   "whyItMatters": "Sets the retention periods, the amendment rules and the existing document numbering convention, which the software should adopt rather than reinvent.",
+   "filled": false
+  }
+ ],
+ "measure": [
+  {
+   "quantity": "Lots registered on each of the two days, and the count for the same two dates one year earlier from the register",
+   "whyItMatters": "Everything from the hardware sizing to the batch-entry screen is built on this one figure; if it is out by more than double, the sizing has to be redone.",
+   "currentAssumption": "11,500 lots a year over 250 working days, so an average of 46 registered per working day."
+  },
+  {
+   "quantity": "Largest single intake from one sender in one go, across the two days, and the largest the staff can remember",
+   "whyItMatters": "Fixes how many rows the batch registration screen must handle in one action before it becomes slower than the register it replaces.",
+   "currentAssumption": "Peak of 80 lots in a day, arriving as two intake batches of 30 to 40, with market-day spikes."
+  },
+  {
+   "quantity": "Stopwatch time at the counter for the first lot of a bundle, and for the tenth lot of the same bundle",
+   "whyItMatters": "If the counter is already faster on paper than the target, the software will be abandoned within a fortnight.",
+   "currentAssumption": "Under 3 minutes for a single sample to a printed label, and under 24 seconds per lot after the first in a batch of 30."
+  },
+  {
+   "quantity": "Wall-clock minutes for one complete Limited Test batch, from leaving the counter to the last report printing, with the batch size, the number of workers and the machines used",
+   "whyItMatters": "This is the process the whole design is shaped around, and no published figure for Dharmavaram exists.",
+   "currentAssumption": "Taken from a comparable unit's published table: about 120 minutes for 1 to 5 lots with 2 workers, rising to 240 to 280 minutes for 26 to 30 lots."
+  },
+  {
+   "quantity": "Number of individual weighings recorded for one Limited Test lot, and the minimum number of skeins accepted",
+   "whyItMatters": "Decides how many reading rows exist per test, which is the largest set of records the system will hold, and the shape of the entry screen.",
+   "currentAssumption": "20 readings per test as the typical case, up to 80 for size deviation on coarse silk; a minimum of 5 skeins per Limited test."
+  },
+  {
+   "quantity": "Reports issued on each of the two days, and the total for the last full month from the despatch register",
+   "whyItMatters": "Sets the batch report-generation target and the printing load, and cross-checks the sample count independently.",
+   "currentAssumption": "About 11,000 reports a year, roughly one per sample."
+  },
+  {
+   "quantity": "Conditioned-mass or weight certificates issued in the last twelve months, and the number of lots and bales they covered",
+   "whyItMatters": "The bale weighings, tare build-up and drying series sit inside the first release; if the volume is large or nil, the first release changes size either way.",
+   "currentAssumption": "Published rate cards carry no conditioning line at all, so the specification assumes the work is occasional but builds the module in full."
+  },
+  {
+   "quantity": "Money receipts and invoices raised in the last full month, and the largest number of samples covered by a single invoice",
+   "whyItMatters": "Decides whether the consolidated invoice screen is a routine daily tool or a rare one, and sizes the receipt series.",
+   "currentAssumption": "3,000 to 6,000 invoices and receipts a year, one invoice covering up to 50 samples, sized for 500 invoices a month."
+  },
+  {
+   "quantity": "Days from receipt to handover for twenty recent reports, read off the two registers",
+   "whyItMatters": "The promised date and the overdue list are meaningless until the real turnaround is known, and the working-calendar rules depend on it.",
+   "currentAssumption": "The published service standard of 2 to 3 days for mechanical and chemical testing."
+  },
+  {
+   "quantity": "Count and duration of every power cut and every internet drop across the two days, and what a battery backup covers if one exists",
+   "whyItMatters": "Decides the hardware list, whether the server needs its own backup supply, and whether bench tablets need to buffer readings at all.",
+   "currentAssumption": "About 5 power cuts a week, no uninterruptible power supply, and an unreliable broadband line."
+  },
+  {
+   "quantity": "Working computers, printers by type, and live network points, counted by walking to each one",
+   "whyItMatters": "This is the hardware quotation; it cannot be written from a description and it cannot be corrected cheaply after purchase.",
+   "currentAssumption": "4 computers of a modest reference specification, a wired network still to be installed, one monochrome laser and one label printer to be bought, and no dot-matrix."
+  },
+  {
+   "quantity": "Test mix for the last full month, by test name, taken from the register rather than from memory",
+   "whyItMatters": "If the non-Limited work is materially more than assumed, the per-test screens matter far more than the batch screen and the build order changes.",
+   "currentAssumption": "About 98 per cent Limited test, with the remainder split across full grading, twist, twisted-yarn denier and water testing."
+  }
+ ],
+ "questions": [
+  {
+   "id": "OPEN-Q-T12",
+   "ask": "Can we have the actual monthly return you sent to CSTRI last month — the real one as it went, not a blank format — and the annual one for the last full year?",
+   "whyBlocking": "The return decides which facts have to be captured at the counter and at the bench. If the records are designed first and the return is fitted afterwards, the wrong facts get captured for a year and somebody quietly starts keeping a spreadsheet again.",
+   "defaultIfSilent": "Build the return from the published annual-report table — samples by test name plus revenue — and accept that the first real month will need rework. Do not defer it to a later phase."
+  },
+  {
+   "id": "OPEN-Q-B5",
+   "ask": "When you weigh a conditioning lot of four bales, is that one job with four bales inside it, or four jobs? And when a twister sends twelve cones at once, is that one sample or twelve?",
+   "whyBlocking": "Everything the software counts hangs off what one sample is — the register, the report, the charge and the figure in the monthly return. It is the one answer that cannot be corrected later without starting the records again.",
+   "defaultIfSilent": "The lot, the unit that is graded or settled, is the sample; the bales, books, cones and skeins inside it are parts of that sample and carry suffixed numbers."
+  },
+  {
+   "id": "OPEN-Q-T11",
+   "ask": "Of the books you keep by hand today, which would you be happy to stop writing on the day this starts, and which must carry on in ink whatever happens? And how far back should we load the old reports?",
+   "whyBlocking": "This is the line between what is built for the first release and what is not. A half-migrated launch, where some work is in the machine and some is still in a book, is worse than a launch a month later.",
+   "defaultIfSilent": "Replace the sample register, the test register, the report register, the calibration register and the stock register; load twelve months of past reports as an index plus every sample still open; keep the bound money-receipt book on paper for now."
+  },
+  {
+   "id": "OPEN-Q-T15",
+   "ask": "On the last working day before we start, what is the last number used in each book — reports, money receipts, conditioning certificates, invoices? Should we carry on from there, or start fresh at one?",
+   "whyBlocking": "A number issued twice, once by hand and once by the machine, is a records problem that cannot be undone afterwards. Every series has to be set before the first document is issued.",
+   "defaultIfSilent": "Continue every series from the next number after the highest already used this financial year, written down and signed by you on the day we switch over."
+  },
+  {
+   "id": "OPEN-Q-B10",
+   "ask": "Do Physical Testing and Chemical Testing keep separate books and separate serial numbers here? And on the monthly revenue sheet, what do PTS, PTA, CTS and CTA stand for?",
+   "whyBlocking": "A division letter cannot be added into a serial number after the first sample has been given one. If the two sides number separately, that has to be decided before a single sample is registered.",
+   "defaultIfSilent": "Build the sample number with a physical-or-chemical part switched off, and switch it on only if you confirm it before the first sample is registered."
+  },
+  {
+   "id": "OPEN-Q-T30",
+   "ask": "Do you still issue conditioned-mass — weight — certificates here? Roughly how many lots and bales a year, and under which charge head? And is the oven temperature and the drying rule written down anywhere in the unit?",
+   "whyBlocking": "The bale weighings, the itemised tare, the drying to constant mass and the eleven per cent addition are a substantial piece of the first release. Whether it is heavy daily work or an occasional job changes the delivery date of that release.",
+   "defaultIfSilent": "Build it inside the first release, sharing the same report numbering, signing and QR path as a test report, with the standard's constants held as data; assume low volume but plan the release at the longer end of its range."
+  },
+  {
+   "id": "OPEN-Q-D10",
+   "ask": "Can we sit down for two hours and write out every test you do — the standard it follows, how many weighings, the formula, how it is rounded, the minimum quantity and how long it takes? And who here should own that list after we finish?",
+   "whyBlocking": "Nothing can compute a result until that list exists. It is the largest single piece of preparation on the whole project, it belongs to the laboratory rather than to the developer, and it is the task most often left until it is too late.",
+   "defaultIfSilent": "Start with the Limited test alone and add the rest as they are encountered; if the list arrives late the first release slips by the same amount, so give it a named owner and a date of its own."
+  },
+  {
+   "id": "OPEN-Q-C17",
+   "ask": "The charge list we have is headed Proposed testing charges and carries no rupee figures. Is there an approved rate card later than 1 December 2023, and can we have the copy with the figures on it?",
+   "whyBlocking": "Without the priced card every invoice the system raises carries a wrong figure from the first day, on every customer.",
+   "defaultIfSilent": "Load the 1 December 2023 card as published, with the 15 November 2019 card behind it as superseded, so an old bill still reprints at the rate that was in force on its date."
+  },
+  {
+   "id": "OPEN-Q-C15",
+   "ask": "Your charge list runs from serial 3 to serial 30, but 1, 2, 16, 17 and 22 to 26 are not on it. What are those items?",
+   "whyBlocking": "Five of the seven entries on the accreditation annexure are fabric tests, and no fabric test appears anywhere on the list, so we cannot tell which catalogue item, if any, the accreditation actually covers.",
+   "defaultIfSilent": "Treat every catalogue item as outside the accredited scope, which is the safe direction, and correct individual items later against the named annexure row they map to."
+  },
+  {
+   "id": "OPEN-Q-C16",
+   "ask": "Do customers actually bring you fabric here — for length, mass, threads per unit length, warp and weft percentage by weight, and width — and yarn taken out of fabric? Do you charge for those?",
+   "whyBlocking": "Those five, plus woven fabric yarn density and raw silk yarn count, are the whole of the accreditation. If nobody asks for them, the accredited certificate is a document this unit will never print, and the plain certificate is the one to build and test first.",
+   "defaultIfSilent": "Assume they are rarely asked for; build the plain certificate as the primary document and keep the accredited one behind a per-item switch."
+  },
+  {
+   "id": "OPEN-Q-A6",
+   "ask": "Apart from yourself, who may put a signature on a report that leaves this unit, and for which kinds of test? Is that written down anywhere, and who covers when you are on tour?",
+   "whyBlocking": "Nothing can be signed until the system knows who is authorised for which parameters, and no login can be created for a person who has no staff record behind them. It is also the first list an assessor asks to see.",
+   "defaultIfSilent": "You alone as signatory for every test area the unit performs, with one named alternate for tour and leave, and the written declaration reference recorded as still to be obtained."
+  },
+  {
+   "id": "OPEN-Q-A7",
+   "ask": "On a busy day, does the same person sometimes do the test and also pass it? When that happens, should the machine refuse, let it through and note it, or ask for a second signature?",
+   "whyBlocking": "This decides whether ordinary work gets stopped or allowed on a three-person day. It has to be your decision, recorded once, rather than the developer's guess repeated forty times a week.",
+   "defaultIfSilent": "Refuse by default, but let you permit it yourself for a named person and a named method for a stated period, with each occurrence recorded on the record and counted in a monthly summary."
+  },
+  {
+   "id": "OPEN-Q-T31",
+   "ask": "For a signed certificate, is a valid digital signature what is needed, or must the file still be provable years after the signing certificate itself has expired? Can the Quality Manager put that answer on paper?",
+   "whyBlocking": "The stronger form needs the machine to reach the internet at the exact moment a report is signed, which this laboratory cannot depend on. And if the answer changes after go-live, every certificate issued in the meantime has to be signed again.",
+   "defaultIfSilent": "A valid digital signature, as answered verbally, with the document built so the stronger form can be added later as a separate copy without disturbing the file the customer already holds."
+  },
+  {
+   "id": "OPEN-Q-T10",
+   "ask": "How many computers are here and how old, is there a cable running between them, whose internet line is it and how often does it drop, is there a battery backup, and how many power cuts in a normal week?",
+   "whyBlocking": "The hardware list and its price cannot be written without these numbers, and the purchase has a lead time of its own.",
+   "defaultIfSilent": "Four computers of a modest specification, a wired network still to be laid, an unreliable broadband line, no battery backup, and about five power cuts a week."
+  },
+  {
+   "id": "OPEN-Q-T13",
+   "ask": "When this is finished, who owns the programme, the data and the manuals — the Board, or the developer? Can that be put on paper before the first payment is made?",
+   "whyBlocking": "A government unit that cannot get hold of its own code and its own data has bought a dependency rather than a system. It costs nothing to settle now and cannot be settled later.",
+   "defaultIfSilent": "The Central Silk Board owns the code, the data and the documentation; the repository is handed over before final payment; the developer keeps no exclusivity. Settle in writing before work starts."
+  },
+  {
+   "id": "OPEN-Q-T17",
+   "ask": "Where does the testing money physically end up — a Board bank account, or the government account through a Pay and Accounts Office? And which ways do people actually pay here: cash, demand draft, the online portal, a bank challan?",
+   "whyBlocking": "It decides what a receipt has to carry, what the day's collection sheet balances against, and whether the system needs to store challan and disbursing-officer references at all.",
+   "defaultIfSilent": "Record every route without committing to one, and switch on only the routes the unit confirms, so a new route later is a setting rather than a rebuild."
+  }
+ ],
+ "dayPlan": [
+  {
+   "day": "Day one",
+   "focus": "The counter and the bench: one Limited Test batch followed from the moment it arrives to the moment the report is handed over. Watch, time, write. Ask almost nothing before four o'clock.",
+   "slots": [
+    "08:45 — arrive before the staff. Walk both rooms while they are empty; sketch the benches, instruments, computers, printers, power points and network points",
+    "09:15 — stand at the counter with a stopwatch as the first samples arrive. Time each arrival and each register entry. Do not interrupt",
+    "10:30 — follow one intake batch to the testing room. Note exactly where it is put down, who carries it, and whether anything is written at the handover",
+    "11:00 — winding, wrap reel and kilcha. Count workers, machines, reel length, minutes per lot, and every wait",
+    "12:30 — the denier computer. Watch the readings go in; ask whether it saves anything to disk and whether it can produce a file. Keep one printout",
+    "13:00 — lunch. Write up the morning while it is fresh; do not ask questions over lunch",
+    "14:00 — the arithmetic and the checking step. Record one lot's twenty raw values and every figure derived from them, in the order they appeared",
+    "15:00 — report typing, numbering, signing and stamping. Watch the exact moment the number is allotted",
+    "16:00 — handover and money. Time one telephone status enquiry with a stopwatch. Collect used counterfoils from the receipt book",
+    "16:45 — the end-of-day close and the retention shelf. Note the closing totals and how the oldest sample on the shelf is identified",
+    "17:15 — photograph every document collected so far, page by page, before leaving the building"
+   ]
+  },
+  {
+   "day": "Day two",
+   "focus": "Everything that is not a Limited Test, the equipment and stock walk-round, the office papers, and the answer sheet with the Unit In-Charge in one uninterrupted sitting.",
+   "slots": [
+    "09:00 — back at the counter with yesterday's notes open. Check whether yesterday was a typical day or a quiet or heavy one, and record the difference",
+    "09:45 — whatever non-Limited work runs today: grading, twist, twisted denier, zari, cocoon or water. Time it and keep its worksheet",
+    "11:00 — equipment walk-round: skein balance, platform balance, oven, standard weights, photograph sets. Open the calibration folder and photograph the current certificate for each",
+    "12:00 — the stock cupboard and the retention shelf. Photograph the stock register pages showing lot numbers and expiry dates",
+    "12:45 — lunch, and write up the morning",
+    "13:30 — the office papers: the monthly return as submitted, the annual return, the report despatch register, the daily collection register, a real tax invoice, the priced rate card, the signatory list, the quality manual pages. Photograph everything",
+    "15:00 — the one-page answer sheet with the Unit In-Charge, in one sitting, without interruption. Record the answer or the agreed default beside every question, and read each one back",
+    "16:30 — start the test catalogue spreadsheet in the room with him: the first ten tests with their standards, readings, formulae and rounding. Agree who owns it and by what date the rest arrives",
+    "17:00 — read the two days back to him in five minutes: what was seen, what was collected, what was measured, and what is still open. Correct on the spot rather than by email later"
+   ]
+  }
+ ]
+}

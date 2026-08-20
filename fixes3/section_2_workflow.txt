@@ -1,0 +1,45 @@
+====================================================================================================
+FINDING 1 of 3  [Major]
+LOCATOR: §10.1 The series (Credit Note row) and WF-99
+EXACT TEXT IN THE DOCUMENT:
+| **Credit Note number** | `DVM/C/<FY4>/<4>` | `DVM/C/2627/0011` | Financial year | Accounts, Unit Incharge, and the customer | **Gap-free and statutory.** Must reference the invoice number and date it adjusts. |
+PROBLEM:
+The debit note is promised in four places and specified in none. section_1_foundation.md gives Accounts the power to "Raise and issue invoices, bills of supply, receipt vouchers, credit and debit notes and refund vouchers"; M1-68 lists "Debit Note" among the series that must exist, with the acceptance check "Every document type in the list has a configured series before go-live"; §25.2 gives `txn_invoice` a `doc_type` covering "credit note, debit note"; and §26.4 puts "credit and debit note" in Phase 2 scope. But §10.1 defines no debit-note format, the sixteen-character sentence names only five length-constrained series, WF-99 omits it from the gap-free list, M17.4 contains no requirement for it, M17.1 has no screen for it and the M21.3 permission matrix has no row for it. This is the upward-correction instrument, which the ERP would have raised: M17-35's credit note reasons cover only over-charging, and M17-36 plus WF-100 forbid editing or cancelling an issued invoice, so an invoice that under-charged the customer — the wrong rate-card line, a missed priority surcharge, tax computed intra-State when the place of supply was another State — currently has no lawful correction path at all.
+REQUIRED FIX (paste-ready):
+Insert this row in §10.1 immediately after the Credit Note row:
+
+| **Debit Note number** | `DVM/D/<FY4>/<4>` | `DVM/D/2627/0006` | Financial year | Accounts, Unit Incharge, and the customer | **Gap-free and statutory.** Must reference the invoice number and date it adjusts. Raised only where the taxable value or the tax charged on an issued invoice was **less** than what is payable. |
+
+In the same section replace "Only five series are length-constrained — invoice, bill of supply, advance receipt voucher, refund voucher and credit note." with "Only six series are length-constrained — invoice, bill of supply, advance receipt voucher, refund voucher, credit note and debit note.", and in WF-99 replace "invoice, bill of supply, advance receipt voucher, refund voucher, credit note, money receipt" with "invoice, bill of supply, advance receipt voucher, refund voucher, credit note, debit note, money receipt".
+
+Then insert this row after M17-35 in parts/section_4_functional_support.md:
+
+| M17-35a | [MUST] | The system shall support a **debit note** referencing the original invoice number and date, for the case where the taxable value or the tax charged on that invoice was **less** than what is payable, with a reason from a controlled list (rate applied wrongly — under-charged; priority surcharge omitted; quantity under-billed; tax component computed wrongly; place of supply corrected; other with text) and an approver. It shall carry the same statutory fields, the same sixteen-character financial-year series rule and the same frozen-file rule as the tax invoice (M17-27, M17-28, M17-39), and shall increase the balance on the customer ledger (M17-21). An issued invoice shall never be edited to correct an under-charge; the debit note is the only instrument, as the credit note is the only instrument for an over-charge under M17-36. | Under-bill an invoice by applying the wrong rate-card line, then attempt to edit the issued invoice; refused, with the debit note route offered. Raise the debit note; it references the invoice number and date, takes the next number in its own series, and the customer ledger balance increases by the difference. |
+
+Finally add a row `| Debit note | – | – | – | R | A | R | C | – | – | R own |` to the M21.3 permission matrix beside "Credit note / refund voucher", and a "Debit Note" line to the M17.1 screen table.
+
+====================================================================================================
+FINDING 2 of 3  [Major]
+LOCATOR: § Entity glossary, Equipment
+EXACT TEXT IN THE DOCUMENT:
+The fixed-asset register (cost, supplier, depreciation, physical verification, condemnation) and the metrological control register (range, interval, calibration result, correction factors, out-of-service status) are two different registers with two different owners.
+PROBLEM:
+The glossary hands cost, supplier, physical verification and condemnation to a fixed-asset register with a different owner. Three of those four are now held by this system: M11-28 requires supplier and purchase cost, M11-29 requires the annual physical verification run with Lab In-Charge sign-off, and M11.5 makes Condemned a state of the equipment record with a condemnation order reference. Only depreciation and capitalisation sit elsewhere. A reader taking this entry at face value would build none of M11-28 or M11-29.
+REQUIRED FIX (paste-ready):
+Replace the sentence with:
+
+This system keeps a **working asset record** — supplier, purchase document, cost, date put to use, useful life, physical verification, condemnation reference — alongside the **metrological control register** (range, interval, calibration result, correction factors, out-of-service status). What it does not keep is the financial fixed-asset register: capitalisation, depreciation and book value stay with the unit's accounts wing and the parent institute, outside this software. Both records exist; they are not the same register.
+
+====================================================================================================
+FINDING 3 of 3  [Minor]
+LOCATOR: WF-3 (§ workflow rules), and the same phrase at §11 Proforma entity note and §10.1 Proforma row
+EXACT TEXT IN THE DOCUMENT:
+| **WF-3** | [MUST] | A Quotation is an estimate only. It never posts to accounts, never allots an invoice number, and carries a validity date. | Issue a quotation. No entry appears in any invoice or receipt register. |
+PROBLEM:
+"Posts to accounts" is ledger-posting language from the withdrawn design, where issued documents were pushed into the ERP to be posted. The general ledger is now out of scope and stays with the accounts wing (N2, M17 ownership note, M22.1), so nothing in this software posts to accounts and the negative statement implies a posting mechanism that other documents supposedly use. The phrase appears three times, all about the quotation and the proforma, and each time the thing actually meant is that the document creates no receivable and no entry in the customer ledger.
+REQUIRED FIX (paste-ready):
+Replace WF-3 with:
+
+| **WF-3** | [MUST] | A Quotation is an estimate only. It creates no charge on the customer ledger, never allots an invoice number, and carries a validity date. | Issue a quotation. No entry appears in the customer ledger, the invoice register or the receipt register. |
+
+At §11, replace "It creates no receivable, posts nothing to accounts, and is an **estimate**" with "It creates no receivable and no entry on the customer ledger, and is an **estimate**". In the §10.1 Proforma / advance demand row, replace "Not a tax document, so no length limit. Never posts to accounts." with "Not a tax document, so no length limit. A demand only: it creates no charge on the customer ledger and no entry in the invoice register."

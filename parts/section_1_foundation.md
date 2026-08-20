@@ -120,7 +120,7 @@ The following are deliberately **not** part of this project. They are listed so 
 |---|---|---|
 | N1 | Payroll, salary, leave, attendance, service records, pension | Handled by departmental systems. No overlap with laboratory work. |
 | N2 | General financial accounting — ledgers, budgets, grants, expenditure heads, trial balance | The unit's accounts wing owns this, on whatever books it already keeps. The LIMS raises test invoices and records receipts; it does not keep the books. |
-| N3 | Procurement workflow — indent, sanction, tender, GeM purchase, purchase order approval | Existing government process. The LIMS records what stock arrived and what it was used for. |
+| N3 | Procurement **beyond the laboratory's own indent** — sanction, tender, GeM purchase, purchase order approval, and payment to the supplier | Existing government process, owned by the unit's accounts wing. The LIMS **does** raise and approve the laboratory's own purchase indent, with its technical acceptance criteria per line (M12-21), and prints it for that process; it then records what stock arrived and what it was used for. It goes no further down the chain. |
 | N4 | Fixed-asset accounting, depreciation, condemnation committees, annual physical verification of assets | The LIMS holds the **metrological** equipment register — calibration, checks, status — and a working record of each instrument's purchase, cost and expected life, which calibration and traceability need. Fixed-asset accounting itself — capitalisation, depreciation, condemnation — belongs to the parent institute and the unit's accounts wing. Both records exist; they are not the same register. |
 | N5 | Research data analysis, statistical modelling, publication figures | Scientists use their own tools. The LIMS holds records; it is not an analysis package. |
 | N6 | Direct control of instruments — starting a test, setting a machine, driving a motor | Out of scope entirely and permanently. |
@@ -368,7 +368,7 @@ Every term used anywhere in this document is defined here in one plain sentence.
 - **Full workflow for trainings, demonstrations, awareness programmes and field visits.** Counts recorded for the headquarters return; no workflow.
 - **Payroll, leave, attendance and service records.**
 - **General financial accounting beyond test invoicing and receipts** — ledgers, budgets, expenditure heads and the trial balance stay with the unit's accounts wing.
-- **Procurement workflow** — indent, sanction, tender, purchase order approval.
+- **Procurement beyond the laboratory's own indent** — sanction, tender, purchase order approval and payment to the supplier. The laboratory's own indent, with the technical acceptance criteria against which the goods are checked on receipt, is raised and approved inside the system (M12-21) and printed for the unit's purchasing process.
 - **Fixed-asset financial accounting, depreciation and condemnation.** The metrological equipment register is in scope, together with the working record of what each instrument cost, because calibration and traceability need it. The financial asset register, with its capitalisation and depreciation, belongs to the parent institute and the accounts wing.
 - **Research data analysis and statistical modelling for publications.**
 - **Any form of instrument control.**

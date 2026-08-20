@@ -1,0 +1,13 @@
+====================================================================================================
+FINDING 1 of 1  [Major]
+LOCATOR: Non-goal N3 (line 123); repeated in §6.2 out-of-scope list (line 371)
+EXACT TEXT IN THE DOCUMENT:
+| N3 | Procurement workflow — indent, sanction, tender, GeM purchase, purchase order approval | Existing government process. The LIMS records what stock arrived and what it was used for. |
+PROBLEM:
+N3 excludes the indent, but the laboratory now raises and approves its own indent inside this system: M12 lists a "Purchase Indent" screen for the Store Keeper and Lab In-Charge, M12-21 is a [MUST] that refuses to save an indent line without technical acceptance criteria, M12-22 warns on an indent to a lapsed supplier, M19 fires an `INDENT_STATUS` notification, the M21.3 matrix carries a "Purchase indent — raise / approve" row, and M22.1 gives the LIMS mastery of "the technical requirement, the acceptance criteria and the laboratory's own approval". The non-goal was written when the ERP owned the indent. As it stands, the scope page a reader is told to read first (§6) tells him a [MUST] module is not being built, and Phase 3's costing has no visible home for it.
+REQUIRED FIX (paste-ready):
+| N3 | Procurement **beyond the laboratory's own indent** — sanction, tender, GeM purchase, purchase order approval, and payment to the supplier | Existing government process, owned by the unit's accounts wing. The LIMS **does** raise and approve the laboratory's own purchase indent, with its technical acceptance criteria per line (M12-21), and prints it for that process; it then records what stock arrived and what it was used for. It goes no further down the chain. |
+
+And in §6.2, replace the bullet "- **Procurement workflow** — indent, sanction, tender, purchase order approval." with:
+
+- **Procurement beyond the laboratory's own indent** — sanction, tender, purchase order approval and payment to the supplier. The laboratory's own indent, with the technical acceptance criteria against which the goods are checked on receipt, is raised and approved inside the system (M12-21) and printed for the unit's purchasing process.

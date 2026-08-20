@@ -94,37 +94,64 @@ build works with the line down (ARC-16).
 Re-run every check in this directory against those fonts once chosen. Two of the three findings
 above are font-dependent.
 
-## PLN-28 — what is proven and what is not
+## PLN-28 — complete
 
 | PLN-28 requirement | Status |
 |---|---|
 | Rendering throws no exception | **done** — HarfBuzz bridge |
 | Every string found in the extracted text layer | **done** — `ActualText` + cluster-level `ToUnicode` |
-| Signature applied; structure tree and byte range survive | **done** — `sign.js`, 2 tests |
-| Glyph stream matches harfbuzzjs, held as a golden file | **not built** |
-| `veraPDF -f ua1` passes | **not run** |
+| Glyph identifiers and advances held as a golden file | **done** — `test/fixtures/shaping-golden.json` |
+| `veraPDF -f ua1` passes | **done** — 106/106 rules, `isCompliant="true"` |
+| Signature applied; structure tree and byte range survive | **done** — and the **signed** file still passes 106/106 |
 
-Six tests, all green. Every assertion has been checked to fail when the code it guards is
-removed — except one, noted below.
+Nine tests. Run conformance with:
 
-### veraPDF has not been run here
+```bash
+JAVA_HOME=/opt/homebrew/opt/openjdk VERAPDF=/path/to/verapdf npm test
+```
 
-The claim that pdfkit can produce PDF/UA-1 output came from the investigation, not from this
-repository. **We have not validated it ourselves.** Java 8 is present on this machine, which
-may be too old for a current veraPDF. Until it is run, tagged-PDF conformance is inherited
-belief, not local evidence — treat it accordingly.
+Without `VERAPDF` the two conformance tests **skip loudly**. That is deliberate: a silent skip
+would let a non-conforming certificate ship.
 
-### One assertion whose failure mode could not be tested
+### What validation actually found, and why assuming would have failed
 
-`signing.test.js` guards against the fixture being untagged (`assert.ok(b > 0, …)`). Removing
-the `addStructure` call to test it makes pdfkit hang rather than fail — `doc.end()` never emits
-`end` when a structure element is opened and never added. The guard is correct, but its failure
-path is unverified. If you change that fixture, check it by hand.
+The first document this suite produced had a complete structure tree, correct `ActualText`, and
+byte-perfect shaping — and **failed PDF/UA-1 on 4 rules and 25 checks.** None of it was visible
+without a validator, and none of the other eight tests noticed:
+
+| Rule | What was missing |
+|---|---|
+| 7.1 t8 | XMP metadata declaring `pdfuaid:part` |
+| 7.1 t10 | `ViewerPreferences /DisplayDocTitle true` |
+| 7.2 t34 | determinable natural language for page content |
+| 7.2 t30 | determinable natural language for each `ActualText` span |
+
+Fixing those left two more that only appeared once the first four were gone:
+
+| Rule | What was wrong |
+|---|---|
+| 7.21.4.1 t1 | **Helvetica cannot be embedded.** A standard-14 font fails PDF/UA outright — Latin text needs a vendored face like everything else |
+| 7.21.4.2 t2 | the `/CIDSet` defect, exactly as ARC-49 predicts |
+
+**The claim that "pdfkit passes PDF/UA" was true of somebody else's document, not of ours.**
+Six separate defects sat between a correct-looking file and a conforming one.
+
+### Language is not one setting
+
+A certificate carries English, Telugu and Devanagari on one page, so a document-level `/Lang`
+cannot answer for all of it. Every run declares its own, and `writeText()` **throws** if Indic
+text arrives without one — a missing `lang` is a validation failure two rules deep, and far
+cheaper to catch at the call site.
+
+### The /CIDSet workaround
+
+`cidset-workaround.js` blanks the entry with equal-length spaces so **no byte offset moves** —
+rewriting the file would invalidate the xref, and padding in place is safe to apply before
+signing. `/CIDSet` is not required by PDF/UA at all, so removing it is correct rather than a
+fudge. When `pdfua.test.js` passes with that step removed, the upstream defect is fixed.
 
 ### The development signing key
 
 `test/fixtures/dev-signing.p12` is a self-signed throwaway, passphrase `test`, CN
-*"LIMS Development Signing Key (NOT FOR ISSUE)"*. It exists so the signing path can be tested
-without a real credential. It must never sign anything issued. The real key is whatever
-credential the Central Silk Board provides — an organisational Document Signer certificate, or
-a token — which is still an open question.
+*"LIMS Development Signing Key (NOT FOR ISSUE)"*. It must never sign anything issued. The real
+credential is whatever the Central Silk Board provides — still an open question.

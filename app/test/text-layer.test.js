@@ -30,6 +30,7 @@ const FONTS = {
 };
 
 // Words chosen because each one broke something during investigation.
+const LANG = { telugu: 'te-IN', devanagari: 'hi-IN' };
 const CASES = [
   ['telugu', 'ప్రయోగశాల'],      // "laboratory"
   ['telugu', 'పట్టు'],           // "silk" — extracted as పటు్ట, reordered
@@ -67,7 +68,7 @@ async function buildPdf(outPath) {
   for (const [script, str] of CASES) {
     const [file] = FONTS[script];
     doc.font(file).fontSize(18);
-    writeText(doc, root, str, { x: 60, y });
+    writeText(doc, root, str, { x: 60, y, lang: LANG[script] });
     y += 40;
   }
   root.end();

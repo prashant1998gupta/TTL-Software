@@ -1,0 +1,535 @@
+{
+  "te-laboratory": {
+    "text": "ప్రయోగశాల",
+    "glyphs": [
+      {
+        "id": 43,
+        "codePoints": [
+          3114,
+          3149,
+          3120
+        ],
+        "xAdvance": 711,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 633,
+        "codePoints": [],
+        "xAdvance": 0,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 468,
+        "codePoints": [
+          3119,
+          3147
+        ],
+        "xAdvance": 1607,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 25,
+        "codePoints": [
+          3095
+        ],
+        "xAdvance": 583,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 178,
+        "codePoints": [
+          3126,
+          3134
+        ],
+        "xAdvance": 882,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 51,
+        "codePoints": [
+          3122
+        ],
+        "xAdvance": 709,
+        "xOffset": 0,
+        "yOffset": 0
+      }
+    ]
+  },
+  "te-silk": {
+    "text": "పట్టు",
+    "glyphs": [
+      {
+        "id": 43,
+        "codePoints": [
+          3114
+        ],
+        "xAdvance": 711,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 33,
+        "codePoints": [
+          3103,
+          3149,
+          3103,
+          3137
+        ],
+        "xAdvance": 772,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 63,
+        "codePoints": [],
+        "xAdvance": 346,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 522,
+        "codePoints": [],
+        "xAdvance": 0,
+        "xOffset": -446,
+        "yOffset": 0
+      }
+    ]
+  },
+  "te-town": {
+    "text": "శ్రీ ధర్మవరం",
+    "glyphs": [
+      {
+        "id": 250,
+        "codePoints": [
+          3126,
+          3149,
+          3120,
+          3136
+        ],
+        "xAdvance": 550,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 644,
+        "codePoints": [],
+        "xAdvance": 0,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 3,
+        "codePoints": [
+          32
+        ],
+        "xAdvance": 283,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 41,
+        "codePoints": [
+          3111
+        ],
+        "xAdvance": 706,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 49,
+        "codePoints": [
+          3120,
+          3149,
+          3118
+        ],
+        "xAdvance": 556,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 921,
+        "codePoints": [],
+        "xAdvance": 259,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 54,
+        "codePoints": [
+          3125
+        ],
+        "xAdvance": 711,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 49,
+        "codePoints": [
+          3120,
+          3074
+        ],
+        "xAdvance": 593,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 6,
+        "codePoints": [],
+        "xAdvance": 507,
+        "xOffset": 0,
+        "yOffset": 0
+      }
+    ]
+  },
+  "te-surname-murthy": {
+    "text": "మూర్తి",
+    "glyphs": [
+      {
+        "id": 47,
+        "codePoints": [
+          3118,
+          3138
+        ],
+        "xAdvance": 1058,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 64,
+        "codePoints": [],
+        "xAdvance": 668,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 209,
+        "codePoints": [
+          3120,
+          3149,
+          3108,
+          3135
+        ],
+        "xAdvance": 593,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 651,
+        "codePoints": [],
+        "xAdvance": 0,
+        "xOffset": -26,
+        "yOffset": 0
+      }
+    ]
+  },
+  "te-surname-keerthi": {
+    "text": "కీర్తి",
+    "glyphs": [
+      {
+        "id": 219,
+        "codePoints": [
+          3093,
+          3136
+        ],
+        "xAdvance": 522,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 209,
+        "codePoints": [
+          3120,
+          3149,
+          3108,
+          3135
+        ],
+        "xAdvance": 593,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 651,
+        "codePoints": [],
+        "xAdvance": 0,
+        "xOffset": -26,
+        "yOffset": 0
+      }
+    ]
+  },
+  "te-conjunct-pru": {
+    "text": "ప్రు",
+    "glyphs": [
+      {
+        "id": 256,
+        "codePoints": [
+          3114,
+          3149,
+          3120,
+          3137
+        ],
+        "xAdvance": 998,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 649,
+        "codePoints": [],
+        "xAdvance": 0,
+        "xOffset": 0,
+        "yOffset": 0
+      }
+    ]
+  },
+  "dv-board": {
+    "text": "बोर्ड",
+    "glyphs": [
+      {
+        "id": 78,
+        "codePoints": [
+          2348,
+          2379
+        ],
+        "xAdvance": 571,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 42,
+        "codePoints": [],
+        "xAdvance": 259,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 68,
+        "codePoints": [
+          2352,
+          2381,
+          2337
+        ],
+        "xAdvance": 535,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 506,
+        "codePoints": [],
+        "xAdvance": 0,
+        "xOffset": 0,
+        "yOffset": 0
+      }
+    ]
+  },
+  "dv-report": {
+    "text": "प्रतिवेदन",
+    "glyphs": [
+      {
+        "id": 309,
+        "codePoints": [
+          2346,
+          2381,
+          2352
+        ],
+        "xAdvance": 569,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 545,
+        "codePoints": [
+          2340,
+          2367
+        ],
+        "xAdvance": 259,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 71,
+        "codePoints": [],
+        "xAdvance": 570,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 84,
+        "codePoints": [
+          2357,
+          2375
+        ],
+        "xAdvance": 556,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 40,
+        "codePoints": [],
+        "xAdvance": 0,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 73,
+        "codePoints": [
+          2342
+        ],
+        "xAdvance": 531,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 75,
+        "codePoints": [
+          2344
+        ],
+        "xAdvance": 555,
+        "xOffset": 0,
+        "yOffset": 0
+      }
+    ]
+  },
+  "dv-csb": {
+    "text": "केंद्रीय रेशम बोर्ड",
+    "glyphs": [
+      {
+        "id": 56,
+        "codePoints": [
+          2325,
+          2375,
+          2306
+        ],
+        "xAdvance": 768,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 512,
+        "codePoints": [],
+        "xAdvance": 0,
+        "xOffset": -221,
+        "yOffset": 0
+      },
+      {
+        "id": 306,
+        "codePoints": [
+          2342,
+          2381,
+          2352,
+          2368
+        ],
+        "xAdvance": 531,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 33,
+        "codePoints": [],
+        "xAdvance": 259,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 81,
+        "codePoints": [
+          2351
+        ],
+        "xAdvance": 580,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 3,
+        "codePoints": [
+          32
+        ],
+        "xAdvance": 260,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 82,
+        "codePoints": [
+          2352,
+          2375
+        ],
+        "xAdvance": 409,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 40,
+        "codePoints": [],
+        "xAdvance": 0,
+        "xOffset": -10,
+        "yOffset": 0
+      },
+      {
+        "id": 85,
+        "codePoints": [
+          2358
+        ],
+        "xAdvance": 680,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 80,
+        "codePoints": [
+          2350
+        ],
+        "xAdvance": 598,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 3,
+        "codePoints": [
+          32
+        ],
+        "xAdvance": 260,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 78,
+        "codePoints": [
+          2348,
+          2379
+        ],
+        "xAdvance": 571,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 42,
+        "codePoints": [],
+        "xAdvance": 259,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 68,
+        "codePoints": [
+          2352,
+          2381,
+          2337
+        ],
+        "xAdvance": 535,
+        "xOffset": 0,
+        "yOffset": 0
+      },
+      {
+        "id": 506,
+        "codePoints": [],
+        "xAdvance": 0,
+        "xOffset": 0,
+        "yOffset": 0
+      }
+    ]
+  }
+}

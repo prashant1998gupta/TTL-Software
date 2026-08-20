@@ -30,16 +30,28 @@ function needsActualText(s) {
  * @param {PDFDocument} doc      a pdfkit document created with { tagged: true }
  * @param {object} parent        the structure element this text belongs under
  * @param {string} text          the logical string, exactly as a human typed it
- * @param {object} [opts]        { x, y, tag, ...pdfkit text options }
+ * @param {object} [opts]        { x, y, tag, lang, ...pdfkit text options }
  * @returns {object} the structure element added, so callers can nest further
  */
 function writeText(doc, parent, text, opts = {}) {
-  const { x, y, tag = 'P', ...textOptions } = opts;
+  const { x, y, tag = 'P', lang, ...textOptions } = opts;
   const str = String(text);
 
   // Only Indic runs need ActualText. Latin text already round-trips, and adding the
   // override everywhere would hide a future regression behind a hardcoded answer.
-  const markOptions = needsActualText(str) ? { actual: str } : {};
+  const indic = needsActualText(str);
+  const markOptions = indic ? { actual: str } : {};
+
+  // PDF/UA requires the natural language of page content to be determinable (7.2 t34), and
+  // separately the language of an ActualText span (7.2 t30). A certificate here carries
+  // English, Telugu and Devanagari on one page, so the document-level /Lang cannot answer
+  // for all of it — each run declares its own. veraPDF fails the file without this.
+  if (lang) markOptions.lang = lang;
+  else if (indic) {
+    throw new Error(
+      `Indic text needs an explicit lang for PDF/UA (7.2 t30/t34): ${str.slice(0, 20)}`
+    );
+  }
 
   const element = doc.struct(tag, [doc.markStructureContent('Span', markOptions)]);
   parent.add(element);

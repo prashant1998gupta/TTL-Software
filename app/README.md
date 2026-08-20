@@ -93,3 +93,38 @@ build works with the line down (ARC-16).
 
 Re-run every check in this directory against those fonts once chosen. Two of the three findings
 above are font-dependent.
+
+## PLN-28 — what is proven and what is not
+
+| PLN-28 requirement | Status |
+|---|---|
+| Rendering throws no exception | **done** — HarfBuzz bridge |
+| Every string found in the extracted text layer | **done** — `ActualText` + cluster-level `ToUnicode` |
+| Signature applied; structure tree and byte range survive | **done** — `sign.js`, 2 tests |
+| Glyph stream matches harfbuzzjs, held as a golden file | **not built** |
+| `veraPDF -f ua1` passes | **not run** |
+
+Six tests, all green. Every assertion has been checked to fail when the code it guards is
+removed — except one, noted below.
+
+### veraPDF has not been run here
+
+The claim that pdfkit can produce PDF/UA-1 output came from the investigation, not from this
+repository. **We have not validated it ourselves.** Java 8 is present on this machine, which
+may be too old for a current veraPDF. Until it is run, tagged-PDF conformance is inherited
+belief, not local evidence — treat it accordingly.
+
+### One assertion whose failure mode could not be tested
+
+`signing.test.js` guards against the fixture being untagged (`assert.ok(b > 0, …)`). Removing
+the `addStructure` call to test it makes pdfkit hang rather than fail — `doc.end()` never emits
+`end` when a structure element is opened and never added. The guard is correct, but its failure
+path is unverified. If you change that fixture, check it by hand.
+
+### The development signing key
+
+`test/fixtures/dev-signing.p12` is a self-signed throwaway, passphrase `test`, CN
+*"LIMS Development Signing Key (NOT FOR ISSUE)"*. It exists so the signing path can be tested
+without a real credential. It must never sign anything issued. The real key is whatever
+credential the Central Silk Board provides — an organisational Document Signer certificate, or
+a token — which is still an open question.

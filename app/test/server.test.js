@@ -27,7 +27,7 @@ before(async () => {
     const psql = '/opt/homebrew/opt/postgresql@16/bin/psql';
     execSync(`${psql} -d postgres -c "DROP DATABASE IF EXISTS ttl_lims_test WITH (FORCE)"`, { stdio: 'pipe' });
     execSync(`${psql} -d postgres -c "CREATE DATABASE ttl_lims_test"`, { stdio: 'pipe' });
-    execSync('node src/server/migrate.js', { stdio: 'pipe', env: { ...process.env } });
+    execSync('node src/server/migrate.js --demo', { stdio: 'pipe', env: { ...process.env } });
   } catch (e) { available = false; return; }
   ({ pool, tx } = require('../src/server/db'));
   samples = require('../src/server/services/samples');
@@ -216,4 +216,90 @@ test('registration with an empty lot mark is refused BEFORE a number is consumed
   const after = (await pool.query(
     `SELECT next_no FROM sys_series WHERE series_code='SAMPLE'`)).rows[0].next_no;
   assert.equal(before, after, 'a refused registration must not burn a gap-free number');
+});
+
+test('amendment: the corrected certificate supersedes; the old QR names its replacement', async (t) => {
+  if (!available) return t.skip('postgres not available');
+  // The audit-critical path (M8-50s): a wrong certificate is never edited —
+  // it is superseded by a new one, with the reason on record and the old QR
+  // telling anyone who scans it what replaced it.
+  const s = await register();
+  await toSubmitted(s);
+  await tx((c) => samples.transition(c, { sampleId: s.id, action: 'VERIFY', user: U.verifier }));
+  const first = await reports.issue({ user: U.sign, sampleId: Number(s.id) });
+
+  await reports.amend({ user: U.sign, sampleId: Number(s.id),
+    reason: 'transcription error in skein 5' });
+  const G2 = [...G]; G2[4] = 1.062;
+  await results.saveAndSubmit({ user: U.tester, sampleId: s.id, grams: G2 });
+  await tx((c) => samples.transition(c, { sampleId: s.id, action: 'VERIFY', user: U.verifier }));
+  const second = await reports.issue({ user: U.sign, sampleId: Number(s.id) });
+
+  assert.notEqual(second.reportNo, first.reportNo, 'the amendment is a NEW report number');
+
+  const oldR = (await pool.query(
+    `SELECT status FROM txn_report WHERE report_no=$1`, [first.reportNo])).rows[0];
+  assert.equal(oldR.status, 'SUPERSEDED', 'the original is marked superseded, not deleted');
+
+  const newR = (await pool.query(
+    `SELECT r.supersedes_id, o.report_no AS old_no FROM txn_report r
+      JOIN txn_report o ON o.id = r.supersedes_id WHERE r.report_no=$1`, [second.reportNo])).rows[0];
+  assert.equal(newR.old_no, first.reportNo, 'the lineage names exactly what was replaced');
+
+  const oldPub = (await pool.query(
+    `SELECT status, replaced_by FROM sys_published_verification WHERE verify_token=$1`,
+    [first.token])).rows[0];
+  assert.equal(oldPub.status, 'SUPERSEDED');
+  assert.equal(oldPub.replaced_by, second.reportNo,
+    'scanning the OLD certificate must name the replacement');
+
+  const newPub = (await pool.query(
+    `SELECT status FROM sys_published_verification WHERE verify_token=$1`, [second.token])).rows[0];
+  assert.equal(newPub.status, 'CURRENT');
+
+  // And the corrected value is what the new certificate was computed from.
+  const cur = await results.current(pool, s.id);
+  assert.equal(cur[4], 1.062);
+
+  // The reason must ARRIVE on the issued report. It was first parked in
+  // sendback_reason, which VERIFY clears — so it reached the certificate as
+  // NULL every time. Review-confirmed; this pins the fix.
+  const reason = (await pool.query(
+    `SELECT amend_reason FROM txn_report WHERE report_no=$1`, [second.reportNo])).rows[0];
+  assert.equal(reason.amend_reason, 'transcription error in skein 5');
+
+  // And the sample page's own query must surface the NEW report, not whichever
+  // row the join happened to return — the superseded certificate was being
+  // shown as current.
+  const page = await samples.get(s.id);
+  assert.equal(page.report_no, second.reportNo,
+    'get() must join only the live report row');
+});
+
+test('CSV export neutralises a cell that begins like a formula', async (t) => {
+  if (!available) return t.skip('postgres not available');
+  // A walk-in "customer" named =HYPERLINK(...) must not execute at
+  // headquarters when the monthly register is opened in Excel.
+  await samples.register({ user: U.counter,
+    customerName: '=HYPERLINK("http://evil/x","open")', customerPhone: '9111111111',
+    lotMark: 'INJ-1', declaredDenier: '20/22', testId: 1 });
+  const { csvField } = require('../src/server/registers');
+  // The defence is at export: the emitted cell must open with an apostrophe
+  // so a spreadsheet reads text, not a formula.
+  assert.equal(csvField('=HYPERLINK("http://evil/x","open")'),
+    `"'=HYPERLINK(""http://evil/x"",""open"")"`);
+  assert.equal(csvField('+91 9440012345'), `"'+91 9440012345"`);
+  assert.equal(csvField('Sri Lakshmi Silks'), '"Sri Lakshmi Silks"',
+    'honest text must pass through unmarked');
+});
+
+test('an amendment without a reason is refused', async (t) => {
+  if (!available) return t.skip('postgres not available');
+  const s = await register();
+  await toSubmitted(s);
+  await tx((c) => samples.transition(c, { sampleId: s.id, action: 'VERIFY', user: U.verifier }));
+  await reports.issue({ user: U.sign, sampleId: Number(s.id) });
+  await assert.rejects(
+    () => reports.amend({ user: U.sign, sampleId: Number(s.id), reason: '' }),
+    /must record its reason/);
 });

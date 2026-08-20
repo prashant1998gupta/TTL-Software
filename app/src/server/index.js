@@ -42,6 +42,70 @@ function intParam(req, res, next) {
   next();
 }
 
+// ---- first-run setup (WF-112, go-live checklist, done as software) -------
+// Until setup has run there are no accounts and no opening numbers, so every
+// path leads to the one screen that creates them. The two questions it insists
+// on — the last sample number and the last report number in the PAPER books —
+// are the cut-over facts the specification says must never be guessed.
+const { hashPassword } = require('./auth');
+const { finYear } = require('./series');
+const cryptoMod = require('node:crypto');
+let setupDone = null; // cached after first check; a restart re-reads it
+
+async function needsSetup() {
+  if (setupDone) return false;
+  const { rows } = await pool.query(`SELECT 1 FROM sys_config WHERE key='setup_done'`);
+  if (rows.length) { setupDone = true; return false; }
+  return true;
+}
+
+app.use(async (req, res, next) => {
+  if (req.path.startsWith('/setup') || !(await needsSetup())) return next();
+  res.redirect('/setup');
+});
+
+app.get('/setup', async (req, res) => {
+  if (!(await needsSetup())) return res.redirect('/login');
+  res.send(pages.setup({}));
+});
+
+app.post('/setup', async (req, res) => {
+  if (!(await needsSetup())) return res.redirect('/login');
+  const b = req.body;
+  const sample = parseInt(one(b.lastSample), 10);
+  const report = parseInt(one(b.lastReport), 10);
+  const errs = [];
+  if (!one(b.username).trim()) errs.push('a username for the Unit In-Charge');
+  if (!one(b.fullName).trim()) errs.push('the In-Charge\u2019s full name');
+  if (one(b.password).length < 8) errs.push('a password of at least 8 characters');
+  if (!Number.isInteger(sample) || sample < 0) errs.push('the last sample number used in the paper register (0 if none)');
+  if (!Number.isInteger(report) || report < 0) errs.push('the last report number used (0 if none)');
+  if (errs.length) return res.send(pages.setup({ error: 'Still needed: ' + errs.join('; ') + '.', values: b }));
+
+  await tx(async (c) => {
+    const salt = cryptoMod.randomBytes(16).toString('hex');
+    await c.query(
+      `INSERT INTO mst_user (username, full_name, full_name_te, role, pass_salt, pass_hash)
+       VALUES ($1,$2,$3,'signatory',$4,$5)`,
+      [one(b.username).trim(), one(b.fullName).trim(), one(b.fullNameTe).trim() || null,
+       salt, hashPassword(one(b.password), salt)]);
+    // Continue the paper series, never restart them (WF-112).
+    await c.query(
+      `INSERT INTO sys_series (series_code, fin_year, next_no) VALUES
+       ('SAMPLE', $1, $2), ('REPORT', $1, $3)
+       ON CONFLICT (series_code, fin_year)
+       DO UPDATE SET next_no = EXCLUDED.next_no`,
+      [finYear(), sample + 1, report + 1]);
+    await c.query(`INSERT INTO sys_config (key, value) VALUES ('setup_done', now()::text)`);
+    await c.query(
+      `INSERT INTO txn_event (action, detail) VALUES ('SETUP',
+        jsonb_build_object('incharge', $1::text, 'opening_sample', $2::int, 'opening_report', $3::int))`,
+      [one(b.username).trim(), sample + 1, report + 1]);
+  });
+  setupDone = true;
+  res.redirect('/login');
+});
+
 app.get('/login', (req, res) => res.send(pages.login({})));
 app.post('/login', async (req, res) => {
   const sid = await auth.login(one(req.body.username), one(req.body.password));
@@ -146,10 +210,25 @@ app.post('/sample/:id/sendback', intParam, auth.requireUser('verifier', 'signato
 app.post('/sample/:id/issue', intParam, auth.requireUser('signatory'), act(async (req) => {
   await reports.issue({ user: req.user, sampleId: Number(req.params.id) });
 }));
+app.post('/sample/:id/amend', intParam, auth.requireUser('signatory'), act(async (req) => {
+  await reports.amend({ user: req.user, sampleId: Number(req.params.id),
+    reason: one(req.body.reason).trim() });
+}));
 app.post('/sample/:id/withdraw', intParam, auth.requireUser('signatory'), act(async (req) => {
   await reports.withdraw({ user: req.user, sampleId: Number(req.params.id),
     reason: one(req.body.reason).trim() });
 }));
+
+// The QR on the acknowledgement slip holds the bare sample number, so the
+// tester at the bench scans the slip with any phone or a ₹2,000 scanner and
+// lands on the sample — no typing, no transcription error.
+app.get('/slip-qr/:id.png', intParam, auth.requireUser(), async (req, res) => {
+  const s = (await pool.query(`SELECT sample_no FROM txn_sample WHERE id=$1`, [req.params.id])).rows[0];
+  if (!s) return res.status(404).end();
+  const QRCode = require('qrcode');
+  res.setHeader('Content-Type', 'image/png');
+  res.send(await QRCode.toBuffer(s.sample_no, { errorCorrectionLevel: 'M', margin: 0, width: 128 }));
+});
 
 // ---- the frozen file -----------------------------------------------------
 app.get('/report/:no.pdf', auth.requireUser(), async (req, res) => {
@@ -160,6 +239,13 @@ app.get('/report/:no.pdf', auth.requireUser(), async (req, res) => {
   res.send(r.pdf);
 });
 
+app.use('/admin', require('./admin'));
+app.use(require('./registers'));
+
 const PORT = process.env.LIMS_PORT || 8787;
-app.listen(PORT, '127.0.0.1', () =>
-  console.log(`LIMS internal: http://localhost:${PORT}  (login: lakshmi/ravi/suma/incharge, password dvm)`));
+app.listen(PORT, '127.0.0.1', async () => {
+  const demo = (await pool.query(
+    `SELECT 1 FROM sys_config WHERE key='setup_done' AND value='demo'`)).rows.length > 0;
+  console.log(`LIMS internal: http://localhost:${PORT}` +
+    (demo ? '  (demo accounts: lakshmi/ravi/suma/incharge, password dvm)' : ''));
+});

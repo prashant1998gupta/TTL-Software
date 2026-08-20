@@ -1,0 +1,14 @@
+# systemd unit for the Linux laboratory server. Copy both .service files to
+# /etc/systemd/system/, then: systemctl enable --now lims lims-verify
+[Unit]
+Description=Silk Testing Laboratory LIMS (internal)
+After=postgresql.service
+[Service]
+User=lims
+WorkingDirectory=/opt/lims/app
+ExecStart=/usr/bin/node src/server/index.js
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+[Install]
+WantedBy=multi-user.target

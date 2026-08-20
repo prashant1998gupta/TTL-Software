@@ -149,6 +149,9 @@ td a.no:hover{text-decoration:underline}
 const TABS = [
   ['/counter', 'Register a sample', ['counter', 'signatory', 'admin']],
   ['/work', "Today's work", ['counter', 'tester', 'verifier', 'signatory', 'admin']],
+  ['/register', 'Sample register', ['counter', 'verifier', 'signatory', 'admin']],
+  ['/day', 'Day sheet', ['counter', 'verifier', 'signatory', 'admin']],
+  ['/admin', 'Administration', ['signatory', 'admin']],
 ];
 
 function page({ title, user, active, flash, body }) {

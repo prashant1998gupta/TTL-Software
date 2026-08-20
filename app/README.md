@@ -7,7 +7,7 @@ path end to end, from the counter to a scanned QR code.
 
 | Piece | What it is |
 |---|---|
-| `src/server/` | The internal application — counter, worklist, bench, verification, issue |
+| `src/server/` | The internal application — counter, worklist, bench, verification, issue, **amendment**, administration, registers |
 | `verify-server.js` | The public QR verification service — its own process, reads only the published table |
 | `src/documents/` | The certificate path — tagged PDF/UA, Telugu via HarfBuzz, digital signature |
 | `src/calc/` | The calculation and grading engine — every constant in configuration |
@@ -40,8 +40,12 @@ the table owner — enforced by trigger, and tested by attempting the attack.
 ## Tests
 
 ```bash
-npm test                              # 49 tests: calc, documents, server workflow
+npm test                              # 52 tests: calc, documents, server workflow
 ```
+
+**Setting up a real laboratory server:** [SETUP.md](SETUP.md) — seven steps, no file editing;
+the application's first-run screen asks for the In-Charge account and the paper registers'
+last numbers, and refuses to guess either.
 
 The server tests recreate a throwaway `ttl_lims_test` database each run. The two PDF/UA
 conformance tests need `VERAPDF` and Java 11+ (see below); they skip loudly without.

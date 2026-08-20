@@ -1,0 +1,4 @@
+# Daily jobs (integrity check, calibration alerts): either a systemd timer, or
+# one cron line — the point is ONE entry, so there is one place to look.
+#   0 6 * * *  cd /opt/lims/app && /usr/bin/node src/server/jobs.js >> /var/log/lims-jobs.log 2>&1
+#   30 21 * * *  LIMS_BACKUP_DIR=/backup /opt/lims/app/deploy/backup.sh >> /var/log/lims-backup.log 2>&1

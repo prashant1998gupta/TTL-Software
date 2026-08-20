@@ -33,16 +33,38 @@ async function issue({ user, sampleId }) {
     const token = crypto.randomBytes(32).toString('base64url');
     const verifyUrl = `${VERIFY_BASE}/v/${token}`;
 
+    // Re-issue after an amendment: the report this one replaces, if any.
+    const prior = (await c.query(
+      `SELECT id, report_no, verify_token FROM txn_report
+        WHERE sample_id=$1 AND status='CURRENT' FOR UPDATE`, [sampleId])).rows[0];
+
     const signatory = (await c.query(`SELECT * FROM mst_user WHERE id=$1`, [user.userId])).rows[0];
     const { pdf, sha256 } = await certificate.render({
       sample: s, computed, readings, reportNo: no, verifyUrl,
+      supersedes: prior ? prior.report_no : null,
       signatory: { fullName: signatory.full_name, fullNameTe: signatory.full_name_te },
     });
 
     const r = (await c.query(
-      `INSERT INTO txn_report (report_no, sample_id, issued_by, pdf, pdf_sha256, computed, verify_token)
-       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id`,
-      [no, sampleId, user.userId, pdf, sha256, JSON.stringify(computed), token])).rows[0];
+      `INSERT INTO txn_report (report_no, sample_id, issued_by, pdf, pdf_sha256, computed,
+                               verify_token, supersedes_id, amend_reason)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
+      [no, sampleId, user.userId, pdf, sha256, JSON.stringify(computed), token,
+       prior ? prior.id : null, prior ? s.amend_reason : null])).rows[0];
+
+    if (prior) {
+      // The old certificate is not destroyed and not hidden: it is marked
+      // superseded, and anyone scanning ITS code is told, and told by what.
+      // EVERY earlier superseded version for this sample points at the newest
+      // report, so a twice-amended certificate's first QR names the one that
+      // is actually current, not a middle link that is itself superseded.
+      await c.query(`UPDATE txn_report SET status='SUPERSEDED' WHERE id=$1`, [prior.id]);
+      await c.query(
+        `UPDATE sys_published_verification SET status='SUPERSEDED', replaced_by=$2
+          WHERE (sample_no=$1 AND status='SUPERSEDED') OR verify_token=$3`,
+        [s.sample_no, no, prior.verify_token]);
+      await c.query(`UPDATE txn_sample SET amend_reason=NULL WHERE id=$1`, [sampleId]);
+    }
 
     await c.query(
       `INSERT INTO sys_published_verification
@@ -76,4 +98,16 @@ async function pdfFor(reportNoOrToken) {
   return rows[0] || null;
 }
 
-module.exports = { issue, withdraw, pdfFor, VERIFY_BASE };
+/** Begin an amendment: back to the bench with the reason on record. */
+async function amend({ user, sampleId, reason }) {
+  return tx(async (c) => {
+    await samples.transition(c, { sampleId, action: 'AMEND', user, detail: { reason } });
+    // The reason rides in its OWN column to the re-issue. It was first parked
+    // in sendback_reason — which the VERIFY step clears, so the reason arrived
+    // at the certificate as NULL every single time. Confirmed by review; the
+    // regression test now reads it back off the issued report row.
+    await c.query(`UPDATE txn_sample SET amend_reason=$2 WHERE id=$1`, [sampleId, reason]);
+  });
+}
+
+module.exports = { issue, withdraw, amend, pdfFor, VERIFY_BASE };

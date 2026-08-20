@@ -62,11 +62,17 @@ and contact the laboratory.</small></div></div>`));
   }
   const r = rows[0];
   const ok = r.status === 'CURRENT';
+  const verdict = { CURRENT: 'GENUINE — CURRENT', SUPERSEDED: 'GENUINE — SUPERSEDED',
+                    WITHDRAWN: 'GENUINE — WITHDRAWN' }[r.status] || r.status;
+  const explain = {
+    CURRENT: 'This certificate was issued by the laboratory and has not been amended or withdrawn.',
+    SUPERSEDED: `This certificate WAS issued by the laboratory but has been AMENDED. The current
+version is <b>${esc(r.replaced_by || '')}</b> — ask the customer for that one.`,
+    WITHDRAWN: 'This certificate WAS issued by the laboratory but has since been WITHDRAWN. Do not rely on it; contact the laboratory.',
+  }[r.status] || '';
   res.send(shell(`<div class="card">
-<div class="v ${ok ? 'ok' : 'bad'}">${ok ? 'GENUINE — CURRENT' : 'GENUINE — WITHDRAWN'}
-<small>${ok
-    ? 'This certificate was issued by the laboratory and has not been amended or withdrawn.'
-    : 'This certificate WAS issued by the laboratory but has since been WITHDRAWN. Do not rely on it; contact the laboratory.'}</small></div>
+<div class="v ${ok ? 'ok' : 'bad'}">${verdict}
+<small>${explain}</small></div>
 <div class="kv">
   <div class="k">Report No.</div><div>${esc(r.report_no)}</div>
   <div class="k">Sample No.</div><div>${esc(r.sample_no)}</div>

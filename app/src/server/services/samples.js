@@ -24,6 +24,11 @@ const TRANSITIONS = {
   VERIFY:     { from: 'SUBMITTED',  to: 'VERIFIED', roles: ['verifier', 'signatory'] },
   ISSUE:      { from: 'VERIFIED',   to: 'ISSUED', roles: ['signatory'] },
   WITHDRAW:   { from: 'ISSUED',     to: 'WITHDRAWN', roles: ['signatory'] },
+  // Amendment (M8-50s): the sample returns to the bench, the correction is a
+  // NEW generation of readings, and the re-issued certificate supersedes the
+  // old one — which stays retrievable and whose QR names its replacement.
+  // Never an edit; the audit trail shows the whole life.
+  AMEND:      { from: 'ISSUED',     to: 'IN_TEST', roles: ['signatory'] },
 };
 
 class Refused extends Error {}
@@ -51,6 +56,9 @@ async function transition(client, { sampleId, action, user, detail }) {
   }
   const sets = { VERIFY: ', verified_by=$3, verified_at=now(), sendback_reason=NULL' }[action] || '';
   const args = [rule.to, sampleId]; if (sets) args.push(user.userId);
+  if (action === 'AMEND' && !(detail && detail.reason)) {
+    throw new Refused('an amendment must record its reason');
+  }
   if (action === 'SEND_BACK') {
     await client.query(
       `UPDATE txn_sample SET status=$1, sendback_reason=$3 WHERE id=$2`,
@@ -142,7 +150,8 @@ async function worklist(q) {
   const args = q ? [`%${q}%`] : [];
   const { rows } = await pool.query(
     `SELECT s.*, r.report_no, r.verify_token, r.status AS report_status
-       FROM txn_sample s LEFT JOIN txn_report r ON r.sample_id = s.id
+       FROM txn_sample s LEFT JOIN txn_report r
+         ON r.sample_id = s.id AND r.status IN ('CURRENT','WITHDRAWN')
        ${where} ORDER BY s.id DESC LIMIT 200`, args);
   return rows;
 }
@@ -153,7 +162,10 @@ async function get(id) {
             u.full_name AS tester_name, v.full_name AS verifier_name,
             e.name AS equipment_name, e.code AS equipment_code, e.calibrated_to
        FROM txn_sample s
-       LEFT JOIN txn_report r ON r.sample_id = s.id
+       -- Only the LIVE report row: after an amendment the sample also has a
+       -- SUPERSEDED report, and an unfiltered join here showed the superseded
+       -- certificate as the sample's current one — confirmed by review.
+       LEFT JOIN txn_report r ON r.sample_id = s.id AND r.status IN ('CURRENT','WITHDRAWN')
        LEFT JOIN mst_user u ON u.id = s.tester_id
        LEFT JOIN mst_user v ON v.id = s.verified_by
        LEFT JOIN mst_equipment e ON e.id = s.equipment_id

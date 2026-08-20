@@ -40,7 +40,7 @@ async function main() {
   await pool.query(sql);
 
   await tx(async (c) => {
-    for (const [username, name, nameTe, role] of USERS) {
+    if (demo) for (const [username, name, nameTe, role] of USERS) {
       const salt = crypto.randomBytes(16).toString('hex');
       await c.query(
         `INSERT INTO mst_user (username, full_name, full_name_te, role, pass_salt, pass_hash)
@@ -58,14 +58,17 @@ async function main() {
        ('BAL-1','Analytical balance, Sartorius', (now() + interval '200 days')::date),
        ('BAL-2','Analytical balance, Shimadzu',  (now() - interval '10 days')::date)
        ON CONFLICT (code) DO NOTHING`);
-    // Legacy series continue from their last used number (WF-112): the paper
-    // register's last sample this year was 411.
-    await c.query(
-      `INSERT INTO sys_series (series_code, fin_year, next_no) VALUES
-       ('SAMPLE', $1, 412), ('REPORT', $1, 312)
-       ON CONFLICT (series_code, fin_year) DO NOTHING`, [finYear()]);
-
     if (demo) {
+      // Legacy series for the demo continue from a pretend paper register
+      // (WF-112). A REAL installation sets its own opening numbers in the
+      // first-run setup screen, and setup refuses to guess them.
+      await c.query(
+        `INSERT INTO sys_series (series_code, fin_year, next_no) VALUES
+         ('SAMPLE', $1, 412), ('REPORT', $1, 312)
+         ON CONFLICT (series_code, fin_year) DO NOTHING`, [finYear()]);
+      await c.query(
+        `INSERT INTO sys_config (key, value) VALUES ('setup_done','demo')
+         ON CONFLICT (key) DO NOTHING`);
       await c.query(
         `INSERT INTO mst_customer (name, name_te, phone, place) VALUES
          ('Sri Lakshmi Silks', 'శ్రీ లక్ష్మి సిల్క్స్', '9440012345', 'Dharmavaram'),
@@ -76,7 +79,8 @@ async function main() {
   });
 
   console.log(`migrated ${process.env.LIMS_DB || 'ttl_lims'}  (fy ${finYear()})` + (demo ? ' with demo data' : ''));
-  console.log('seeded users: incharge / suma / ravi / lakshmi  password: dvm  (DEVELOPMENT ONLY)');
+  if (demo) console.log('seeded users: incharge / suma / ravi / lakshmi  password: dvm  (DEVELOPMENT ONLY)');
+  else console.log('no users yet — the first visit to the application runs the setup screen');
   await pool.end();
 }
 main().catch((e) => { console.error(e); process.exit(1); });

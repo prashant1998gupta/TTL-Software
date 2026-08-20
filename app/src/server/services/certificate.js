@@ -25,9 +25,11 @@ const FONT = {
   dv: path.join(F, 'NotoSansDevanagari[wdth,wght].ttf'),
   latin: path.join(F, 'NotoSans[wdth,wght].ttf'),
 };
-// The development key. The real credential is whatever CSB issues (OPEN-Q on
-// the signing instrument); sign.js takes any PKCS#12, so only this path changes.
-const DEV_P12 = path.join(__dirname, '..', '..', '..', 'test', 'fixtures', 'dev-signing.p12');
+// The signing credential: the real PKCS#12 via LIMS_P12 when CSB provides it,
+// the development key otherwise — which is marked NOT FOR ISSUE in its own CN.
+const P12_PATH = process.env.LIMS_P12 ||
+  path.join(__dirname, '..', '..', '..', 'test', 'fixtures', 'dev-signing.p12');
+const P12_PASSPHRASE = process.env.LIMS_P12_PASSPHRASE || 'test';
 
 function fmtDate(d) {
   return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -36,7 +38,7 @@ function fmtDate(d) {
 /**
  * @returns {Promise<{pdf: Buffer, sha256: string}>} the signed, frozen file
  */
-async function render({ sample, computed, readings, reportNo, verifyUrl, signatory }) {
+async function render({ sample, computed, readings, reportNo, verifyUrl, signatory, supersedes }) {
   const { useHarfBuzz } = await import('../../documents/shaping.mjs');
   const doc = createDocument({
     title: `Test Report ${reportNo} — Silk Testing Laboratory, Dharmavaram`,
@@ -72,7 +74,15 @@ async function render({ sample, computed, readings, reportNo, verifyUrl, signato
   doc.moveDown(1.4);
 
   doc.font('latin').fontSize(13);
-  writeText(doc, root, 'TEST REPORT', { lang: 'en-IN', tag: 'H2', align: 'center', width: W, characterSpacing: 2 });
+  writeText(doc, root, supersedes ? 'AMENDED TEST REPORT' : 'TEST REPORT',
+    { lang: 'en-IN', tag: 'H2', align: 'center', width: W, characterSpacing: 2 });
+  if (supersedes) {
+    doc.font('latin').fontSize(9).fillColor('#8c1d2f').moveDown(0.2);
+    writeText(doc, root,
+      `This report amends and supersedes ${supersedes}, which is no longer valid.`,
+      { lang: 'en-IN', align: 'center', width: W });
+    doc.fillColor('black');
+  }
   doc.moveDown(0.8);
 
   // ---- particulars -------------------------------------------------------
@@ -190,8 +200,8 @@ async function render({ sample, computed, readings, reportNo, verifyUrl, signato
 
   const rendered = Buffer.concat(chunks);
   const { pdf: stripped } = stripCidSet(rendered);
-  const signed = await signPdf(stripped, fs.readFileSync(DEV_P12), {
-    passphrase: 'test',
+  const signed = await signPdf(stripped, fs.readFileSync(P12_PATH), {
+    passphrase: P12_PASSPHRASE,
     reason: `Issued test report ${reportNo}`,
     name: signatory.fullName,
   });

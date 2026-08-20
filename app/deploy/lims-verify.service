@@ -1,0 +1,12 @@
+[Unit]
+Description=Silk Testing Laboratory LIMS (public verification)
+After=postgresql.service
+[Service]
+User=lims
+WorkingDirectory=/opt/lims/app
+ExecStart=/usr/bin/node verify-server.js
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+[Install]
+WantedBy=multi-user.target

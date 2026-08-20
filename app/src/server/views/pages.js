@@ -50,7 +50,11 @@ ${registered ? `
 <div class="slip">
   <h3>Silk Testing Laboratory, Dharmavaram</h3>
   <div class="te">పట్టు పరీక్షా ప్రయోగశాల — నమూనా రసీదు</div>
-  <div class="n">${esc(registered.sample_no)}</div>
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="n">${esc(registered.sample_no)}</div>
+    <img src="/slip-qr/${registered.id}.png" width="64" height="64"
+         alt="QR of the sample number, for scanning at the bench">
+  </div>
   <div class="kv">
     <div class="k">Customer</div><div>${esc(registered.customer_name)}</div>
     <div class="k">Lot mark</div><div>${esc(registered.lot_mark)}</div>
@@ -192,9 +196,15 @@ ${computedPanel(computed)}
   <div class="k">Fingerprint</div><div class="mono">${esc(s.pdf_sha256)}</div>
 </div>
 ${['signatory', 'admin'].includes(user.role) ? `
-<form method="post" action="/sample/${s.id}/withdraw" style="margin-top:16px">
+<form method="post" action="/sample/${s.id}/amend" style="margin-top:16px">
+  <div class="inline"><input name="reason" placeholder="Reason for amendment (recorded, printed on the new certificate)" required>
+  <button class="btn ghost sm">Amend — back to the bench</button></div>
+  <p class="hint" style="margin:6px 0 0">The corrected certificate is a new report; this one stays
+  retrievable, marked superseded, and its QR names the replacement.</p>
+</form>
+<form method="post" action="/sample/${s.id}/withdraw" style="margin-top:12px">
   <div class="inline"><input name="reason" placeholder="Reason for withdrawal (recorded, shown on the QR page)" required>
-  <button class="btn ghost sm" style="color:var(--bad);border-color:var(--bad)">Withdraw the certificate</button></div>
+  <button class="btn ghost sm" style="color:var(--bad);border-color:var(--bad)">Withdraw outright</button></div>
 </form>` : ''}</div>`;
   }
   if (s.status === 'WITHDRAWN') {
@@ -308,4 +318,39 @@ function readingsTable(readings) {
   <div class="grid" style="margin-top:12px">${tds}</div></details>`;
 }
 
-module.exports = { login, counter, worklist, sample };
+// ---------------------------------------------------------------- first-run setup
+function setup({ error, values = {} }) {
+  const v = (k) => esc(values[k] || '');
+  return page({ title: 'First-run setup', user: null, body: `
+<div class="login-wrap"><div class="login" style="width:min(560px,100%)">
+  <div class="head">
+    <div class="te">మొదటి అమరిక</div>
+    <h1>Set up this installation</h1>
+    <div class="te">Runs once. Creates the Unit In-Charge's account and continues the paper registers' numbering.</div>
+  </div>
+  ${error ? `<div class="flash err">${esc(error)}</div>` : ''}
+  <div class="card">
+    <form method="post" action="/setup">
+      <div class="row"><label>Username</label><input name="username" value="${v('username')}" required autofocus></div>
+      <div class="row"><label>Full name<span class="sub">As it will appear on certificates</span></label>
+        <input name="fullName" value="${v('fullName')}" required></div>
+      <div class="row"><label>Name in Telugu<span class="sub">Optional</span></label>
+        <input name="fullNameTe" value="${v('fullNameTe')}"></div>
+      <div class="row"><label>Password<span class="sub">At least 8 characters</span></label>
+        <input name="password" type="password" required minlength="8"></div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+      <p class="hint" style="margin-bottom:14px"><b>The cut-over numbers.</b> Open the paper
+      registers and copy the LAST number used in each. The system continues from the next number —
+      a collision between a system number and a hand-written one is a records incident that cannot
+      be undone, so these are asked, not guessed.</p>
+      <div class="row"><label>Last sample number used<span class="sub">From the intake register; 0 for a brand-new series</span></label>
+        <input name="lastSample" value="${v('lastSample')}" inputmode="numeric" required></div>
+      <div class="row"><label>Last report number used<span class="sub">From the report-issue register</span></label>
+        <input name="lastReport" value="${v('lastReport')}" inputmode="numeric" required></div>
+      <div class="actions"><button class="btn" style="width:100%">Complete setup</button></div>
+    </form>
+  </div>
+</div></div>`});
+}
+
+module.exports = { login, counter, worklist, sample, setup };

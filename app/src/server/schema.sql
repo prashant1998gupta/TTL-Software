@@ -35,6 +35,14 @@ CREATE TABLE IF NOT EXISTS mst_test (
   is_active     BOOLEAN NOT NULL DEFAULT true
 );
 
+-- One row of configuration the whole installation reads (unit code, verify
+-- base URL, signing key path). A table, not a file, so it is backed up with
+-- everything else and survives a server move.
+CREATE TABLE IF NOT EXISTS sys_config (
+  key           VARCHAR(40) PRIMARY KEY,
+  value         TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS mst_equipment (
   id            BIGSERIAL PRIMARY KEY,
   code          VARCHAR(20) NOT NULL UNIQUE,
@@ -78,7 +86,11 @@ CREATE TABLE IF NOT EXISTS txn_sample (
   equipment_id  BIGINT REFERENCES mst_equipment(id),
   verified_by   BIGINT REFERENCES mst_user(id),
   verified_at   TIMESTAMPTZ,
-  sendback_reason TEXT
+  sendback_reason TEXT,
+  -- The amendment reason lives in its OWN column. It was first parked in
+  -- sendback_reason, which VERIFY clears — so the reason the whole amendment
+  -- machinery exists to record reached the certificate as NULL, every time.
+  amend_reason  TEXT
 );
 CREATE INDEX IF NOT EXISTS ix_sample_status ON txn_sample(status);
 CREATE INDEX IF NOT EXISTS ix_sample_customer ON txn_sample(customer_name);
@@ -112,7 +124,12 @@ CREATE TABLE IF NOT EXISTS txn_report (
   computed      JSONB NOT NULL,              -- the values as issued, for the record
   verify_token  VARCHAR(43) NOT NULL UNIQUE, -- unguessable, in the QR
   status        VARCHAR(12) NOT NULL DEFAULT 'CURRENT'
-                CHECK (status IN ('CURRENT','WITHDRAWN')),
+                CHECK (status IN ('CURRENT','SUPERSEDED','WITHDRAWN')),
+  -- Amendment lineage (M8-50s): a corrected certificate is a NEW report that
+  -- names what it replaces and why. The old file stays retrievable, marked
+  -- superseded; its QR names the replacement. Nothing is ever edited in place.
+  supersedes_id BIGINT REFERENCES txn_report(id),
+  amend_reason  TEXT,
   withdrawn_reason TEXT,
   withdrawn_at  TIMESTAMPTZ
 );
@@ -128,7 +145,8 @@ CREATE TABLE IF NOT EXISTS sys_published_verification (
   test_name     VARCHAR(120) NOT NULL,
   issued_on     DATE NOT NULL,
   pdf_sha256    CHAR(64) NOT NULL,
-  status        VARCHAR(12) NOT NULL DEFAULT 'CURRENT'
+  status        VARCHAR(12) NOT NULL DEFAULT 'CURRENT',
+  replaced_by   VARCHAR(30)                  -- report_no of the amendment, shown on the old QR
 );
 
 -- Append-only audit trail (M21). No UPDATE, no DELETE, ever.

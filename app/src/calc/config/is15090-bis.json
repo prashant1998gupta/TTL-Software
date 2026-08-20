@@ -1,0 +1,213 @@
+{
+  "$comment": [
+    "Seeded reference data for raw silk grading under IS 15090, BIS specification set.",
+    "",
+    "M1-51 and the M8.5 note in the specification both require that NONE of this appears in",
+    "program code. The engine reads this file; it knows no constant of its own.",
+    "",
+    "EVERY row carries \"confirmed\": false until the Unit In-Charge signs it off against a real",
+    "Dharmavaram grading worksheet (OPEN-Q-C13). While anything here is unconfirmed the engine",
+    "refuses to compute a grade in live mode — see grade.js. That is the recommended default of",
+    "OPEN-Q-C13: 'Do not compute a grade in a live system while any row is still unconfirmed.'",
+    "",
+    "The BIS tables deliberately differ from the ISA tables. They are separate records, not",
+    "translations of each other: IS 15090 states that 'the values in respect of maximum deviation",
+    "for various grades are different than those specified in International Silk Association",
+    "Standards'. Do not derive one from the other."
+  ],
+
+  "specSet": "BIS",
+  "standard": "IS 15090 (Parts 1-11):2002, Amendment No. 1 (February 2007)",
+  "effectiveFrom": "2026-08-01",
+  "confirmed": false,
+  "confirmedBy": null,
+  "confirmedOn": null,
+
+  "rounding": {
+    "$comment": "IS 2:1960 — retain the same number of significant places as the specified value.",
+    "rule": "IS_2_1960",
+    "confirmed": false,
+    "precision": {
+      "sizeDeviation":    { "tex": 3, "denier": 2 },
+      "maximumDeviation": { "tex": 2, "denier": 1 },
+      "averageSize":      { "tex": 3, "denier": 2 },
+      "cohesion":         { "strokes": 0 },
+      "evenness":         { "percent": 1 },
+      "cleanness":        { "percent": 1 },
+      "neatness":         { "percent": 0 }
+    }
+  },
+
+  "statistics": {
+    "$comment": [
+      "OPEN — the divisor is NOT specified by any source read for this project. IS 15090 prints a",
+      "worked frequency-distribution example (Fi, di, Fi*di, Fi*di^2) but the sources consulted did",
+      "not settle whether the divisor is n or n-1. Seeded as 'n' because the frequency-distribution",
+      "presentation of a complete enumeration of specimens reads as a population, but this is a",
+      "GUESS and is marked unconfirmed. A real worksheet settles it in one reading: recompute its",
+      "printed size deviation both ways and see which matches."
+    ],
+    "standardDeviationDivisor": "n",
+    "confirmed": false
+  },
+
+  "sizeCategories": {
+    "$comment": [
+      "Resolved from the size MARKED OR DECLARED on the bales, never from the measured size.",
+      "A lot marked 33 denier may measure 34.5 denier and still pass the 7 per cent gate of WF-74:",
+      "the marked size governs category resolution, the measured size governs only the",
+      "reading-count rule. See M1-51."
+    ],
+    "resolveFrom": "markedSize",
+    "confirmed": false,
+    "bands": [
+      { "category": "I",   "maxTex": 2.0,  "maxDenier": 18,   "minTex": null, "minDenier": null },
+      { "category": "II",  "maxTex": 3.6,  "maxDenier": 33,   "minTex": 2.1,  "minDenier": 19 },
+      { "category": "III", "maxTex": null, "maxDenier": null, "minTex": 3.7,  "minDenier": 34 }
+    ]
+  },
+
+  "characteristics": {
+    "$comment": [
+      "Authoritative Major / Auxiliary classification, per category. This is the store the grade",
+      "engine reads. The is_major_characteristic / is_auxiliary_characteristic booleans on",
+      "mst_method_parameter are non-authoritative report-ordering defaults ONLY and the engine must",
+      "never read them, because they cannot express maximumDeviation being major in Category III",
+      "and auxiliary in Categories I and II."
+    ],
+    "confirmed": false,
+    "byCategory": {
+      "I": {
+        "major": ["sizeDeviation", "evennessI", "evennessII", "cleanness", "averageNeatness", "lowNeatness"],
+        "auxiliary": ["maximumDeviation", "evennessIII", "windingBreaks", "tenacity", "elongation", "cohesion"]
+      },
+      "II": {
+        "major": ["sizeDeviation", "evennessI", "evennessII", "cleanness", "averageNeatness", "lowNeatness"],
+        "auxiliary": ["maximumDeviation", "evennessIII", "windingBreaks", "tenacity", "elongation", "cohesion"]
+      },
+      "III": {
+        "major": ["sizeDeviation", "evennessI", "evennessII", "cleanness", "averageNeatness", "lowNeatness", "maximumDeviation"],
+        "auxiliary": ["evennessIII", "windingBreaks", "tenacity", "elongation"]
+      }
+    }
+  },
+
+  "applicability": {
+    "$comment": "Applying cohesion to coarse silk produces a wrong grade that looks plausible, which is why the rule is stated rather than left implicit.",
+    "confirmed": false,
+    "cohesion": { "appliesWhenMarkedDenierAtMost": 33 }
+  },
+
+  "oneClassCap": {
+    "$comment": [
+      "An auxiliary result below the provisional grade's requirement pulls the grade down, but by",
+      "at most one class, and only for the characteristics listed. The cap list is category-scoped:",
+      "maximumDeviation is capped only where it is AUXILIARY (I and II). In Category III it is a",
+      "major test and the auxiliary cap cannot apply to it."
+    ],
+    "confirmed": false,
+    "maxClassesDropped": 1,
+    "appliesTo": {
+      "I":   ["evennessIII", "maximumDeviation"],
+      "II":  ["evennessIII", "maximumDeviation"],
+      "III": ["evennessIII"]
+    }
+  },
+
+  "grades": {
+    "$comment": [
+      "Ordered best to worst. The engine must support extension without a code change, so the",
+      "order is data. 'Lowest grade' means furthest along this list."
+    ],
+    "confirmed": false,
+    "order": ["4A", "3A", "2A", "A", "B", "C", "D", "E"]
+  },
+
+  "gradeTable": {
+    "$comment": [
+      "NOT SEEDED — deliberately left empty.",
+      "",
+      "The per-grade limit values for each characteristic are the heart of the grading tables and",
+      "were NOT available to this project. Inventing them would produce a grade that looks",
+      "plausible and is wrong, which is the worst possible failure for a document a buyer settles",
+      "money against. The engine therefore REFUSES to grade until this is populated, in draft mode",
+      "as well as live mode, and says so by name.",
+      "",
+      "Populate from the unit's own grade tables, one record per category per characteristic:",
+      "  { \"category\": \"II\", \"characteristic\": \"sizeDeviation\", \"limits\": [",
+      "      { \"grade\": \"4A\", \"max\": 0.00 }, { \"grade\": \"3A\", \"max\": 0.00 }, ... ] }",
+      "where 'max' is the worst value still allowed for that grade. Use 'min' instead for",
+      "characteristics where a higher value is better (neatness, tenacity, cohesion)."
+    ],
+    "confirmed": false,
+    "records": []
+  },
+
+  "repeatRules": {
+    "$comment": "WF-74. Compared against the size MARKED on the bales, not the measured average.",
+    "confirmed": false,
+    "conditionedSizeVsDeclared": {
+      "tolerancePercent": 7,
+      "direction": "either",
+      "onBreach": "discardSiblingAllocationsAndRepeat"
+    }
+  },
+
+  "readingCounts": {
+    "$comment": [
+      "CONFLICTING SOURCES — do not rely on either figure without a worksheet.",
+      "",
+      "The specification states 4 sizing skeins of 450 m from each of 10 bobbins = 40 readings for",
+      "silk up to 3.7 tex, and 8 sizing skeins of 112.5 m from each of 10 bobbins = 80 readings",
+      "from 3.8 tex upwards.",
+      "",
+      "The domain research instead records size deviation using 200 skeins x 450 m (fine) or",
+      "400 skeins x 112.5 m (coarse), weighed in 10 separate lots.",
+      "",
+      "These are not reconcilable by arithmetic and may reflect BIS versus ISA, or a full grading",
+      "versus the local Limited Test. The engine does not care how many readings there are - it",
+      "computes over what it is given - but the METHOD MASTER must state the required count, and",
+      "M6-03 enforces it. Settle this against a real worksheet before enforcing any count."
+    ],
+    "confirmed": false,
+    "sizeDeviation": [
+      { "appliesWhenMarkedTexAtMost": 3.7, "specimensPerBobbin": 4, "bobbins": 10, "skeinLengthMetres": 450,   "totalReadings": 40 },
+      { "appliesWhenMarkedTexAbove": 3.7,  "specimensPerBobbin": 8, "bobbins": 10, "skeinLengthMetres": 112.5, "totalReadings": 80 }
+    ],
+    "alternativeFromResearch": [
+      { "appliesWhenMarkedTexAtMost": 3.7, "skeins": 200, "skeinLengthMetres": 450,   "weighedInLots": 10 },
+      { "appliesWhenMarkedTexAbove": 3.7,  "skeins": 400, "skeinLengthMetres": 112.5, "weighedInLots": 10 }
+    ]
+  },
+
+  "maximumDeviation": {
+    "$comment": [
+      "From the coarsest and finest specimens, not from the full set. The count depends on",
+      "coarseness: 4 and 4 for finer silk, 8 and 8 for coarse."
+    ],
+    "confirmed": false,
+    "rules": [
+      { "appliesWhenMarkedTexAtMost": 3.7, "coarsest": 4, "finest": 4 },
+      { "appliesWhenMarkedTexAbove": 3.7,  "coarsest": 8, "finest": 8 }
+    ]
+  },
+
+  "lowNeatness": {
+    "$comment": "The mean of the worst one-fifth of panels — 4 of 20.",
+    "confirmed": false,
+    "worstFraction": 0.2
+  },
+
+  "conditionedSize": {
+    "$comment": [
+      "Oven-dry mass plus the official commercial allowance for silk. The 11 per cent regain is a",
+      "constant of trade and is verified; the oven temperature and the convergence thresholds are",
+      "standards constants and are also configuration, never code."
+    ],
+    "confirmed": false,
+    "regainPercent": 11,
+    "ovenTemperatureCelsius": 140,
+    "convergencePercent": 0.25,
+    "setAgreementTolerancePercent": 0.5
+  }
+}

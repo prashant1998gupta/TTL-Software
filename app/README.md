@@ -189,3 +189,131 @@ fudge. When `pdfua.test.js` passes with that step removed, the upstream defect i
 `test/fixtures/dev-signing.p12` is a self-signed throwaway, passphrase `test`, CN
 *"LIMS Development Signing Key (NOT FOR ISSUE)"*. It must never sign anything issued. The real
 credential is whatever the Central Silk Board provides — still an open question.
+
+### The four critical npm advisories — assessed, not reachable
+
+`npm audit` reports **4 critical** advisories against `crypto-js <= 4.1.1`, reached through
+`@signpdf/placeholder-plain` → `@signpdf/placeholder-pdfkit010` → `pdfkit 0.9.0–0.12.1`. There is
+no upstream fix. Recording the assessment here so it is not rediscovered and re-litigated every
+few months, and so there is an answer ready when an assessor asks.
+
+**The vulnerable code never executes on our path.** Verified by running the real placeholder call
+and inspecting the module cache afterwards:
+
+```
+placeholder produced bytes: 18570
+crypto-js modules loaded   : NONE
+nested old pdfkit loaded   : NONE
+```
+
+`plainAddPlaceholder` inserts the signature placeholder by byte manipulation. It never enters the
+pdfkit-based branch, so neither the old nested `pdfkit` nor `crypto-js` is ever loaded. Our own
+direct `pdfkit` is 0.19.1 and is not affected. The advisories describe weak PBKDF2 and insufficient
+entropy in cryptographic secret generation — neither is on any path we call, and the signature
+itself is produced by `@signpdf/signer-p12` from the P12 credential, not by `crypto-js`.
+
+**What would make it reachable:** switching from `plainAddPlaceholder` to the pdfkit-based
+placeholder (`@signpdf/placeholder-pdfkit010` directly, or `pdfkitAddPlaceholder`). If anyone ever
+does that, this assessment is void and the dependency must be replaced first.
+
+**Re-check it like this** — do not take this paragraph on trust once the dependency tree changes:
+
+```bash
+node -e "
+const { plainAddPlaceholder } = require('@signpdf/placeholder-plain');
+const PDFDocument = require('pdfkit');
+const doc = new PDFDocument(); doc.text('x'); doc.end();
+const chunks = []; doc.on('data', c => chunks.push(c));
+doc.on('end', () => {
+  plainAddPlaceholder({ pdfBuffer: Buffer.concat(chunks), reason: 't', signatureLength: 8192 });
+  const bad = Object.keys(require.cache).filter(k => k.includes('crypto-js'));
+  console.log('crypto-js loaded:', bad.length ? bad : 'NONE');
+});
+"
+```
+
+`NONE` means this assessment still holds. Anything else means it does not.
+
+---
+
+# Calculation and grading engine
+
+The specification names three items as carrying most of the schedule risk, to be attacked first
+rather than left to the end. The tagged and signed PDF was the first. This is the second: the
+calculation and grading engine a non-programmer must be able to author (NFR-109, AC-38).
+
+```
+src/calc/
+  stats.js       n, mean, standard deviation, CV%, min, max, range — and the
+                 frequency-distribution form IS 15090 prints its worked example in
+  rounding.js    IS 2:1960 half-up, at the precision configured per characteristic AND unit
+  formulas.js    sizeDeviation, maximumDeviation, averageNeatness, lowNeatness, conditionedSize
+  grade.js       two-stage grading: majors set a provisional grade, auxiliaries cap one class
+  config/is15090-bis.json   every constant of the standard
+```
+
+`npm test` runs 28 tests for this component.
+
+## The engine knows no constant of its own
+
+M1-51 requires that none of the standard's reference data appears in program code. It does not.
+Size categories, the major and auxiliary sets per category, the one-class cap list, precision per
+unit, the 11 per cent regain, the 140 °C oven temperature, the 7 per cent repeat gate and the grade
+order all live in `config/is15090-bis.json`. Two tests assert this by reading the source and
+failing if a constant has crept in.
+
+The BIS and ISA tables are separate records, not translations of each other — IS 15090 states that
+its maximum-deviation values deliberately differ from the International Silk Association's.
+
+## It refuses rather than guesses
+
+A grade that looks plausible and is wrong is the worst outcome this system can produce: a buyer
+settles money against it and nobody can tell by looking. So the engine refuses, by name, when:
+
+| Refusal | Why |
+|---|---|
+| `no-grade-table` | The per-grade limits were **not available to this project and were deliberately not invented**. `gradeTable.records` ships empty and the engine will not grade until the laboratory's own tables are loaded. |
+| `unconfirmed-config` | In live mode, while any configuration row still reads `confirmed: false`. This is the recommended default of OPEN-Q-C13: do not compute a grade in a live system while any row is unconfirmed. Draft mode proceeds and returns the same list as warnings. |
+| `missing-marked-size` | The size category is resolved from the size **marked on the bales**, never the measured size. A lot marked 33 denier may measure 34.5 and still be Category II. |
+| `missing-major-result` | A major test cannot be skipped. Auxiliary results are optional. |
+| `bad-mode` | There is no default mode, because the difference is whether an unconfirmed grade table may be used. |
+
+`stats.standardDeviation` likewise refuses without an explicit `n` or `n-1`, because a silent
+default would bake an unverified choice into every grade the laboratory ever issues.
+
+## The three things that produce a plausible wrong grade
+
+Each has a test whose name says what it is guarding:
+
+1. **Category from the marked size, not the measured size.** Getting this backwards silently moves
+   a lot into the wrong grade table.
+2. **`maximumDeviation` is MAJOR in Category III and AUXILIARY in Categories I and II.** So it sets
+   the grade outright for coarse silk but can only cap it by one class for finer silk. The
+   classification is read per category from `characteristics.byCategory`. The
+   `is_major_characteristic` booleans on the parameter master cannot express this, which is why
+   M1-51 calls them non-authoritative — a test greps `grade.js` and fails if they are ever read.
+3. **Cohesion applies only at 33 denier or finer.** Gated twice: Category III does not list it, and
+   the applicability rule blocks it independently. The two gates coincide exactly, so either one
+   alone still holds the line if the other is edited.
+
+## What is NOT verified here
+
+Recorded so it is not mistaken for settled:
+
+- **The grade tables themselves.** Empty, deliberately. This is the single largest gap.
+- **The standard-deviation divisor.** No source read for this project settled whether it is `n` or
+  `n-1`. Seeded as `n`, marked unconfirmed. A real worksheet settles it in one reading: recompute
+  its printed size deviation both ways and see which matches.
+- **The maximum-deviation arithmetic.** The sources establish *which* specimens enter it — the four
+  coarsest and four finest, or eight and eight for coarse silk — but not the arithmetic applied to
+  them. Implemented as (mean of coarsest) − (mean of finest) and declared as an assumption in
+  `formulas.UNCONFIRMED_DEFINITIONS`.
+- **The reading counts conflict.** The specification says 4 sizing skeins from each of 10 bobbins
+  (40 readings), or 8 from each of 10 (80). The domain research instead records 200 skeins × 450 m
+  or 400 × 112.5 m, weighed in 10 lots. These do not reconcile by arithmetic and may reflect BIS
+  versus ISA, or a full grading versus the local Limited Test. Both are recorded in the config and
+  a test fails if the conflict is quietly resolved. The engine itself is indifferent — it computes
+  over whatever readings it is given — but the method master must state the required count.
+
+Every one of these is a question for the Unit In-Charge with a real grading worksheet in hand, and
+each is cheap to settle that way and impossible to settle without it.

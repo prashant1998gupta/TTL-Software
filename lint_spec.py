@@ -11,6 +11,7 @@ so they are checked here rather than spent on a reviewer's attention:
   * a numbering-format example that does not match its own format string
   * a question already marked ANSWERED that is still described as open, and a
     stated count of open questions that disagrees with the document itself
+  * a figure quoted in README.md that has drifted from the document it describes
 
 Usage: python lint_spec.py <spec.md>
 Exit status is 0 always; this reports, it does not gate.
@@ -212,6 +213,56 @@ def check_answered(lines, qdefined):
     return answered, stale, counts
 
 
+
+def check_readme(spec_text, defined_ids, qdefined, answered):
+    """
+    The README is the repository's front door and quotes figures from the
+    specification. Those figures drift silently every time the document grows,
+    and a wrong number there is the first thing a reader sees. Check the claims
+    against the document rather than trusting them.
+    """
+    problems = []
+    try:
+        with open("README.md", encoding="utf-8") as fh:
+            readme = fh.read()
+    except OSError:
+        return problems
+
+    words = len(spec_text.split())
+
+    m = re.search(r"([\d,]+) words, ([\d,]+) requirements", readme)
+    if m:
+        claimed_w = int(m.group(1).replace(",", ""))
+        claimed_r = int(m.group(2).replace(",", ""))
+        # Word counts move with every edit; allow 1%, but ids must be exact.
+        if abs(claimed_w - words) > words * 0.01:
+            problems.append("word count: README says %s, document has %s"
+                            % (f"{claimed_w:,}", f"{words:,}"))
+        if claimed_r != len(defined_ids):
+            problems.append("requirement count: README says %s, document defines %d"
+                            % (f"{claimed_r:,}", len(defined_ids)))
+
+    m = re.search(r"There are (\d+) such questions; (\w+) (?:are|is) answered", readme)
+    if m:
+        words_to_num = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
+                        "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12}
+        if int(m.group(1)) != len(qdefined):
+            problems.append("question count: README says %s, document defines %d"
+                            % (m.group(1), len(qdefined)))
+        claimed_a = words_to_num.get(m.group(2).lower())
+        if claimed_a is not None and claimed_a != answered:
+            problems.append("answered count: README says %s, document marks %d answered"
+                            % (m.group(2), answered))
+
+    for m in re.finditer(r"All (\w+) (?:lint )?checks (?:must|should) report zero", readme):
+        words_to_num = {"five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9}
+        n = words_to_num.get(m.group(1).lower())
+        if n is not None and n != 9:
+            problems.append('lint-check count: README says "%s", this script runs 9'
+                            % m.group(1))
+    return problems
+
+
 def main():
     path = sys.argv[1]
     lines = load(path)
@@ -221,6 +272,7 @@ def main():
     tables = check_tables(lines)
     formats = check_number_formats(lines)
     answered, stale_q, bad_counts = check_answered(lines, qdefined)
+    readme = check_readme("\n".join(lines), defined, qdefined, len(answered))
 
     print("SPEC LINT — %s" % path)
     print("  lines %d | requirement ids defined %d | open questions defined %d (%d answered, %d open)"
@@ -268,6 +320,12 @@ def main():
     print("6b. Stated question counts that disagree with the document: %d" % len(bad_counts))
     for num, kind, said, actual in bad_counts[:15]:
         print("   L%-6d says %d %s, document has %d" % (num, said, kind, actual))
+
+
+    print()
+    print("7. README claims that disagree with the document: %d" % len(readme))
+    for r in readme:
+        print("   %s" % r)
 
 
 if __name__ == "__main__":

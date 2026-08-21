@@ -2,3 +2,7 @@ node_modules/
 test/out-*.pdf
 demo-certificate.pdf
 .lims-db.json
+
+# test output
+out-*.pdf
+demo-certificate.pdf

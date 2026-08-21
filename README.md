@@ -36,8 +36,8 @@ downloaded from the foot of that page.
 | Document | For | Size |
 |---|---|---|
 | `index.html` — the visual guide, published at the link above | The Unit In-Charge. Start here. | ~20 min read |
-| `Silk Testing Laboratory System - Overview for the Lab.docx` | The laboratory, as a circulable Word file | 44,000 words |
-| `Silk Testing Laboratory System - Full Specification.docx` | The developer | 191,000 words, 1,280 requirements |
+| `Silk Testing Laboratory System - Overview for the Lab.docx` | The laboratory, as a circulable Word file | 45,532 words |
+| `Silk Testing Laboratory System - Full Specification.docx` | The developer | 200,649 words, 1,291 requirements |
 
 The overview is a strict subset of the full specification, so the two cannot disagree.
 The visual guide is one self-contained file: no external fonts, scripts or images, so it works offline,
@@ -56,7 +56,7 @@ Two independent tracks. Neither needs the other.
 npm install && bash build.sh && python3 lint_spec.py SPEC.md
 ```
 
-All eight lint checks must report zero. Everything is generated from `parts/`.
+All nine lint checks must report zero. Everything is generated from `parts/`.
 
 **The document component** — needs Node 20 or later:
 
@@ -64,7 +64,7 @@ All eight lint checks must report zero. Everything is generated from `parts/`.
 cd app && npm install && npm test
 ```
 
-Nine tests. The fonts are vendored in `app/vendor/fonts/`, so nothing is fetched.
+Fifty-two tests. The fonts are vendored in `app/vendor/fonts/`, so nothing is fetched.
 
 **To run the PDF/UA conformance tests** you also need veraPDF and a Java 11+ runtime. Both live
 on the build machine only and are never installed on the laboratory server, so they do not
@@ -111,8 +111,9 @@ python3 lint_spec.py SPEC.md
 ```
 
 Reports duplicate requirement identifiers, references to identifiers that were never defined,
-open questions referenced but never defined, malformed table rows, and numbering examples that
-contradict their own format string. All five checks should report zero.
+open questions defined twice or referenced but never defined, malformed table rows, numbering
+examples that contradict their own format string, answered questions still described as open,
+stated counts that disagree with the document, and README claims that have drifted from it. All nine checks should report zero.
 
 `python3 _inspect.py <file.docx>` round-trips a generated Word file and reports heading levels,
 table width agreement and whether the table-of-contents field is present.
@@ -155,7 +156,7 @@ An initial ten-point discussion note (reproduced verbatim in Appendix A) was exp
 specification. Domain facts were researched against 259 sources rather than assumed, and the
 research briefs in `parts/research_*.md` mark their own confidence — verified, inferred, or
 unverified. Where a fact could not be established, the document raises an **OPEN-Q** with a
-recommended default instead of asserting it. There are 110 such questions; seven are answered.
+recommended default instead of asserting it. There are 111 such questions; seven are answered.
 
 The draft was then reviewed adversarially. 129 findings were raised, each serious one independently
 re-checked — 42 were rejected as misreadings and 73 confirmed and applied, followed by a second pass
